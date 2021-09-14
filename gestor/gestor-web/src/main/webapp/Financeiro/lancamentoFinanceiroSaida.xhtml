@@ -33,7 +33,7 @@
         </style>
         <h:body style="background-color: white !important ; background-size: 100%;">
             <h:form id="form" style="height: 100% !important">
-                #{lancamentoController.lancamentoEntrada(true)}
+                #{lancamentoController.lancamentoEntrada(false)}
                 <h:panelGrid columns="4" cellpadding="3" cellspacing="3" style="width: 100%;  background-color: lightsteelblue; box-shadow: 10px 10px">
                     <h:graphicImage url="/Images/money-fly.png"  width="30px" height="30px" /> 
                     <p:outputLabel value="PAGAMENTOS" style="font-size: large !important; color: white" />
@@ -59,15 +59,15 @@
                                  scrollable="true"   style="height: 98%" 
                                  scrollRows="15" paginatorPosition="bottom"  value="#{lancamentoController.listarLancamentosSaida()}"  var="u"
                                  >
-                        <p:column headerText="#" width="5%">
+                        <p:column headerText="#" width="6%">
                             <p:commandLink actionListener="#{lancamentoController.setLancamentoFinanceiro(u)}" ajax="false"  immediate="true" >
                                 <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
                             </p:commandLink>
                         </p:column>
-                        <p:column   width="6%" headerText="Cód"  >
+                        <p:column   width="7%" headerText="Cód"  >
                             <p:outputLabel value="#{u.id}" style="text-align: center" /> 
                         </p:column>
-                        <p:column   width="18%" headerText="Responsavel" filterBy="#{u.usuario.nome}" style="text-align: center">
+                        <p:column   width="15%" headerText="Responsavel" filterBy="#{u.usuario.nome}" style="text-align: center">
                             <p:outputLabel value="#{not empty u.usuario ? u.usuario.nome : null}" style="text-align: center" /> 
                         </p:column>
                         <p:column rendered="#{usuarioController.empresa.loginKey ne 'BBERTUZZI'}"   width="20%" headerText="Colaborador" filterBy="#{u.usuarioFornecedor.nome}" >
@@ -246,8 +246,8 @@
                                      var="t" scrollHeight="300" scrollable="true"  scrollRows="10" >
                             <p:ajax process="@this" listener="#{lancamentoController.addParcela(t)}" event="rowSelect"  update="form" />
                             <p:ajax process="@this"  event="rowUnselect"  update="form" />
-                            <p:column selectionMode="multiple" style="width:6%;text-align:center"/>
-                            <p:column headerText="Sacado/cedente" >
+                            <p:column selectionMode="multiple" style="width:3%;text-align:center"/>
+                            <p:column headerText="Sacado/cedente" width="15%" >
                                 #{t.titulo.sacadoCedente}   
                             </p:column>
                             <p:column headerText="Venda" width="8%"> 
@@ -262,16 +262,21 @@
                                 <p:outputLabel id="data"  value="#{t.dataVencimento}"  >
                                     <f:convertDateTime pattern="dd/MM/yyyy" />
                                 </p:outputLabel>
+                                <p:commandLink  onclick="PF('dlgVcto').show();"  actionListener="#{lancamentoController.selecionarParcelaAltVcto(t)}" immediate="true"  >
+                                    <h:graphicImage url="/Images/edit.png"  width="15px" height="15px" />
+                                </p:commandLink>
+
                             </p:column>
-                            <p:column headerText="Responsável">
-                                #{not empty t.titulo.orcamento ? t.titulo.orcamento.usuario.nome : t.titulo.lancamentoFinanceiro.usuario.nome}
-                            </p:column>
-                            <p:column   width="15%" headerText="Valor "  style="text-align: left">
+
+                            <!--<p:column headerText="Responsável">-->
+                            <!--# {not empty t.titulo.orcamento ? t.titulo.orcamento.usuario.nome : t.titulo.lancamentoFinanceiro.usuario.nome}-->
+                            <!--</p:column>-->
+                            <p:column   width="13%" headerText="Valor "  style="text-align: left">
                                 <p:outputLabel value="#{t.valorParcela }" style="text-align: right" >
                                     <f:convertNumber currencySymbol="R$" type="currency"/>
                                 </p:outputLabel> 
                             </p:column>
-                            <p:column   width="15%" headerText="Saldo "  style="text-align: left">
+                            <p:column   width="13%" headerText="Saldo "  style="text-align: left">
                                 <p:outputLabel value="#{t.valorSaldo }" style="text-align: right; font-weight: bold" >
                                     <f:convertNumber currencySymbol="R$" type="currency"/>
                                 </p:outputLabel> 
@@ -279,6 +284,13 @@
                             <p:column   width="15%" headerText="Observaçoes "  style="text-align: left">
                                 <p:outputLabel value="#{t.titulo.lancamentoFinanceiro.observacao }" style="text-align: left" >
                                 </p:outputLabel> 
+                            </p:column>
+                               <p:column   width="5%" headerText="#"  style="text-align: left">
+                                   <p:commandLink  actionListener="#{lancamentoController.excluiParcela(t)}" immediate="true"  >
+                                    <h:graphicImage url="/Images/remove.png"  width="15px" height="15px" />
+                                    <p:confirm header="Confirmação" message="Deseja realmente excluir o Registro?" icon="ui-icon-alert" />
+                                </p:commandLink>
+                                       
                             </p:column>
                         </p:dataTable>
 
@@ -400,8 +412,6 @@
                     <p:commandLink value="NENHUM REGISTRO" style="color: white !important; float: right" actionListener="#{lancamentoController.lancamentoFinanceiro.setBanco(null)}" oncomplete="PF('dlgBanco').hide();"  />
                 </p:dialog>
 
-
-
                 <p:dialog  style="background-color: lightslategray; " 
                            widgetVar="dlgTpPagamento" id="dlgTpPagamento" height="500px" width="50%"  modal="true" header="Seleção de tipo de pagamento">
                     <p:dataTable    value="#{lancamentoController.listarTipoPagamentos()}" var="t" scrollRows="15" scrollable="true" scrollHeight="400"   >
@@ -452,6 +462,23 @@
                         </p:column>
                     </p:dataTable>
                     <p:commandLink value="NENHUM REGISTRO" style="color: white !important; float: right" actionListener="#{lancamentoController.lancamentoFinanceiro.setFornecedor(null)}" oncomplete="PF('dlgFornecedor').hide();"  />
+                </p:dialog>
+
+                <p:dialog  style="background-color: white; " 
+                           widgetVar="dlgVcto" id="dlgVcto" height="200px" width="300px"  modal="true" header="Alterar vencimento">
+                    <p:outputPanel autoUpdate="true" >
+                        <p:outputLabel value="Atual vencimento" style="font-weight: bold" /> <br/>
+                        <p:outputLabel value="#{lancamentoController.parcelaAltVcto.dataVencimento}"  >
+                            <f:convertDateTime pattern="dd/MM/yyyy" />                                   
+                        </p:outputLabel>
+                        <br/>
+                        <br/>
+                        <p:outputLabel value="Novo vencimento" style="font-weight: bold" /> <br/>
+                        <p:calendar  value="#{lancamentoController.novaDataVencimento}"  pattern="dd/MM/yyyy" mask="true"  >
+                         <p:ajax event="dateSelect" update="@this" />
+                        </p:calendar>
+                    </p:outputPanel>
+                    <p:commandButton value="SALVAR" style="color: green !important; float: right" actionListener="#{lancamentoController.alterarVencimento()}" oncomplete="PF('dlgVcto').hide();" />
                 </p:dialog>
 
                 <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">

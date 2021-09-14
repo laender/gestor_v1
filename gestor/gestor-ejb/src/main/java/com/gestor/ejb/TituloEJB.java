@@ -1,173 +1,153 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+// 
+// Decompiled by Procyon v0.5.36
+// 
+
 package com.gestor.ejb;
 
+import java.util.Iterator;
+import com.gestor.entidades.LancamentoParcela;
+import java.util.Collection;
+import com.gestor.entidades.Fornecedor;
+import javax.persistence.Query;
 import com.gestor.entidades.Cliente;
 import com.gestor.entidades.Empresa;
-import com.gestor.entidades.FormaPagamento;
-import com.gestor.entidades.Fornecedor;
-import com.gestor.entidades.LancamentoFinanceiro;
-import com.gestor.entidades.LancamentoParcela;
-import com.gestor.entidades.Orcamento;
-import com.gestor.entidades.Titulo;
-import com.gestor.entidades.TituloParcela;
 import com.gestor.entidades.Usuario;
 import com.gestor.enums.EnumTipoLancamento;
-import com.gestor.enums.EnumTipoTitulo;
-import com.gestor.util.GestorException;
-import com.gestor.util.Utils;
-import java.math.BigDecimal;
-import java.math.MathContext;
-import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
+import com.gestor.entidades.FormaPagamento;
 import java.util.List;
+import com.gestor.entidades.TituloParcela;
+import java.util.ArrayList;
+import java.math.RoundingMode;
+import java.math.MathContext;
+import com.gestor.util.Utils;
+import com.gestor.enums.EnumTipoTitulo;
+import java.math.BigDecimal;
+import java.util.Date;
+import com.gestor.util.GestorException;
+import com.gestor.entidades.Orcamento;
+import com.gestor.entidades.LancamentoFinanceiro;
+import javax.persistence.PersistenceContext;
+import javax.persistence.EntityManager;
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
+import com.gestor.entidades.Titulo;
 
-/**
- *
- * @author laender
- */
 @Stateless
 @LocalBean
-public class TituloEJB extends AbstractEJB<Titulo> {
-
+public class TituloEJB extends AbstractEJB<Titulo>
+{
     @PersistenceContext(unitName = "gestor-pu")
     private EntityManager em;
-
+    
     @Override
     protected EntityManager getEntityManager() {
-        return em;
+        return this.em;
     }
-
+    
     public TituloEJB() {
         super(Titulo.class);
     }
-
-    public void gerarTitulo(LancamentoFinanceiro lancamentoFinanceiro, Orcamento orcamento) throws GestorException {
-
+    
+    public void gerarTitulo(final LancamentoFinanceiro lancamentoFinanceiro, final Orcamento orcamento) throws GestorException {
         try {
-            em.detach(lancamentoFinanceiro != null ? lancamentoFinanceiro : orcamento);
-
+            this.em.detach((lancamentoFinanceiro != null) ? lancamentoFinanceiro : orcamento);
             Titulo titulo = this.gerarTituloCabecalho(lancamentoFinanceiro, orcamento);
-
             titulo = this.gerarParcelas(titulo, lancamentoFinanceiro, orcamento);
-
-            em.merge(titulo);
-        } catch (Exception e) {
+            this.em.merge((Object)titulo);
+        }
+        catch (Exception e) {
             e.printStackTrace();
             throw new GestorException("Erro ao gerar o titulo financeiro");
         }
-
     }
-
-    private Titulo gerarTituloCabecalho(LancamentoFinanceiro lancamentoFinanceiro, Orcamento orcamento) {
-        BigDecimal valorTitulo = lancamentoFinanceiro != null ? lancamentoFinanceiro.getValor() : orcamento.getValorTotal();
-        EnumTipoTitulo tipoTitulo = this.getTipoTitulo(lancamentoFinanceiro, orcamento);
-        Titulo titulo = new Titulo();
-        titulo.setDataEmissao(orcamento != null ? orcamento.getDataVenda() : new Date());
+    
+    private Titulo gerarTituloCabecalho(final LancamentoFinanceiro lancamentoFinanceiro, final Orcamento orcamento) {
+        final BigDecimal valorTitulo = (lancamentoFinanceiro != null) ? lancamentoFinanceiro.getValor() : orcamento.getValorTotal();
+        final EnumTipoTitulo tipoTitulo = this.getTipoTitulo(lancamentoFinanceiro, orcamento);
+        final Titulo titulo = new Titulo();
+        titulo.setDataEmissao((orcamento != null) ? orcamento.getDataVenda() : new Date());
         titulo.setValorTitulo(valorTitulo);
         titulo.setValorSaldo(valorTitulo);
         titulo.setTipo(tipoTitulo);
-        titulo.setTipoPagamento(lancamentoFinanceiro != null ? lancamentoFinanceiro.getTipoPagamento() : orcamento.getTipoPagamento());
+        titulo.setTipoPagamento((lancamentoFinanceiro != null) ? lancamentoFinanceiro.getTipoPagamento() : orcamento.getTipoPagamento());
         titulo.setLancamentoFinanceiro(lancamentoFinanceiro);
         titulo.setOrcamento(orcamento);
         titulo.setSacadoCedente(this.getSacadoCedente(orcamento, lancamentoFinanceiro));
-        titulo.setNumeroControle(lancamentoFinanceiro != null ? lancamentoFinanceiro.getNumeroControle() : null);
-        titulo.setUsuario(lancamentoFinanceiro != null ? lancamentoFinanceiro.getUsuario() : orcamento.getUsuario());
+        titulo.setNumeroControle((lancamentoFinanceiro != null) ? lancamentoFinanceiro.getNumeroControle() : null);
+        titulo.setUsuario((lancamentoFinanceiro != null) ? lancamentoFinanceiro.getUsuario() : orcamento.getUsuario());
         return titulo;
     }
-
-    private Titulo gerarParcelas(Titulo titulo, LancamentoFinanceiro lancamentoFinanceiro, Orcamento orcamento) throws GestorException {
-        TituloParcela tituloParcela;
-        FormaPagamento formaPagamento = lancamentoFinanceiro != null ? lancamentoFinanceiro.getFormaPagamento() : orcamento.getFormaPagamento();
-        Date dtVencPrimeiraParcOrct = orcamento != null && orcamento.getDataVencimento() != null ? orcamento.getDataVencimento(): null;
+    
+    private Titulo gerarParcelas(final Titulo titulo, final LancamentoFinanceiro lancamentoFinanceiro, final Orcamento orcamento) throws GestorException {
+        final FormaPagamento formaPagamento = (lancamentoFinanceiro != null) ? lancamentoFinanceiro.getFormaPagamento() : orcamento.getFormaPagamento();
+        final Date dtVencPrimeiraParcOrct = (orcamento != null && orcamento.getDataVencimento() != null) ? orcamento.getDataVencimento() : null;
         if (formaPagamento == null) {
             throw new GestorException("Forma de pagamento não informada");
         }
-        int numParcelas = formaPagamento.isVendaAPrazo() ? Utils.nvl(formaPagamento.getNumeroParcelas(), 1) : 1;
-        Integer diasVctPrimeiraParc = Utils.nvl(formaPagamento.getDiasVctoPrimeiraParcela(), 1);
-
-        Integer intervaloParcelas = Utils.nvl(formaPagamento.getIntervaloParcelas(), 0);
-        Date dataVctoPrimeiraParcela = lancamentoFinanceiro != null ? lancamentoFinanceiro.getDataVencimento() : dtVencPrimeiraParcOrct;
-        
+        final int numParcelas = formaPagamento.isVendaAPrazo() ? Utils.nvl(formaPagamento.getNumeroParcelas(), Integer.valueOf(1)) : 1;
+        final Integer diasVctPrimeiraParc = Utils.nvl(formaPagamento.getDiasVctoPrimeiraParcela(), Integer.valueOf(1));
+        final Integer intervaloParcelas = Utils.nvl(formaPagamento.getIntervaloParcelas(), Integer.valueOf(0));
+        final Date dataVctoPrimeiraParcela = (lancamentoFinanceiro != null) ? lancamentoFinanceiro.getDataVencimento() : dtVencPrimeiraParcOrct;
         Date dataVct = titulo.getDataEmissao();
-        BigDecimal valorParcela = titulo.getValorTitulo().divide(BigDecimal.valueOf(numParcelas), MathContext.DECIMAL128).setScale(2, RoundingMode.HALF_EVEN);
-        List<TituloParcela> parcelas = new ArrayList<>();
+        final BigDecimal valorParcela = titulo.getValorTitulo().divide(BigDecimal.valueOf(numParcelas), MathContext.DECIMAL128).setScale(2, RoundingMode.HALF_EVEN);
+        final List<TituloParcela> parcelas = new ArrayList<TituloParcela>();
         BigDecimal valorTotalParcela = BigDecimal.ZERO;
-        for (int i = 1; i <= numParcelas; i++) {
-            tituloParcela = new TituloParcela();
+        for (int i = 1; i <= numParcelas; ++i) {
+            final TituloParcela tituloParcela = new TituloParcela();
             tituloParcela.setTitulo(titulo);
-            tituloParcela.setNumeroParcela(i);
-            tituloParcela.setDataVencimento(this.adicionaDias(dataVct, diasVctPrimeiraParc, i, intervaloParcelas,dataVctoPrimeiraParcela));
+            tituloParcela.setNumeroParcela(Integer.valueOf(i));
+            tituloParcela.setDataVencimento(this.adicionaDias(dataVct, diasVctPrimeiraParc, i, intervaloParcelas, dataVctoPrimeiraParcela));
             dataVct = tituloParcela.getDataVencimento();
             tituloParcela.setValorParcela(valorParcela);
             tituloParcela.setValorSaldo(valorParcela);
             parcelas.add(tituloParcela);
             valorTotalParcela = valorTotalParcela.add(valorParcela);
         }
-        BigDecimal dif = titulo.getValorTitulo().subtract(valorTotalParcela);
+        final BigDecimal dif = titulo.getValorTitulo().subtract(valorTotalParcela);
         if (dif.compareTo(BigDecimal.ZERO) > 0) {
-            TituloParcela primeiraParcela = parcelas.get(0);
+            final TituloParcela primeiraParcela = parcelas.get(0);
             primeiraParcela.setValorParcela(primeiraParcela.getValorParcela().add(dif));
             primeiraParcela.setValorSaldo(primeiraParcela.getValorSaldo().add(dif));
         }
-        titulo.setParcelas(parcelas);
-
+        titulo.setParcelas((List)parcelas);
         return titulo;
     }
-
-    private Date adicionaDias(Date data, Integer diasVctPrimeiraParc, int contador, Integer intervalo, Date dataVctoPrimeiraParcela) {
-        Calendar c = Calendar.getInstance();
+    
+    private Date adicionaDias(final Date data, final Integer diasVctPrimeiraParc, final int contador, final Integer intervalo, final Date dataVctoPrimeiraParcela) {
+        final Calendar c = Calendar.getInstance();
         c.setTime(data);
-        int diasMes = intervalo == 30 ? c.getActualMaximum(Calendar.DAY_OF_MONTH) : intervalo;
+        final int diasMes = (intervalo == 30) ? c.getActualMaximum(5) : intervalo;
         if (dataVctoPrimeiraParcela != null && contador == 1) {
             c.setTime(dataVctoPrimeiraParcela);
-        } else {
-            c.add(Calendar.DATE, +(contador == 1 ? diasVctPrimeiraParc : diasMes));
+        }
+        else {
+            c.add(5, (contador == 1) ? ((int)diasVctPrimeiraParc) : diasMes);
         }
         return c.getTime();
     }
-
-    public Date getDataVencimentoMensal(int contador, Date dataVct) {
+    
+    public Date getDataVencimentoMensal(final int contador, final Date dataVct) {
         try {
-            Calendar cal = Calendar.getInstance();
+            final Calendar cal = Calendar.getInstance();
             cal.setTime(dataVct);
-            return (Date) em.createNativeQuery("select current_date + interval '" + contador + " month' ").getSingleResult();
-
-        } catch (Exception e) {
-            e.printStackTrace();
+            return (Date)this.em.createNativeQuery("select current_date + interval '" + contador + " month' ").getSingleResult();
         }
-        return null;
+        catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
-
-    private EnumTipoTitulo getTipoTitulo(LancamentoFinanceiro lancamentoFinanceiro, Orcamento orcamento) {
+    
+    private EnumTipoTitulo getTipoTitulo(final LancamentoFinanceiro lancamentoFinanceiro, final Orcamento orcamento) {
         if (lancamentoFinanceiro != null) {
-            return lancamentoFinanceiro.getTipoLancamento().equals(EnumTipoLancamento.ENTRADA) ? EnumTipoTitulo.RECEBER : EnumTipoTitulo.PAGAR;
+            return lancamentoFinanceiro.getTipoLancamento().equals((Object)EnumTipoLancamento.ENTRADA) ? EnumTipoTitulo.RECEBER : EnumTipoTitulo.PAGAR;
         }
         return EnumTipoTitulo.RECEBER;
     }
-
-    public List<TituloParcela> listarParcelas(Date dataInicial, Date dataFinal,
-            boolean provisionados, Usuario vendedor,
-            boolean realizados,
-            EnumTipoTitulo tipo,
-            Empresa empresa, Cliente cliente,
-            Orcamento orcamento,
-            LancamentoFinanceiro lancamentoFinanceiro) {
-        String sql = "select distinct tp from TituloParcela tp "
-                + " INNER join tp.titulo t "
-                + " LEFT join t.lancamentoFinanceiro lf "
-                + " LEFT join t.orcamento o  "
-                + " where  1 = 1 ";
+    
+    public List<TituloParcela> listarParcelas(final Date dataInicial, final Date dataFinal, final boolean provisionados, final Usuario vendedor, final boolean realizados, final EnumTipoTitulo tipo, final Empresa empresa, final Cliente cliente, final Orcamento orcamento, final LancamentoFinanceiro lancamentoFinanceiro) {
+        String sql = "select distinct tp from TituloParcela tp  INNER join tp.titulo t  LEFT join t.lancamentoFinanceiro lf  LEFT join t.orcamento o   where  1 = 1 ";
         if (empresa != null) {
             sql += " and tp.titulo.usuario.empresa =:empresa";
         }
@@ -177,14 +157,12 @@ public class TituloEJB extends AbstractEJB<Titulo> {
         if (dataFinal != null) {
             sql += " and tp.dataVencimento <= :dataFinal ";
         }
-
         if (cliente != null) {
             sql += " and (lf.cliente =:cliente or o.cliente =:cliente) ";
         }
         if (vendedor != null) {
             sql += " and tp.titulo.usuario =:vendedor";
         }
-
         if (orcamento != null) {
             sql += " and tp.titulo.orcamento =:orcamento";
         }
@@ -201,146 +179,149 @@ public class TituloEJB extends AbstractEJB<Titulo> {
             sql += " and tp.titulo.tipo =:tipo";
         }
         sql += " order by tp.dataVencimento";
-
         try {
-            Query q = em.createQuery(sql);
-            q.setParameter("empresa", empresa);
+            final Query q = this.em.createQuery(sql);
+            q.setParameter("empresa", (Object)empresa);
             if (dataInicial != null) {
-                q.setParameter("dataInicial", dataInicial);
+                q.setParameter("dataInicial", (Object)dataInicial);
             }
             if (dataFinal != null) {
-                q.setParameter("dataFinal", dataFinal);
+                q.setParameter("dataFinal", (Object)dataFinal);
             }
             if (orcamento != null) {
-                q.setParameter("orcamento", orcamento);
+                q.setParameter("orcamento", (Object)orcamento);
             }
             if (lancamentoFinanceiro != null) {
-                q.setParameter("lancamentoFinanceiro", lancamentoFinanceiro);
+                q.setParameter("lancamentoFinanceiro", (Object)lancamentoFinanceiro);
             }
             if (cliente != null) {
-                q.setParameter("cliente", cliente);
+                q.setParameter("cliente", (Object)cliente);
             }
             if (vendedor != null) {
-                q.setParameter("vendedor", vendedor);
+                q.setParameter("vendedor", (Object)vendedor);
             }
             if (tipo != null) {
-                q.setParameter("tipo", tipo);
+                q.setParameter("tipo", (Object)tipo);
             }
-            return (List<TituloParcela>) q.getResultList();
-
-        } catch (Exception e) {
+            return (List<TituloParcela>)q.getResultList();
+        }
+        catch (Exception e) {
             e.printStackTrace();
+            return null;
         }
-        return null;
     }
-
-    public void excluir(Titulo titulo) {
-        em.remove(titulo);
+    
+    public void excluir(final Titulo titulo) {
+        this.em.remove((Object)titulo);
     }
-
-    public Titulo getTituloPorOcamento(Orcamento orcamento) {
+    
+    public Titulo getTituloPorOcamento(final Orcamento orcamento) {
         try {
-            return (Titulo) em.createQuery("select t from Titulo t where t.orcamento =:orcamento")
-                    .setParameter("orcamento", orcamento).getSingleResult();
-
-        } catch (Exception e) {
-            // e.printStackTrace();
+            return (Titulo)this.em.createQuery("select t from Titulo t where t.orcamento =:orcamento").setParameter("orcamento", (Object)orcamento).getSingleResult();
         }
-        return null;
-    }
-
-    public Titulo getTituloPorLancamentoFinanceiro(LancamentoFinanceiro lancamentoFinanceiro) {
-        try {
-            return (Titulo) em.createQuery("select t from Titulo t where t.lancamentoFinanceiro =:lancamento")
-                    .setParameter("lancamento", lancamentoFinanceiro).getSingleResult();
-
-        } catch (Exception e) {
-          //  e.printStackTrace();
+        catch (Exception ex) {
+            return null;
         }
-        return null;
     }
-
-    public List<TituloParcela> listarParcelasAbertasPorEmpresa(Empresa empresa, EnumTipoTitulo tipoTitulo) {
+    
+    public Titulo getTituloPorLancamentoFinanceiro(final LancamentoFinanceiro lancamentoFinanceiro) {
         try {
-            return (List<TituloParcela>) em.createQuery("select t from TituloParcela t "
-                    + "where  t.titulo.usuario.empresa =:empresa  "
-                    + " and t.valorSaldo > 0"
-                    + " and t.titulo.tipo =:tipo "
-                    + " order by t.dataVencimento")
-                    .setParameter("empresa", empresa)
-                    .setParameter("tipo", tipoTitulo)
-                    .getResultList();
-
-        } catch (Exception e) {
+            return (Titulo)this.em.createQuery("select t from Titulo t where t.lancamentoFinanceiro =:lancamento").setParameter("lancamento", (Object)lancamentoFinanceiro).getSingleResult();
+        }
+        catch (Exception ex) {
+            return null;
+        }
+    }
+    
+    public List<TituloParcela> listarParcelasAbertasPorEmpresa(final Empresa empresa, final EnumTipoTitulo tipoTitulo) {
+        try {
+            return (List<TituloParcela>)this.em.createQuery("select t from TituloParcela t where  t.titulo.usuario.empresa =:empresa   and t.valorSaldo > 0 and t.titulo.tipo =:tipo  order by t.dataVencimento").setParameter("empresa", (Object)empresa).setParameter("tipo", (Object)tipoTitulo).getResultList();
+        }
+        catch (Exception e) {
             e.printStackTrace();
+            return null;
         }
-        return null;
     }
-
-    private String getSacadoCedente(Orcamento orcamento, LancamentoFinanceiro lancamentoFinanceiro) {
-        if (lancamentoFinanceiro != null) {
-            Cliente cliente = lancamentoFinanceiro.getCliente();
-            Usuario usuario = lancamentoFinanceiro.getUsuarioFornecedor();
-            Fornecedor fornecedor = lancamentoFinanceiro.getFornecedor();
-
-            if (cliente != null) {
-                return cliente.getNome();
-            }
-            if (usuario != null) {
-                return usuario.getNome();
-            }
-            if (fornecedor != null) {
-                return fornecedor.getNome();
-            }
-        } else {
+    
+    private String getSacadoCedente(final Orcamento orcamento, final LancamentoFinanceiro lancamentoFinanceiro) {
+        if (lancamentoFinanceiro == null) {
             return orcamento.getCliente().getNome();
         }
+        final Cliente cliente = lancamentoFinanceiro.getCliente();
+        final Usuario usuario = lancamentoFinanceiro.getUsuarioFornecedor();
+        final Fornecedor fornecedor = lancamentoFinanceiro.getFornecedor();
+        if (cliente != null) {
+            return cliente.getNome();
+        }
+        if (usuario != null) {
+            return usuario.getNome();
+        }
+        if (fornecedor != null) {
+            return fornecedor.getNome();
+        }
         return null;
     }
-
-    public void liquidarParcelas(LancamentoFinanceiro lancamentoFinanceiro) throws GestorException {
+    
+    public void liquidarParcelas(final LancamentoFinanceiro lancamentoFinanceiro) throws GestorException {
         try {
-            List<LancamentoParcela> parcelas = lancamentoFinanceiro.getParcelas();
+            final List<LancamentoParcela> parcelas = (List<LancamentoParcela>)lancamentoFinanceiro.getParcelas();
             BigDecimal valorLcto = lancamentoFinanceiro.getValor();
             BigDecimal valorLiquidacao = BigDecimal.ZERO;
-            if (!Utils.empty(parcelas)) {
-                for (LancamentoParcela lancamentoParcela : parcelas) {
+            if (!Utils.empty((Collection)parcelas)) {
+                for (final LancamentoParcela lancamentoParcela : parcelas) {
                     if (valorLcto.compareTo(BigDecimal.ZERO) == 0) {
                         break;
                     }
-                    TituloParcela tituloParcela = lancamentoParcela.getParcela();
-                    BigDecimal saldoParcela = tituloParcela.getValorSaldo();
+                    final TituloParcela tituloParcela = lancamentoParcela.getParcela();
+                    final BigDecimal saldoParcela = tituloParcela.getValorSaldo();
                     if (saldoParcela.compareTo(valorLcto) <= 0) {
                         tituloParcela.setValorSaldo(BigDecimal.ZERO);
                         valorLcto = valorLcto.subtract(saldoParcela);
                         valorLiquidacao = saldoParcela;
                         lancamentoParcela.setValorLiquidacao(valorLiquidacao);
-
-                    } else if (saldoParcela.compareTo(valorLcto) > 0) {
+                    }
+                    else if (saldoParcela.compareTo(valorLcto) > 0) {
                         tituloParcela.setValorSaldo(saldoParcela.subtract(valorLcto));
                         valorLiquidacao = valorLcto;
                         lancamentoParcela.setValorLiquidacao(valorLiquidacao);
                     }
-                    Titulo titulo = tituloParcela.getTitulo();
+                    final Titulo titulo = tituloParcela.getTitulo();
                     titulo.setValorSaldo(titulo.getValorSaldo().subtract(valorLiquidacao));
-                    em.merge(tituloParcela);
-                    em.merge(titulo);
+                    this.em.merge((Object)tituloParcela);
+                    this.em.merge((Object)titulo);
                 }
             }
-
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
     }
-
-    public List<LancamentoParcela> getLancamentoParcelas(TituloParcela parcela) {
+    
+    public List<LancamentoParcela> getLancamentoParcelas(final TituloParcela parcela) {
         try {
-            return (List<LancamentoParcela>) em.createQuery("select t from LancamentoParcela t where t.parcela =:parcela ")
-                    .setParameter("parcela", parcela).getResultList();
-        } catch (Exception e) {
-            e.printStackTrace();
+            return (List<LancamentoParcela>)this.em.createQuery("select t from LancamentoParcela t where t.parcela =:parcela ").setParameter("parcela", (Object)parcela).getResultList();
         }
-        return null;
+        catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
-
+    
+    public void salvarParcela(final TituloParcela parcela) {
+        this.em.merge((Object)parcela);
+    }
+    
+    public void excluiParcela(final TituloParcela parcela) throws GestorException {
+        if (parcela.getValorParcela().compareTo(parcela.getValorSaldo()) > 0) {
+            throw new GestorException("A parcela j\u00e1 teve uma baixa, a baixa deve ser estornada para excluir a parcela");
+        }
+        final Titulo titulo = parcela.getTitulo();
+        titulo.setValorTitulo(titulo.getValorTitulo().subtract(parcela.getValorParcela()));
+        titulo.setValorSaldo(titulo.getValorSaldo().subtract(parcela.getValorSaldo()));
+        this.merge(titulo);
+        this.em.remove(this.em.find((Class)TituloParcela.class, (Object)parcela.getId()));
+        if (titulo.getParcelas().size() == 1) {
+            this.em.remove(this.em.find((Class)Titulo.class, (Object)titulo.getId()));
+        }
+    }
 }
