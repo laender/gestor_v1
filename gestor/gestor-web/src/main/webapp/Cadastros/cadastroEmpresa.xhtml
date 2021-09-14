@@ -1,0 +1,221 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+    <h:head>
+        <title>Gestor - Cadastro de empresas</title>
+
+    </h:head>
+    <style>
+        .column1{}
+        .column2{
+            vertical-align: top;
+        }
+        .ui-widget {
+            font-size: 12px !important;
+        }
+    </style>
+
+    <h:body style="background-color: activecaption ; background-size: 100%;height: 98% !important">
+        <h:form id="form" style="overflow: auto" >
+            <p:messages id="messages"  showDetail="true" autoUpdate="true"  />
+            <h:panelGrid columns="3" cellpadding="3" cellspacing="3" style="width: 98%; border-radius: 15px 15px; background-color: lightsteelblue; box-shadow: 10px 10px">
+                <h:graphicImage url="/Images/empresas.png"  width="30px" height="30px" /> 
+                <p:outputLabel value="CADASTRO DE EMPRESAS" style="font-size: x-large" />
+                <p:outputPanel >
+                    <p:commandButton  actionListener="#{cadastroEmpresaController.salvar()}" rendered="#{cadastroEmpresaController.empresa ne null}" value="SALVAR" style="color: white; background-color: green; float: right; font-weight: bold" />
+                    <p:commandButton  actionListener="#{cadastroEmpresaController.cancelar()}" rendered="#{cadastroEmpresaController.empresa ne null}" value="CANCELAR" style="color: white; background-color:grey ; float: right; border: none" />
+                    <p:commandButton  actionListener="#{cadastroEmpresaController.novo()}" rendered="#{cadastroEmpresaController.empresa eq null}" value="NOVO" style="color: white; background-color: darkturquoise; float: right; font-weight: bold" />
+                    <p:commandButton actionListener="#{cadastroEmpresaController.fechar()}" ajax="false" rendered="#{cadastroEmpresaController.empresa eq null}"  value="FECHAR" style="color: white; float: right; border: none" />
+                    <p:commandButton value="Exclusão" actionListener="#{cadastroEmpresaController.excluir()}"  immediate="true"
+                                     rendered="#{cadastroEmpresaController.empresa ne null and cadastroEmpresaController.empresa.id ne null}"
+                                     update="messages" style="color: white; background-color:black ; float: right"  >
+                        <p:confirm header="Confirmação" message="Deseja realmente excluir o Registro?" icon="ui-icon-alert" />
+                    </p:commandButton>
+                </p:outputPanel>
+            </h:panelGrid>
+            <p:separator  />
+            <p:outputPanel id="panelNovo" rendered="#{cadastroEmpresaController.empresa ne null}" style="height: 98% !important" >
+                <p:tabView>
+                    <p:tab title="Informações">
+                        <h:panelGrid columns="2" cellpadding="10" cellspacing="10" columnClasses="column1, column2" style="width: 70%">
+                            <p:column>
+                                <p:focus for="inputId"/>
+                                <h:panelGrid columns="1" cellpadding="3" cellspacing="2"  >
+                                    <!--<p:outputLabel value="Logomarca:" />-->
+                                    <!--<p:fileUpload fileUploadListener="# {cadastroEmpresaController.handleFileUpload}" mode="advanced"  
+                                                  update="messages" auto="true" sizeLimit="100000" allowTypes="/(\.|\/)(gif|jpe?g|png)$/" /> -->
+
+
+                                    <p:outputLabel value="Nome" style="font-weight: bold" />
+                                    <p:inputText id="inputId" value="#{cadastroEmpresaController.empresa.nome}" style="width: 300px"/>
+                                    <p:outputLabel value="CPF/CNPJ" style="font-weight: bold" />
+                                    <p:inputText value="#{cadastroEmpresaController.empresa.cnpjCpf}" style="width: 200px" />
+                                    <p:outputLabel value="Telefone" style="font-weight: bold" />
+                                    <p:inputText value="#{cadastroEmpresaController.empresa.telefonePrincipal}" style="width: 250px" />
+                                    <p:outputLabel value="Rua" style="font-weight: bold" />
+                                    <p:inputText value="#{cadastroEmpresaController.empresa.endereco}" style="width: 400px" />
+                                    <p:outputLabel value="Numero" style="font-weight: bold" />
+                                    <p:inputText value="#{cadastroEmpresaController.empresa.numero}" style="width: 70px" >
+                                        <f:convertNumber integerOnly="true" minIntegerDigits="1"  />
+                                    </p:inputText>
+                                    <p:outputLabel value="Bairro" style="font-weight: bold" />
+                                    <p:inputText value="#{cadastroEmpresaController.empresa.bairro}" style="width: 300px" />
+                                    <p:outputLabel value="Email" style="font-weight: bold" />
+                                    <p:inputText value="#{cadastroEmpresaController.empresa.email}" style="width: 300px" />
+                                    <p:outputLabel value="Instagram" style="font-weight: bold" />
+                                    <p:inputText value="#{cadastroEmpresaController.empresa.instagram}" style="width: 300px" />
+                                    <p:outputLabel value="Home Page" style="font-weight: bold" />
+                                    <p:inputText value="#{cadastroEmpresaController.empresa.homePage}" style="width: 500px" />
+                                    <p:outputLabel value="Logo (\src\main\resources\Images)" style="font-weight: bold" />
+                                    <p:inputText value="#{cadastroEmpresaController.empresa.logoImage}" style="width: 500px" />
+                                    <p:outputLabel value="Login KEY" style="font-weight: bold" />
+                                    <p:inputText value="#{cadastroEmpresaController.empresa.loginKey}" style="width: 200px" />
+
+                                </h:panelGrid>
+                            </p:column>
+                            <p:column>
+                                <h:panelGrid columns="1" cellpadding="4" cellspacing="4">
+                                    <p:outputLabel value="Ativa" style="font-weight: bold" />
+                                    <p:selectBooleanCheckbox value="#{cadastroEmpresaController.empresa.ativo}"  />
+                                    <p:outputLabel value="Caixa acumulativo" style="font-weight: bold" />
+                                    <p:selectBooleanCheckbox value="#{cadastroEmpresaController.empresa.caixaAcumulativo}"  />
+                                    <p:outputLabel value="Comissao sobre total da venda" style="font-weight: bold" />
+                                    <p:selectBooleanCheckbox value="#{cadastroEmpresaController.empresa.comissaoTotalVenda}"  />
+                                    <p:outputLabel value="Comissao sobre total da Mão de obra" style="font-weight: bold"   />
+                                    <p:selectBooleanCheckbox value="#{cadastroEmpresaController.empresa.comissaoTotalMaoObra}"  />
+                                    <p:outputLabel value="Controla estoque" style="font-weight: bold"   />
+                                    <p:selectBooleanCheckbox value="#{cadastroEmpresaController.empresa.controlaEstoque}"  />
+                                    <p:outputLabel value="Exibe multiplicador" style="font-weight: bold"   />
+                                    <p:selectBooleanCheckbox value="#{cadastroEmpresaController.empresa.exibirMultiplicador}"  />
+                                    <p:outputLabel value="Exibe venda rapida" style="font-weight: bold"   />
+                                    <p:selectBooleanCheckbox value="#{cadastroEmpresaController.empresa.exibirVendaRapida}"  />
+                                    <p:outputLabel value="Permite alterar valor comissão" style="font-weight: bold"   />
+                                    <p:selectBooleanCheckbox value="#{cadastroEmpresaController.empresa.permiteAlterarComissao}"  />
+                                    <p:outputLabel value="Data inicio testes" style="font-weight: bold" />
+                                    <p:calendar value="#{cadastroEmpresaController.empresa.dataInicioTestes}"  pattern="dd/MM/yyyy" mask="true" disabled="#{orcamentoController.orcamento.status eq 'VENDA' or orcamentoController.orcamento.status eq 'CANCELADO'}" >
+                                    </p:calendar>
+                                    <p:outputLabel value="Data inicio efetivo" style="font-weight: bold" />
+                                    <p:calendar value="#{cadastroEmpresaController.empresa.dataInicioEfetivo}"  pattern="dd/MM/yyyy" mask="true" disabled="#{orcamentoController.orcamento.status eq 'VENDA' or orcamentoController.orcamento.status eq 'CANCELADO'}" >
+                                    </p:calendar>
+                                </h:panelGrid>
+                                <br/>
+                                <br/>
+                                <p:outputPanel id="panelDadosLocal" autoUpdate="true" style="width: 98%"  >
+                                    <h:panelGrid columns="2" cellpadding="2" cellspacing="2"  >
+
+                                        <p:outputLabel value="Cidade" style="font-weight: bold" /> <br/>
+                                        <p:inputText disabled="true" value="#{cadastroEmpresaController.empresa.cidade.nome}" />
+                                        <p:commandLink onclick="PF('dlgCidade').show();" >
+                                            <h:graphicImage url="/Images/search.png"  width="27px" height="27px"/>
+                                        </p:commandLink>
+
+                                    </h:panelGrid>
+                                    <h:panelGrid columns="2" cellpadding="2" cellspacing="2" >
+
+                                        <p:outputLabel value="Ramo Atividade" style="font-weight: bold" /> <br/>
+                                        <p:inputText disabled="true" value="#{cadastroEmpresaController.empresa.ramoAtividade.descricao}" />
+                                        <p:commandLink onclick="PF('dlgRamoAtiv').show();" >
+                                            <h:graphicImage url="/Images/search.png"  width="27px" height="27px"/>
+                                        </p:commandLink>
+
+                                    </h:panelGrid>
+                                </p:outputPanel>
+                            </p:column>
+                        </h:panelGrid>
+                    </p:tab>
+                    <p:tab title="Pagamentos">
+
+                    </p:tab>
+                </p:tabView>
+
+
+            </p:outputPanel>
+
+            <p:outputPanel  rendered="#{cadastroEmpresaController.empresa eq null}" style="height: 450px !important;width: 98% !important;" >
+                <p:dataTable   scrollable="true"  scrollRows="14" scrollHeight="500px"     value="#{cadastroEmpresaController.empresas}"  var="u" >
+                    <p:column headerText="#" width="4%">
+                        <p:commandLink actionListener="#{cadastroEmpresaController.setEmpresa(u)}" immediate="true" >
+                            <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                        </p:commandLink>
+                    </p:column>
+                    <p:column headerText="Cod"  width="4%"  style="text-align: center " >
+                        <p:outputLabel value="#{u.id}" style="font-size: small;text-align: center" />
+                    </p:column>
+                    <p:column headerText="Nome" width="18%"  style="text-align: center " >
+                        <p:outputLabel value="#{u.nome}" style="font-size: small;text-align: center" />
+                    </p:column>
+                    <p:column headerText="CPF/CNPJ" width="13%" style="text-align: center " >
+                        <p:outputLabel value="#{u.cnpjCpf}" style="font-size: small;text-align: center" />
+                    </p:column>
+                    <p:column headerText="Endereço"  style="text-align: center " >
+                        <p:outputLabel value="#{u.endereco}" style="font-size: small;text-align: center" />
+                    </p:column>
+                    <p:column headerText="Cidade"  style="text-align: center " >
+                        <p:outputLabel value="#{u.cidade.nome}" style="font-size: small;text-align: center" />
+                    </p:column>
+                    <p:column headerText="email" style="text-align: center " >
+                        <p:outputLabel value="#{u.email}" style="font-size: small;text-align: center" />
+                    </p:column>
+                    <p:column headerText="Atividade" style="text-align: center " >
+                        <p:outputLabel value="#{u.ramoAtividade.descricao}" style="font-size: small;text-align: center" />
+                    </p:column>
+                    <p:column headerText="Data testes" style="text-align: center " >
+                        <p:outputLabel value="#{u.dataInicioTestes}" style="font-size: small;text-align: center" >
+                            <f:convertDateTime pattern="dd/MM/yyyy" />
+                        </p:outputLabel>
+                    </p:column>
+                    <p:column headerText="Data efetivaçao" style="text-align: center " >
+                        <p:outputLabel value="#{u.dataInicioEfetivo}" style="font-size: small;text-align: center" >
+                            <f:convertDateTime pattern="dd/MM/yyyy" />
+                        </p:outputLabel>
+                    </p:column>
+                    <p:column headerText="ativa" width="8%" style="text-align: center " >
+                        <p:selectBooleanCheckbox value="#{u.ativo}"  disabled="true" />
+                    </p:column>
+                </p:dataTable>
+            </p:outputPanel>
+            <p:dialog  style="background-color: lightslategray;" 
+                       widgetVar="dlgCidade" id="dlgCidade" height="400px" width="500px"  modal="true" header="Seleção de Cidade">
+                <p:dataTable    value="#{cadastroEmpresaController.listarCidades()}" var="c" >
+                    <p:column headerText="#" width="8%">
+                        <p:commandLink actionListener="#{cadastroEmpresaController.empresa.setCidade(c)}"  oncomplete="PF('dlgCidade').hide();" >
+                            <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                        </p:commandLink>
+                    </p:column>
+
+                    <p:column headerText="Nome" filterBy="#{c.nome}" width="90%" >
+                        #{c.nome}   
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+            <p:dialog  style="background-color: lightslategray;" 
+                       widgetVar="dlgRamoAtiv" id="dlgRamoAtiv" height="400px" width="500px"  modal="true" header="Selecao de atividade">
+                <p:dataTable    value="#{cadastroEmpresaController.listarRamosAtividade()}" var="c" >
+                    <p:column headerText="#" width="8%">
+                        <p:commandLink actionListener="#{cadastroEmpresaController.empresa.setRamoAtividade(c)}"  oncomplete="PF('dlgRamoAtiv').hide();" >
+                            <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                        </p:commandLink>
+                    </p:column>
+
+                    <p:column headerText="Nome" filterBy="#{c.descricao}" width="90%" >
+                        #{c.descricao}   
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+
+
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                <p:commandButton value="Excluir" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                <p:commandButton value="Cancelar" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+            </p:confirmDialog>
+
+
+        </h:form>
+    </h:body>
+</html>
+

@@ -1,0 +1,97 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/template.xhtml">
+    <h:head>
+        <title>Gestor - Cadastro de Multiplicador</title>
+    </h:head>
+    <ui:define name="body" >
+        <style>
+            .ui-widget {
+                font-size: 12px !important;
+            }
+
+        </style>
+        <script>
+            function somenteNumeros(num) {
+                var er = /[^0-9.]/;
+                er.lastIndex = 0;
+                var campo = num;
+                if (er.test(campo.value)) {
+                    campo.value = "";
+                    alert("Utilize apenas números e substitua vírgula(,) por ponto (.)");
+                }
+            }
+        </script>
+
+
+        <h:body style="background-color: whitesmoke ; background-size: 100%">
+            <h:form id="form" style="height: 100% !important">
+                <h:panelGrid columns="3" cellpadding="3" cellspacing="3" style="width: 100%;  background-color: lightsteelblue; box-shadow: 10px 10px">
+                    <h:graphicImage url="/Images/multiply.png"  width="30px" height="30px" /> 
+                    <p:outputLabel value="CADASTRO DE MULTIPLICADORES" style="font-size: large !important; color: white" />
+                    <p:outputPanel >
+                        <p:commandButton  actionListener="#{cadastroMultiplicadorController.salvar()}" rendered="#{cadastroMultiplicadorController.multiplicador ne null}" value="SALVAR" style="color: white; background-color: green; float: right; font-weight: bold" />
+                        <p:commandButton  actionListener="#{cadastroMultiplicadorController.cancelar()}" rendered="#{cadastroMultiplicadorController.multiplicador ne null}" value="CANCELAR" style="color: white; background-color:grey ; float: right; border: none" />
+                        <p:commandButton  actionListener="#{cadastroMultiplicadorController.novo()}" rendered="#{cadastroMultiplicadorController.multiplicador eq null}" value="NOVO" style="color: white; background-color: darkturquoise; float: right; font-weight: bold" />
+                        <p:commandButton actionListener="#{cadastroMultiplicadorController.fechar()}"    ajax="false"  rendered="#{cadastroMultiplicadorController.multiplicador eq null}"  value="FECHAR" style="color: white; background-color: red; float: right; border: none" />
+
+
+                        <p:commandButton value="Exclusão" actionListener="#{cadastroMultiplicadorController.excluir()}"  rendered="#{cadastroMultiplicadorController.multiplicador.id ne null}" 
+                                         update="messages" style="color: white; background-color:black ; float: right"  >
+                            <p:confirm header="Confirmação" message="Deseja realmente excluir o Registro?" icon="ui-icon-alert" />
+                        </p:commandButton>
+                    </p:outputPanel>
+                </h:panelGrid>
+                <p:separator  />
+
+                <p:outputPanel rendered="#{cadastroMultiplicadorController.multiplicador eq null}" style="height: 90% !important; overflow: scroll !important ">
+
+                    <p:dataTable emptyMessage="Nenhum multiplicador cadastrado."   
+                                 scrollHeight="200" scrollRows="20"     scrollable="true"  style="height: 98%"  
+                                 value="#{cadastroMultiplicadorController.listarMultiplicadores()}"  var="u" >
+                        <p:column headerText="#" width="4%" >
+                            <p:commandLink actionListener="#{cadastroMultiplicadorController.setMultiplicador(u)}"  update="form"  >
+                                <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                            </p:commandLink>
+                        </p:column>
+
+                        <p:column width="90%" headerText="Fator"  style="text-align: left">
+                            <p:outputLabel value="#{u.fator}" style="text-align: center" >
+                                <f:convertNumber maxFractionDigits="1" />
+                            </p:outputLabel> 
+                        </p:column>
+                        <p:column width="10%" headerText="Padrão" style="text-align: center">
+                            <p:outputLabel value="#{u.padrao ? 'SIM': 'NÃO'}" style="text-align: center" /> 
+                        </p:column>
+
+                    </p:dataTable>
+                </p:outputPanel>
+
+                <p:outputPanel id="panelDados" rendered="#{not empty cadastroMultiplicadorController.multiplicador}" style="border-radius: 10px 10px;background-color: whitesmoke; " >
+                    <p:focus for="inputId"/>
+                    <h:panelGrid columns="1"  cellpadding="4" cellspacing="4" style="width: 90%" >
+                        <p:outputLabel value="Padrão"  style="font-weight: bold" />
+                        <p:selectBooleanCheckbox value="#{cadastroMultiplicadorController.multiplicador.padrao}"  />
+
+                        <p:outputLabel value="Fator de multiplicação" style="font-weight: bold" />
+                        <p:inputText id="inputId" value="#{cadastroMultiplicadorController.multiplicador.fator}"  onkeyup="somenteNumeros(this);" style="width: 60%" >
+                        </p:inputText>
+                    </h:panelGrid>
+                </p:outputPanel>
+
+
+                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                    <p:commandButton value="Excluir" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                    <p:commandButton value="Cancelar" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                </p:confirmDialog>
+            </h:form>
+        </h:body>
+    </ui:define>
+
+</ui:composition>
+
+
+

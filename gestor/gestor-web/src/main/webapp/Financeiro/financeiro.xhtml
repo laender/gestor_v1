@@ -1,0 +1,74 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Gestor - Financeiro</title>
+    </h:head>
+    <style type="text/css"> 
+        .footer {
+            position: fixed;
+            bottom:0;
+            right: 0;
+        }
+    </style>
+    <h:form>
+        #{cadastrosController.init()}
+        <h:body style="background-color: activecaption ; background-size: 100%">
+            <h:panelGrid columns="2" width="98%">
+                <p:column>
+                    <ui:include src="../menuLateral.xhtml"  />   
+                </p:column>
+                <p:column>
+                    <h:panelGrid columns="8"  cellpadding="10" cellspacing="10"  style="width: 60%" >
+
+                        <p:column>
+                            <h:panelGrid columns="1">
+                                <h:commandLink title="Lançamento" action="lancamentoFinanceiroEntrada.xhtml" >
+                                    <h:graphicImage url="/Images/cash-clock.png" style="width: 100px; height: 100px"  />
+                                </h:commandLink>
+                                <p:outputLabel value="RECEBIMENTOS" />
+                            </h:panelGrid>
+                        </p:column>
+                        <p:column>
+                            <h:panelGrid columns="1">
+                                <h:commandLink title="Lançamento" action="lancamentoFinanceiroSaida.xhtml" >
+                                    <h:graphicImage url="/Images/money-fly.png" style="width: 100px; height: 100px"  />
+                                </h:commandLink>
+                                <p:outputLabel value="PAGAMENTOS" />
+                            </h:panelGrid>
+                        </p:column>
+                        <p:column>
+                            <h:panelGrid columns="1">
+                                <h:commandLink title="Estorno" action="estornoLancamento.xhtml" >
+                                    <h:graphicImage url="/Images/estorno.png" style="width: 100px; height: 100px"  />
+                                </h:commandLink>
+                                <p:outputLabel value="ESTORNOS" />
+                            </h:panelGrid>
+                        </p:column>
+                        <p:column>
+                            <h:panelGrid columns="1">
+                                <h:commandLink title="Caixa" action="caixa.xhtml" >
+                                    <h:graphicImage url="/Images/caixa.png" style="width: 100px; height: 100px"  />
+                                </h:commandLink>
+                                <p:outputLabel value="CAIXA" />
+                            </h:panelGrid>
+                        </p:column>
+                    </h:panelGrid>
+                </p:column>
+            </h:panelGrid>
+
+            <p:outputPanel styleClass="panelCentral">
+                <!--<ui:include src="../menuDocker.xhtml"  />-->
+            </p:outputPanel>
+            <p:outputPanel styleClass="footer">
+                <p:commandButton actionListener="#{cadastrosController.fechar()}" ajax="false"    value="FECHAR" style="color: white; background-color: red; float: right" />
+            </p:outputPanel>
+        </h:body>
+    </h:form>
+
+</html>
+

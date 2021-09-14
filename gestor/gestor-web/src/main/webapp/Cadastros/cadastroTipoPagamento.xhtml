@@ -1,0 +1,79 @@
+<ui:composition  xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:p="http://primefaces.org/ui"
+                 template="/WEB-INF/templates/template.xhtml"
+                 >
+    <h:head>
+        <title>Gestor - Cadastro de tipos de pagamento</title>
+    </h:head>
+
+    <ui:define name="body" >
+        <style>
+            .ui-widget {
+                font-size: 12px !important;
+            }
+        </style>
+
+        <h:body style="background-color: whitesmoke ; background-size: 100%">
+            <h:form id="form" style="height: 100% !important">
+                <h:panelGrid columns="4" cellpadding="3" cellspacing="3" style="width: 98%;  background-color: lightsteelblue; box-shadow: 10px 10px">
+                    <h:graphicImage url="/Images/money.png"  width="30px" height="30px" /> 
+                    <p:outputLabel value="CADASTRO DE TIPOS DE PAGAMENTOS" style="font-size: large !important; color: white" />
+                    <h:outputLink target="_blank" value="https://youtu.be/LKkqUrzP30c"  >ASSISTA AQUI O TUTORIAL</h:outputLink>
+                    <p:outputPanel >
+                        <p:commandButton  actionListener="#{cadastroTipoPagamentoController.salvar()}" rendered="#{cadastroTipoPagamentoController.tipoPagamento ne null}" value="SALVAR" style="color: white; background-color: green; float: right; font-weight: bold" />
+                        <p:commandButton  actionListener="#{cadastroTipoPagamentoController.cancelar()}" rendered="#{cadastroTipoPagamentoController.tipoPagamento ne null}" value="CANCELAR" style="color: white; background-color:grey ; float: right; border: none" />
+                        <p:commandButton  actionListener="#{cadastroTipoPagamentoController.novo()}" rendered="#{cadastroTipoPagamentoController.tipoPagamento eq null}" value="NOVO" style="color: white; background-color: darkturquoise; float: right; font-weight: bold" />
+                        <p:commandButton actionListener="#{cadastroTipoPagamentoController.fechar()}"    ajax="false"  rendered="#{cadastroTipoPagamentoController.tipoPagamento eq null}"  value="FECHAR" style="color: white; background-color: red; float: right; border: none" />
+
+
+                        <p:commandButton value="Exclusão" actionListener="#{cadastroTipoPagamentoController.excluir()}"  rendered="#{cadastroTipoPagamentoController.tipoPagamento.id ne null}" 
+                                         update="messages" style="color: white; background-color:black ; float: right"  >
+                            <p:confirm header="Confirmação" message="Deseja realmente excluir o Registro?" icon="ui-icon-alert" />
+                        </p:commandButton>
+                    </p:outputPanel>
+                </h:panelGrid>
+                <p:separator  />
+
+                <p:outputPanel rendered="#{cadastroTipoPagamentoController.tipoPagamento eq null}" style=" overflow: scroll !important ">
+
+                    <p:dataTable emptyMessage="Nenhum tipo de pagamento cadastrado. Cadastre um novo, exemplo: Dinheiro, cheque, cartão de credito..."   
+                                 scrollHeight="500" scrollRows="20"     scrollable="true"     
+                                 value="#{cadastroTipoPagamentoController.getTipoPagamentos()}"  var="u" >
+                        <p:column headerText="#" width="5%" >
+                            <p:commandLink actionListener="#{cadastroTipoPagamentoController.setTipoPagamento(u)}"  update="form"  >
+                                <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                            </p:commandLink>
+                        </p:column>
+
+                        <p:column width="95%" headerText="Descrição" filterBy="#{u.descricao}" style="text-align: left">
+                            <p:outputLabel value="#{u.descricao}" style="text-align: center" /> 
+                        </p:column>
+
+                    </p:dataTable>
+                </p:outputPanel>
+
+                <p:outputPanel id="panelDados" rendered="#{not empty cadastroTipoPagamentoController.tipoPagamento}" style="border-radius: 10px 10px;background-color: whitesmoke; " >
+                    <p:focus for="inputId"/>
+                    <h:panelGrid columns="1"  cellpadding="4" cellspacing="4" style="width: 90%" >
+                        <p:outputLabel value="Descrição" style="font-weight: bold" />
+                        <p:inputText id="inputId" value="#{cadastroTipoPagamentoController.tipoPagamento.descricao}" style="width: 60%" />
+                    </h:panelGrid>
+                </p:outputPanel>
+
+
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                <p:commandButton value="Excluir" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                    <p:commandButton value="Cancelar" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                </p:confirmDialog>
+            </h:form>
+        </h:body>
+    </ui:define>
+
+</ui:composition>
+
+
+
+

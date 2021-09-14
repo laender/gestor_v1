@@ -1,0 +1,537 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <h:head>
+        <title>Gestor - Serviços</title>
+    </h:head>  
+
+
+    <style type="text/css"> 
+        .border {
+            border: 1px solid #000;
+        }
+        .column1{
+            width: 60%;
+            vertical-align: top;
+        }
+        .column2{
+            width: 30%;
+            vertical-align: top !important;
+        }
+        .column3{
+            width: 10%;
+            vertical-align: top !important;
+        }
+        .cabecalhoCol1{
+            width: 60%
+        }
+        .cabecalhoCol2{
+            width: 40%
+        }
+        .columnUser1{
+
+        }
+        .columnUser2{
+            vertical-align: bottom;
+        }
+        .ui-widget {
+            font-size: 12px !important;
+        }
+    </style>
+    <script>
+        function somenteNumeros(num) {
+            var er = /[^0-9.]/;
+            er.lastIndex = 0;
+            var campo = num;
+            if (er.test(campo.value)) {
+                campo.value = "";
+                alert("Utilize apenas números e substitua vírgula(,) por ponto (.)");
+            }
+        }
+    </script>
+    <h:body style="background-color: whitesmoke ; background-size: 100%">
+        <h:form id="form" style="height: 100% !important">
+            <p:messages id="messages" showDetail="true" autoUpdate="true" closable="true" />
+            <p:outputPanel autoUpdate="true"   >
+                <h:panelGrid columns="3" cellpadding="3" cellspacing="3" style="width: 100%; border-radius: 15px 15px; background-color: lightsteelblue; ">
+                    <h:graphicImage url="/Images/ordemServico.png"  width="30px" height="30px" /> 
+                    <p:outputLabel value="ORDEM DE SERVIÇO" style="font-size: large !important; color: white" />
+                    <p:outputPanel >
+                        <p:commandButton  actionListener="#{ordemServicoController.salvar(false)}"  rendered="#{ordemServicoController.ordemServico ne null}" value="SALVAR" style="color: white; background-color: green; float: right; font-weight: bold"   />
+                        <p:commandButton  actionListener="#{ordemServicoController.cancelar()}" rendered="#{ordemServicoController.ordemServico ne null}" value="SAIR" style="color: white; background-color:grey ; float: right; border: none" />
+                        <p:commandButton  actionListener="#{ordemServicoController.novo()}" rendered="#{ordemServicoController.ordemServico eq null}" value="NOVO" style="color: white; background-color: darkturquoise; float: right; font-weight: bold" />
+                        <p:commandButton actionListener="#{ordemServicoController.fechar()}" ajax="false"  rendered="#{ordemServicoController.ordemServico eq null}"  value="FECHAR" style="color: white; background-color: red; float: right; border: none" />
+                        <p:commandButton value="Exclusao" actionListener="#{ordemServicoController.excluir()}"  rendered="#{ordemServicoController.ordemServico.id ne null}" 
+                                         update="messages" style="color: white; background-color:black ; float: right"  >
+                            <p:confirm header="Confirmacao" message="Deseja realmente excluir o Registro? " icon="ui-icon-alert" />
+                        </p:commandButton>
+                    </p:outputPanel>
+                </h:panelGrid>
+                <h:panelGrid columns="2" columnClasses="cabecalhoCol1, cabecalhoCol2" style="width: 99%" rendered="#{ordemServicoController.ordemServico ne null}" >
+                    <p:column>
+                        <h:panelGrid columns="3" style="width: 98%;background-color: whitesmoke ;border-radius: 10px 10px;margin-left: 2%">
+                            <p:column>
+                                <h:panelGrid columns="1" cellpadding="10" cellspacing="10" style="width: 99%; padding: 5px !important" >
+                                    <p:selectOneRadio  value="#{ordemServicoController.ordemServico.concluida}" rendered="#{not empty ordemServicoController.ordemServico}" style="width: 90%; font-weight: bold"  >
+                                        <f:selectItem itemLabel="CONCLUÍDO"  itemValue="true"  />
+                                        <f:selectItem itemLabel="EM ABERTO" itemValue="false" />
+                                    </p:selectOneRadio>
+                                </h:panelGrid>
+                            </p:column>
+                            <p:column>
+                                <p:commandLink target="_blank" actionListener="#{ordemServicoController.imprimirOrdemServico(null)}"   ajax="false"  rendered="#{ordemServicoController.ordemServico.id ne null}"  >
+                                    <h:graphicImage url="/Images/print.png"  width="30px" height="30px" />
+                                </p:commandLink>
+                            </p:column>
+                            <p:column rendered="#{not empty ordemServicoController.ordemServico}" >
+                                <h:panelGrid columns="1">
+                                    <h:outputLabel value="DATA" style="font-weight: bold; font-size: 14px" />
+                                    <h:outputText value="#{ordemServicoController.ordemServico.dataEmissao}" style="font-weight: bold; font-size: large" >
+                                        <f:convertDateTime pattern="dd/MM/yyyy" />
+                                    </h:outputText>  
+                                </h:panelGrid>
+                            </p:column>
+                        </h:panelGrid>
+                    </p:column>
+                    <p:column>
+                        <h:panelGrid columns="3" style="width: 98%;background-color: whitesmoke ;border-radius: 10px 10px;">
+                            <p:column>
+                                <h:panelGrid columns="1" style="background-color: darkorange;  width: 100%;border-radius: 10px 10px;" rendered="#{not empty ordemServicoController.ordemServico}" >
+                                    <p:outputLabel  value="TOTAL GERAL" style="font-weight: bold;color: white; margin-left: 5%" />
+                                    <p:outputLabel value="#{ordemServicoController.ordemServico.valorTotal}" style="color: white; font-weight: bold;font-size: larger; margin-left: 5%" >
+                                        <f:convertNumber currencySymbol="R$" type="currency"/>
+                                    </p:outputLabel>
+                                </h:panelGrid>
+                            </p:column>
+                            <p:column>
+                                <p:outputLabel  value="TOTAL PAGO" style="font-weight: bold; margin-left: 5%; " /><br/>
+                                <p:inputText value="#{ordemServicoController.ordemServico.valorPago}"  onkeyup="somenteNumeros(this);"   style="margin-left: 5%;margin-bottom: 2px; width: 85%; text-align: right" >
+                                    <p:ajax event="change" listener="#{ordemServicoController.calcularSaldo()}"  update="total"  />
+                                </p:inputText>
+                            </p:column>
+                            <p:column>
+                                <h:panelGrid columns="1" style="background-color:tomato ;  width: 100%;border-radius: 10px 10px;" rendered="#{not empty ordemServicoController.ordemServico}" >
+                                    <p:outputLabel  value="SALDO DEVEDOR" style="font-weight: bold;color: white; margin-left: 5%" />
+                                    <p:outputLabel id="total" value="#{ordemServicoController.ordemServico.valorSaldo}" style="color: white; font-weight: bold;font-size: larger; margin-left: 5%" >
+                                        <f:convertNumber currencySymbol="R$" type="currency"/>
+                                    </p:outputLabel>
+                                </h:panelGrid>
+                            </p:column>
+                        </h:panelGrid>
+                    </p:column>
+                </h:panelGrid>
+            </p:outputPanel>
+            <p:outputPanel id="listagem" rendered="#{ordemServicoController.ordemServico eq null}" style="height: 98% !important; ">
+                <br/>
+                <h:panelGrid columns="2" >
+                    <p:outputLabel  value="Listar concluidas" style="font-weight: bold" />
+                    <p:selectBooleanCheckbox value="#{ordemServicoController.listarOrdemServicosConcluidas}" >
+                        <p:ajax event="change" listener="#{ordemServicoController.recarregarListagem()}" update="form" />
+                    </p:selectBooleanCheckbox>
+
+                </h:panelGrid>
+                <p:dataTable emptyMessage="Nenhuma Ordem de serviço cadastrada"    scrollRows="20" 
+                             style="height: 98% "  scrollHeight="500" scrollable="true"  paginator="true" paginatorPosition="bottom"
+                             rowsPerPageTemplate="25,50,100,200,500,1000,99999999"
+                             value="#{ordemServicoController.ordemServicos}"  var="u" >
+                    <p:column headerText="#" width="5%">
+                        <p:commandLink actionListener="#{ordemServicoController.setOrdemServico(u)}"  immediate="true" >
+                            <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                        </p:commandLink>
+                    </p:column>
+                    <p:column   width="15%" headerText="Codigo" filterBy="#{u.id}" style="text-align: center">
+                        <p:outputLabel value="#{u.id}" style="text-align: center" /> 
+                    </p:column>
+                    <p:column   width="30%" headerText="Cliente" filterBy="#{u.cliente.nome}" filterMatchMode="contains" style="text-align: center">
+                        <p:outputLabel value="#{u.cliente.nome}" style="text-align: left" /> 
+                    </p:column>
+                    <p:column   width="20%" headerText="CPF/CPNJ" filterBy="#{u.cliente.cpfCnpj}" filterMatchMode="contains" style="text-align: left">
+                        <p:outputLabel value="#{u.cliente.cpfCnpj}" style="text-align: left" /> 
+                    </p:column>
+                    <p:column   width="18%" headerText="RG" filterBy="#{u.cliente.rg}" filterMatchMode="contains" style="text-align: left">
+                        <p:outputLabel value="#{u.cliente.rg}" style="text-align: left" /> 
+                    </p:column>
+                    <p:column  width="13%" headerText="Placa Ant" filterBy="#{u.placaAnterior}" filterMatchMode="contains" style="text-align: center">
+                        <p:outputLabel value="#{u.placaAnterior}" style="text-align: center" /> 
+                    </p:column>
+                    <p:column  width="18%" headerText="Renavan" filterBy="#{u.renavan}" filterMatchMode="contains" style="text-align: center">
+                        <p:outputLabel value="#{u.renavan}" style="text-align: left" /> 
+                    </p:column>
+                    <p:column  width="18%" headerText="Responsável" filterBy="#{u.usuarioExecutante.nome}" style="text-align: center">
+                        <p:outputLabel value="#{u.usuarioExecutante.nome}" style="text-align: left" /> 
+                    </p:column>
+                    <p:column   width="16%" headerText="Emissão"  style="text-align: center">
+                        <p:outputLabel value="#{u.dataEmissao}" >
+                            <f:convertDateTime pattern="dd/MM/yyyy" />
+                        </p:outputLabel>
+
+                    </p:column>
+                    <p:column   width="18%" headerText="Valor Total" filterBy="#{u.valorTotal}"  style="text-align: center">
+                        <p:outputLabel value="#{u.valorTotal }" style="text-align: right" >
+                            <f:convertNumber currencySymbol="R$" type="currency"/>
+                        </p:outputLabel> 
+                    </p:column>
+                    <p:column   width="18%" headerText="Valor Pago" filterBy="#{u.valorPago}"  style="text-align: center">
+                        <p:outputLabel value="#{u.valorPago }" style="text-align: right" >
+                            <f:convertNumber currencySymbol="R$" type="currency"/>
+                        </p:outputLabel> 
+                    </p:column>
+                    <p:column   width="18%" headerText="Valor Saldo" filterBy="#{u.valorSaldo}"  style="text-align: center">
+                        <p:outputLabel value="#{u.valorSaldo }" style="text-align: right" >
+                            <f:convertNumber currencySymbol="R$" type="currency"/>
+
+                        </p:outputLabel> 
+                    </p:column>
+                    <p:column width="5%" headerText="#" style="text-align: center"> 
+                        <p:commandLink target="_blank" actionListener="#{ordemServicoController.imprimirOrdemServico(u)}"   ajax="false"   >
+                            <h:graphicImage url="/Images/print.png"  width="20px" height="20px" />
+                        </p:commandLink>
+                    </p:column>
+                </p:dataTable>
+                <br/>
+
+            </p:outputPanel>
+
+            <p:outputPanel id="panelCabecalho" autoUpdate="true" rendered="#{not empty ordemServicoController.ordemServico}" style="width: 98%; background-color: whitesmoke;border-radius: 20px 20px;">
+                <h:panelGrid columns="5" style="width: 98%; margin-left: 1%"  cellpadding="2" cellspacing="2" >
+                    <p:column  >
+                        <p:outputLabel value="Cliente" style="font-weight: bold" /> <br/>
+                        <p:inputText style="width: 85%; color: black; background-color: white "  disabled="true" value="#{ordemServicoController.ordemServico.cliente.nome}" /> 
+                        <p:commandLink onclick="PF('dlgCliente').show();"  >
+                            <h:graphicImage url="/Images/search.png"  style="vertical-align: bottom"  width="30px" height="30px"/>
+                        </p:commandLink>
+                    </p:column>
+
+                    <p:column>
+                        <h:panelGrid columns="1" >
+                            <p:outputLabel value="Doc. originais entregues dia" style="font-weight: bold" />
+                            <p:calendar value="#{ordemServicoController.ordemServico.dataEntregaDocOriginais}"  pattern="dd/MM/yyyy" mask="true"  >
+                            </p:calendar>
+                        </h:panelGrid>
+                    </p:column>
+
+                    <p:column>
+                        <h:panelGrid columns="1" >
+                            <p:outputLabel value="Data encaminhamento" style="font-weight: bold" />
+                            <p:calendar value="#{ordemServicoController.ordemServico.dataEncaminhamento}"  pattern="dd/MM/yyyy" mask="true"  >
+                            </p:calendar>
+                        </h:panelGrid>
+                    </p:column>
+                    <p:column>
+                        <h:panelGrid columns="1" >
+                            <p:outputLabel value="Data assianatura recibo" style="font-weight: bold" />
+                            <p:calendar value="#{ordemServicoController.ordemServico.dataAssRecibo}"  pattern="dd/MM/yyyy" mask="true"  >
+                            </p:calendar>
+                        </h:panelGrid>
+                    </p:column>
+                    <p:column>
+                        <p:outputLabel value="Observações" style="font-weight: bold" />
+                        <p:inputTextarea value="#{ordemServicoController.ordemServico.observacao}"  style="width: 95%;" />  
+                    </p:column>
+                </h:panelGrid>
+                <h:panelGrid columns="3" cellpadding="2" cellspacing="2" style="width: 98%; margin-left: 1%" columnClasses="column1, column2,column3" >
+                    <p:column>
+                        <h:panelGrid columns="3" style="width: 99%; vertical-align: top !important">
+                            <p:column>
+                                <p:outputLabel value="Placa Atual" style="font-weight: bold" />
+                                <p:inputText style="width: 85%"   value="#{ordemServicoController.ordemServico.placaAtual}"                                      /> 
+                            </p:column>
+                            <p:column>
+                                <p:outputLabel value="Placa anterior" style="font-weight: bold" /><br/>
+                                <p:inputText style="width: 85%"   value="#{ordemServicoController.ordemServico.placaAnterior}" 
+                                             /> 
+                            </p:column>
+                            <p:column>
+                                <p:outputLabel value="Renavan" style="font-weight: bold" /><br/>
+                                <p:inputText style="width: 85%"   value="#{ordemServicoController.ordemServico.renavan}" 
+                                             /> 
+                            </p:column>
+                            <p:column>
+                                <p:outputLabel value="Chassi" style="font-weight: bold" /><br/>
+                                <p:inputText style="width: 85%"   value="#{ordemServicoController.ordemServico.chassi}" 
+                                             /> 
+                            </p:column>
+                            <p:column>
+                                <p:outputLabel value="Ano" style="font-weight: bold" /><br/>
+                                <p:inputText style="width: 85%"   value="#{ordemServicoController.ordemServico.ano}" 
+                                             /> 
+                            </p:column>
+                            <p:column>
+                                <p:outputLabel value="Modelo" style="font-weight: bold" /><br/>
+                                <p:inputText style="width: 85%"   value="#{ordemServicoController.ordemServico.modelo}" 
+                                             /> 
+                            </p:column>
+                            <p:column>
+                                <p:outputLabel value="Combustivel" style="font-weight: bold" />
+                                <p:selectOneMenu id="comb" value="#{ordemServicoController.ordemServico.combustivel}" editable="true"   >
+                                    <f:selectItems value="#{ordemServicoController.listarCombustiveis()}" />
+                                    <!--<p:ajax event="change" update="@this" listener="# {orcamentoController.atualizaItem(p)}" />-->
+                                </p:selectOneMenu>
+                            </p:column>
+                            <p:column>
+                                <p:outputLabel value="Cor" style="font-weight: bold" /><br/>
+                                <p:inputText style="width: 85%"   value="#{ordemServicoController.ordemServico.cor}" 
+                                             /> 
+                            </p:column>
+                            <p:column>
+                                <p:outputLabel value="Venc.CRV" style="font-weight: bold" /><br/>
+                                <p:calendar style="width: 85%"   value="#{ordemServicoController.ordemServico.dataVencimentoCrv}" 
+                                            /> 
+                            </p:column>
+                        </h:panelGrid>
+                    </p:column>
+                    <p:column>
+                        <p:outputLabel value="Pendências" style="font-weight: bold" /> <br/>
+                        <h:panelGrid style="width: 99%" columns="2" >
+                            <p:column>
+                                <p:selectBooleanCheckbox  value="#{ordemServicoController.ordemServico.pendenciaRg}" itemLabel="RG" /><br/>
+                                <p:selectBooleanCheckbox  value="#{ordemServicoController.ordemServico.pendenciaCPF}" itemLabel="CPF" /><br/>
+                                <p:selectBooleanCheckbox  value="#{ordemServicoController.ordemServico.pendenciaCNH}" itemLabel="CNH" /><br/>
+                                <p:selectBooleanCheckbox  value="#{ordemServicoController.ordemServico.pendenciaCompEnd}" itemLabel="Comp.Endereço" /><br/>
+                                <p:selectBooleanCheckbox  value="#{ordemServicoController.ordemServico.pendenciaCertCasamento}" itemLabel="Cert.Casamento" /><br/>
+                                <p:selectBooleanCheckbox  value="#{ordemServicoController.ordemServico.pendenciaCertDivorcio}" itemLabel="Cert.Divorcio" /><br/>
+                                <p:selectBooleanCheckbox  value="#{ordemServicoController.ordemServico.pendenciaCarroVistoria}" itemLabel="Carro para vistoria" /><br/>
+                            </p:column>
+                            <p:column>
+                                <p:selectBooleanCheckbox  value="#{ordemServicoController.ordemServico.pendenciaPgtoDebitos}" itemLabel="Pagamento Débitos" /><br/>
+                                <p:selectBooleanCheckbox  value="#{ordemServicoController.ordemServico.pendenciaCRV}" itemLabel="CRV" /><br/>
+                                <p:selectBooleanCheckbox  value="#{ordemServicoController.ordemServico.pendenciaContrSocial}" itemLabel="Contrato social" /><br/>
+                                <p:selectBooleanCheckbox  value="#{ordemServicoController.ordemServico.pendenciaDeclaracao}" itemLabel="Declaração" /><br/>
+                                <p:selectBooleanCheckbox  value="#{ordemServicoController.ordemServico.pendenciaProcuracao}" itemLabel="Procuração" /><br/>
+                                <p:selectBooleanCheckbox  value="#{ordemServicoController.ordemServico.pendenciaCartTrabalho}" itemLabel="Carteira de trabalho" /><br/>
+                                <p:selectBooleanCheckbox  value="#{ordemServicoController.ordemServico.pendenciaDinheiro}" itemLabel="Dinheiro" />
+                            </p:column>
+                        </h:panelGrid>
+
+                    </p:column>
+                    <p:column>
+                        <h:panelGrid columns="1" >
+                            <p:outputLabel value="Data limite pendencias" style="font-weight: bold" />
+                            <p:calendar value="#{ordemServicoController.ordemServico.dataLimitePendencias}"  pattern="dd/MM/yyyy" mask="true"  >
+                            </p:calendar>
+                        </h:panelGrid>
+                        <br/>
+                        <p:outputLabel value="Armário" style="font-weight: bold" /><br/>
+                        <p:inputText value="#{ordemServicoController.ordemServico.armario}" />
+                        <p:outputLabel value="Gaveta" style="font-weight: bold" /><br/>
+                        <p:inputText value="#{ordemServicoController.ordemServico.gaveta}" />
+
+                    </p:column>
+
+                </h:panelGrid>
+                <h:panelGrid style="margin-left: 1%; width: 40% " cellpadding="3" cellspacing="3"  columns="2"  columnClasses="columnUser1,columnUser2">
+                    <p:column>
+                        <h:panelGrid style="margin-left: 1%; "  columns="2" columnClasses="columnUser1,columnUser2">
+                            <p:column>
+                                <p:outputLabel value="Profissional"  style="font-weight: bold"/><br/>
+                                <p:inputText  disabled="true" value="#{ordemServicoController.ordemServico.usuarioExecutante.nome}" /> 							
+                            </p:column>
+                            <p:column>
+                                <p:commandLink style="text-align: left"   onclick="PF('dlgUsuario').show();" >
+                                    <h:graphicImage url="/Images/search.png" style="vertical-align: bottom"  width="30px" height="30px"/>
+                                </p:commandLink>
+                            </p:column>
+                        </h:panelGrid>
+
+                    </p:column>
+                    <p:column>
+                        <p:outputLabel value="Tabela de preço"  style="font-weight: bold" /><br/>
+                        <p:inputText style="width:70%; color: #000" disabled="true" value="#{ordemServicoController.tabelaPreco.descricao}" /> 
+                        <p:commandLink onclick="PF('dlgTblPreco').show();"  disabled="##{ordemServicoController.ordemServico.concluida}" >
+                            <h:graphicImage url="/Images/search.png"  style="vertical-align: bottom"  width="30px" height="30px"/>
+                        </p:commandLink>
+                    </p:column>
+
+                </h:panelGrid>
+            </p:outputPanel>
+            <p:outputPanel id="panelItens" autoUpdate="true" rendered="#{not empty ordemServicoController.ordemServico}" style="width: 98%;  max-height: 40%;border-radius: 10px 10px; background-color: whitesmoke" >
+
+                <p:commandButton value="ADICIONAR PRODUTO" style="background-color: green; color: white; margin-left: 84%" onclick="PF('dlgProduto').show();"  rendered="#{not empty ordemServicoController.ordemServico}" />
+                <br/>
+                <br/>
+                <p:dataTable emptyMessage="Nenhum item"  
+                             scrollable="true" scrollRows="10" scrollHeight="400px"   value="#{ordemServicoController.ordemServico.itens}"  var="p" >
+                    <p:column  width="30%"  headerText="Produto"  style="text-align: left">
+                        <p:outputLabel value="#{p.produto.descricao} #{ordemServicoController.concatenaObservacao(p.observacao) }" style="text-align: center" /> 
+                    </p:column>
+
+                    <p:column   width="15%" headerText="Vlr Unitário"  style="text-align: left">
+                        <p:inputText  id="valorUnitario" value="#{p.valorUnitario}" onkeyup="somenteNumeros(this);" 
+                                      disabled="#{(not empty p.tabelaPrecoItem.valorVenda and p.tabelaPrecoItem.valorVenda > 0 ) }"  style="width: 80%; text-align: right;" >
+                            <p:ajax event="change" listener="#{ordemServicoController.calcularSubtotal()}"  update="total"  />
+                        </p:inputText>
+                    </p:column>
+                    <p:column   width="22%" headerText="Qtd"  style="text-align: center">
+                        <p:panelGrid columns="3" style="width: 100%">
+                            <p:column style="width: 5%">
+                                <p:commandLink actionListener="#{ordemServicoController.minQtd(p)}" update="@form"   >
+                                    <h:graphicImage url="/Images/minus.png"  width="20px" height="20px" />
+                                </p:commandLink>
+                            </p:column>
+                            <p:column style="width: 70%" >
+                                <p:inputText  id="qtd" value="#{p.quantidade}"  style="width: 98%; text-align: right; color: black" >
+                                    <p:ajax event="change" listener="#{ordemServicoController.calcularSubtotal()}"  update="total"  />
+                                </p:inputText>
+                            </p:column>
+                            <p:column style="width: 5%">
+                                <p:commandLink actionListener="#{ordemServicoController.addQtd(p)}"    update="@form"  >
+                                    <h:graphicImage url="/Images/add3.png"  width="20px" height="20px" />
+                                </p:commandLink>
+                            </p:column>
+                        </p:panelGrid>
+                    </p:column>
+                    <p:column   width="8%" headerText="$ Desc"  style="text-align: left">
+                        <p:outputLabel value="#{p.valorDesconto}" style="width: 98%; text-align: center"  >
+                            <f:convertNumber currencySymbol="R$" type="currency"/>
+                        </p:outputLabel>
+                    </p:column>
+                    <p:column   width="8%" headerText="% Desc"  style="text-align: left">
+                        <p:outputLabel value="#{p.percDesconto}" style="width: 98%; text-align: center"   />
+                    </p:column>
+                    <p:column   width="8%" headerText="$ Acresc"  style="text-align: left">
+                        <p:outputLabel value="#{p.valorAcrescimo}" style="width: 98%; text-align: center"   >
+                            <f:convertNumber currencySymbol="R$" type="currency"/>
+                        </p:outputLabel>
+                    </p:column>
+                    <p:column   width="8%" headerText="% Acresc"  style="text-align: left">
+                        <p:outputLabel value="#{p.percAcrescimo}" style="width: 98%; text-align: center"  />
+                    </p:column>
+                    <p:column   width="15%" headerText="Subtotal"  style="text-align: center">
+                        <p:inputText readonly="true" id="total" value="#{p.valorTotal}"  style="width: 98%; text-align: center" >
+                            <f:convertNumber currencySymbol="R$" type="currency"/>
+                        </p:inputText>
+                    </p:column>
+                    <p:column headerText="#" width="4%">
+                        <p:commandLink   actionListener="#{ordemServicoController.selecionarItem(p)}"  immediate="true" onsuccess="PF('dlgEdit').show();"  >
+                            <h:graphicImage url="/Images/edit.png"  width="20px" height="20px" />
+                        </p:commandLink>
+                    </p:column>
+                    <p:column headerText="#" width="4%">
+                        <p:commandLink actionListener="#{ordemServicoController.removeItem(p)}"    >
+                            <h:graphicImage url="/Images/remove.png"  width="20px" height="20px" />
+                        </p:commandLink>
+                    </p:column>
+                </p:dataTable>
+            </p:outputPanel>
+            <p:dialog       widgetVar="dlgEdit" id="dlgEdit" height="350px" width="40%"  modal="true" header="Aplicar deconto/acrescimo">
+                <p:outputPanel autoUpdate="true" style="width: 99%">
+                    <h:panelGrid columns="1" columnClasses="column1, column2" style="width: 99%; height: 99%">
+                        <p:outputLabel value="#{ordemServicoController.itemSelecionado.produto.descricao}"  style="text-align: right; font-weight: bold; font-size: x-large !important" />
+                        <br/>
+                        <p:outputLabel value="% desconto" style="font-weight: bold" />
+                        <p:inputText value="#{ordemServicoController.percDesconto}"  onkeyup="somenteNumeros(this);" style="text-align: right ; width: 30%" />
+                        <p:outputLabel value="% acréscimo" style="font-weight: bold" />
+                        <p:inputText  value="#{ordemServicoController.percAcrescimo}" onkeyup="somenteNumeros(this);" style="text-align: right; width: 30% " />
+                        <p:outputLabel value="Observação" style="font-weight: bold" />
+                        <p:inputText  value="#{ordemServicoController.observacao}" placeholder="DIGITE AQUI OS DETALHES DO ITEM PARA COMPOR A SUA DESCRIÇÃO"  style="text-align: right; width: 90% " />
+                    </h:panelGrid>
+                </p:outputPanel>
+                <br/>
+
+                <p:outputPanel >
+                    <h:commandButton value="CONFIRMAR" style="color: green; float: right" actionListener="#{ordemServicoController.confirmaEdicao()}" />
+                </p:outputPanel>
+            </p:dialog>
+            <p:dialog  style="background-color: lightslategray;" 
+                       widgetVar="dlgUsuario" id="dlgUsuario" height="400px" width="40%"  modal="true" header="Selecao de Profissional">
+                <p:dataTable    value="#{ordemServicoController.listarUsuarios()}" var="u" scrollable="true" scrollRows="15" scrollHeight="500px"   >
+                    <p:column headerText="#" width="8%">
+                        <p:commandLink actionListener="#{ordemServicoController.ordemServico.setUsuarioExecutante(u)}"  oncomplete="PF('dlgUsuario').hide();"  >
+                            <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                        </p:commandLink>
+                    </p:column>
+                    <p:column headerText="Nome" filterBy="#{u.nome}">
+                        #{u.nome}   
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+            <p:dialog  style="background-color: lightslategray;" 
+                       widgetVar="dlgTblPreco" id="dlgTblPreco" height="500px" width="70%"  modal="true" header="Selecao de Precos">
+                <p:dataTable    value="#{ordemServicoController.listarTabelasPreco()}" var="u" scrollable="true" scrollRows="15" scrollHeight="500px" >
+                    <p:column headerText="#" width="8%">
+                        <p:commandLink actionListener="#{ordemServicoController.setTabelaPreco(u)}"  oncomplete="PF('dlgTblPreco').hide();" update="form"  >
+                            <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                        </p:commandLink>
+                    </p:column>
+                    <p:column headerText="Tabela" filterBy="#{u.descricao}">
+                        #{u.descricao}   
+                    </p:column>
+                </p:dataTable>
+                <p:commandLink value="NENHUM REGISTRO" style="color: white !important; float: right" actionListener="#{ordemServicoController.setTabelaPreco(null)}" oncomplete="PF('dlgTblPreco').hide();" update="form" />
+            </p:dialog>
+
+
+            <p:dialog  style="background-color: lightslategray;" 
+                       widgetVar="dlgCliente" id="dlgCliente" height="500px" width="50%"  modal="true" header="Selecao de Clientes">
+                <p:dataTable    value="#{ordemServicoController.listarClientes()}" var="i"  scrollable="true" scrollRows="15" scrollHeight="500px"  >
+                    <p:column headerText="#" width="8%">
+                        <p:commandLink actionListener="#{ordemServicoController.ordemServico.setCliente(i)}"  oncomplete="PF('dlgCliente').hide();"   >
+                            <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                        </p:commandLink>
+                    </p:column>
+                    <p:column headerText="Cliente" filterBy="#{i.nome}">
+                        #{i.nome}   
+                    </p:column>
+                    <p:column headerText="Cpf/Cnpj" filterBy="#{i.cpfCnpj}">
+                        #{i.cpfCnpj}   
+                    </p:column>
+                    <p:column headerText="RG" filterBy="#{i.cpfCnpj}">
+                        #{i.rg}   
+                    </p:column>
+                </p:dataTable>
+                <p:commandButton value="NOVO CLIENTE" onclick="PF('dlgNovoCliente').show();" actionListener="#{ordemServicoController.novoCliente()}" onsuccess="PF('dlgCliente').hide();" />
+                <p:commandLink value="NENHUM REGISTRO" style="color: white !important; float: right" actionListener="#{ordemServicoController.ordemServico.setCliente(null)}" oncomplete="PF('dlgCliente').hide();" update="form" />
+            </p:dialog>
+            <p:dialog  style="background-color: lightslategray;" 
+                       widgetVar="dlgProduto" id="dlgProduto" height="500px" width="50%"  modal="true" header="Selecao de Produtos">
+                <p:dataTable     value="#{ordemServicoController.listarProdutos()}" var="c"  
+                                 scrollable="true" scrollHeight="400" scrollRows="20"  >
+                    <p:column headerText="#" width="8%">
+                        <p:commandLink actionListener="#{ordemServicoController.addProduto(c)}"   >
+                            <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                        </p:commandLink>
+                    </p:column>
+                    <p:column headerText="Produto" filterBy="#{c.descricao}">
+                        #{c.descricao}   
+                    </p:column>
+                    <p:column headerText="Tipo" filterBy="#{c.tipoProduto.descricao}">
+                        #{c.tipoProduto.descricao}   
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+            <p:dialog   
+                widgetVar="dlgNovoCliente" id="dlgNovoCliente" height="600px" width="50%"  modal="true" header="Cadastro rápido cliente">
+                <h:panelGrid columns="1" cellpadding="2" cellspacing="2" style="margin-left: 1%; width: 90%" >
+                    <p:outputLabel value="Nome" style="font-weight: bold; margin-top: 5px" />
+                    <p:inputText  value="#{ordemServicoController.cliente.nome}" style="width: 90%"/>
+                    <p:outputLabel value="CPF/CNPJ" style="font-weight: bold" />
+                    <p:inputText value="#{ordemServicoController.cliente.cpfCnpj}" style="width: 50%" />
+                    <p:outputLabel value="RG" style="font-weight: bold" />
+                    <p:inputText value="#{ordemServicoController.cliente.rg}" style="width: 50%" />
+                    <p:outputLabel value="Email" style="font-weight: bold" />
+                    <p:inputText value="#{ordemServicoController.cliente.email}" style="width: 90%" />
+                    <p:outputLabel value="Telefone" style="font-weight: bold" />
+                    <p:inputText value="#{ordemServicoController.cliente.telefone}" style="width: 40%" />
+                    <p:outputLabel value="Observações" style="font-weight: bold" />
+                    <p:inputTextarea value="#{ordemServicoController.cliente.observacao}" style="width: 90%" />
+                </h:panelGrid>
+                <p:commandButton value="SALVAR"  style="float:right" actionListener="#{ordemServicoController.salvarNovoCliente()}"  onsuccess="PF('dlgNovoCliente').hide();"  />
+            </p:dialog>
+
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                <p:commandButton value="Excluir" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                <p:commandButton value="Cancelar" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+            </p:confirmDialog>
+        </h:form>
+    </h:body>
+
+
+</html>
+
+
+

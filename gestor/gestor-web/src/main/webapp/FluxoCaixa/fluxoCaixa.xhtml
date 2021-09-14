@@ -1,0 +1,76 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Gestor - Fluxo de caixa</title>
+    </h:head>
+    <style type="text/css"> 
+        .footer {
+            position:absolute;
+            bottom:0;
+            width:98%;
+            float: right;
+        }
+    </style>
+    <h:form>
+        #{cadastrosController.init()}
+        <h:body style="background-color: activecaption ; background-size: 100%">
+            <h:panelGrid columns="8"  cellpadding="10" cellspacing="10"  style="width: 90%" >
+                <p:column>
+                    <h:panelGrid columns="1" >
+                        <h:commandLink title="Usuarios" action="cadastroUsuario.xhtml" rendered="#{usuarioController.usuario.administrador}" >
+                            <h:graphicImage url="/Images/usuario.png" style="width: 100px; height: 100px"  />
+                        </h:commandLink>
+                        <p:outputLabel value="USUÁRIOS" />
+                    </h:panelGrid>
+                </p:column>
+                <p:column>
+                    <h:panelGrid columns="1" >
+                        <h:commandLink title="Clientes" action="cadastroClientes.xhtml"  >
+                            <h:graphicImage url="/Images/user-group.png" style="width: 100px; height: 100px"  />
+                        </h:commandLink>
+                        <p:outputLabel value="CLIENTES" />
+                    </h:panelGrid>
+                </p:column>
+                <p:column>
+                    <h:panelGrid columns="1">
+                        <h:commandLink title="Fornecedores" action="cadastroFornecedores.xhtml" >
+                            <h:graphicImage url="/Images/empresa.png" style="width: 100px; height: 100px"  />
+                        </h:commandLink>
+                        <p:outputLabel value="FORNECEDORES" />
+                    </h:panelGrid>
+                </p:column>
+
+                <p:column>
+                    <h:panelGrid columns="1">
+                        <h:commandLink title="Tipo produto" action="cadastroTipoProduto.xhtml" >
+                            <h:graphicImage url="/Images/tipoProduto.png" style="width: 100px; height: 100px"  />
+                        </h:commandLink>
+                        <p:outputLabel value="TIPO PRODUTO" />
+                    </h:panelGrid>
+                </p:column>
+
+            </h:panelGrid>
+                <p:outputPanel styleClass="panelCentral">
+                <p:dock position="bottom"  >
+                    <p:menuitem value="Cadastros"  icon="/Images/cadastro_icon.png" url="/Cadastros/cadastros.xhtml"/>
+                    <p:menuitem value="Financeiro"  icon="/Images/cash-clock.png" url="/Financeiro/financeiro.xhtml"/>
+                    <p:menuitem value="Fluxo de Caixa" rendered="#{usuarioController.usuario.empresa.fluxoCaixa}"   icon="/Images/fluxoCaixa.png" url="/FluxoCaixa/fluxoCaixa.xhtml"/>
+                    <p:menuitem value="Estoque"  rendered="#{usuarioController.usuario.empresa.controlaEstoque}"   icon="/Images/estoque.png" url="/Estoque/estoque.xhtml"/>
+                    <p:menuitem value="Relatorios" rendered="#{usuarioController.usuario.administrador or usuarioController.usuario.userSystem}" icon="/Images/notificacao.png" url="/Cadastros/relatorios.xhtml"/>
+                    <p:menuitem value="Sair"  icon="/Images/logout.png" url="index.xhtml"/>
+                    <!-- more menuitems -->
+                </p:dock>
+            </p:outputPanel>
+            <p:outputPanel styleClass="footer">
+                <p:commandButton actionListener="#{cadastrosController.fechar()}" ajax="false"    value="FECHAR" style="color: white; background-color: red; float: right" />
+            </p:outputPanel>
+        </h:body>
+    </h:form>
+
+</html>
+

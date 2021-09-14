@@ -1,0 +1,77 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Gestor - Login</title>
+    </h:head>
+    <style type="text/css">
+
+        .panelCentral{
+            margin-top: 5%; 
+            background-color: dodgerblue;
+            box-shadow: 7px 7px 7px 7px;
+            position: absolute;
+            left: 33%;
+            border-radius: 10px 10px;
+            top: 20%;
+            width:25% !important;
+            margin-left: 3px !important;
+            margin-right: 2px !important;
+
+        }
+        .bodyBackGround{
+            no-repeat center center fixed;
+            background-size: cover;
+            height: 100%;
+
+        }
+        .ui-widget {
+            font-size: 12px !important;
+        }
+    </style>
+  
+    <div class="bodyBackGround">
+        <h:body styleClass="bodyBackGround">
+            <h:form>
+                <p:messages id="messages" showDetail="true" autoUpdate="true" closable="true" />
+                <h:panelGrid columns="2" style="width: 100%;height: 90%">
+                    <p:column>
+                        <h:graphicImage url="/Images/backgroundLogin.png"  width="100%"   />
+                    </p:column>
+                    <p:column>
+                        <p:outputPanel  styleClass="panelCentral" >
+                            <br/>
+                            <p:focus for="inputId"/>
+                            <h:panelGrid columns="1" cellpadding="3" cellspacing="2"  style="width: 97%; margin-left: 2%; " >
+                                <h:panelGrid columns="2" style="width: 85%">
+                                    <p:column>
+                                        <p:commandLink >
+                                            <p:graphicImage url="/Images/empresa.png" style="width: 110px; height: 110px" />
+                                        </p:commandLink>
+                                    </p:column>
+                                    <p:column>
+                                        <p:outputLabel value="GE$TOR EXPERT" style="font-weight: bold; font-size: x-large !important;  color: whitesmoke;text-align: center;margin-left: 5%;  " /><br/>
+                                        <!--<p:outputLabel value="EXPERT" style="font-weight: bold; font-size: xx-large !important;  color: whitesmoke;text-align: center;margin-left: 15%;  " />-->
+                                    </p:column>
+                                </h:panelGrid>
+                                <h4>Faça o login</h4>
+                                <p:inputText id="inputId"  value="#{usuarioController.loginKey}" placeholder="EMPRESA" style="width: 99%" />
+                                <p:inputText  value="#{usuarioController.login}"  placeholder="login" style="width: 99%"  />
+                                <p:password value="#{usuarioController.senha}" placeholder="senha" style="width: 99%"  />  
+                                <p:outputLabel value=""/>
+                                <p:commandButton ajax="false"  value="Acessar"  actionListener="#{usuarioController.logar()}" style=" color: white; background-color: midnightblue; border-radius: 15px 15px; width: 98%"  >
+                                </p:commandButton>
+                            </h:panelGrid>
+                        </p:outputPanel>
+                    </p:column>
+                </h:panelGrid>
+            </h:form>
+        </h:body>
+    </div> 
+
+</html>
+

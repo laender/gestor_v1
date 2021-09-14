@@ -1,0 +1,208 @@
+relat<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                template="/WEB-INF/templates/template.xhtml">
+
+    <h:head>
+        <title>Gestor - Estoque/Custos</title>
+    </h:head>
+
+    <ui:define name="body" >
+        <style type="text/css"> 
+            .column1{}
+            .column2{
+                vertical-align: top;
+            }
+            .ui-widget {
+                font-size: 12px !important;
+            }
+        </style>
+
+        <h:body style="background-color: whitesmoke ; background-size: 100%;height: 98% !important">
+            <h:form id="form" style="overflow: auto" >
+                <h:panelGrid columns="3" cellpadding="3" cellspacing="3" style="width: 99%;  background-color: lightsteelblue; box-shadow: 10px 10px">
+                    <h:graphicImage url="/Images/graphic.ico"  width="30px" height="30px" /> 
+                    <p:outputLabel value="RELATORIO ESTOQUE" style="font-size: large !important; color: white" />
+                    <p:outputPanel >
+                        <p:commandButton  actionListener="#{gerenciadorController.listarMovimentacoesEstoque()}"  value="GERAR" style="color: white; background-color: green; float: right; font-weight: bold"  />
+                        <p:commandButton actionListener="#{gerenciadorController.fechar()}" ajax="false"  value="FECHAR" style="color: white; background-color: red; float: right; border: none" />
+                    </p:outputPanel>
+                </h:panelGrid>
+                <p:separator  />
+                <p:outputPanel id="panelFiltros" autoUpdate="true" style="height: 98% !important; background-color: whitesmoke;border-radius: 20px 20px;" >
+                    <p:focus for="inputId"/>
+                    <h:panelGrid columns="5" cellpadding="2" cellspacing="2"  width="80%" >
+                        <p:column>
+                            <p:outputLabel id="inputId" value="Data Inicial" style="font-weight: bold" /> <br/>
+                            <p:calendar value="#{gerenciadorController.dataInicial}" pattern="dd/MM/yyyy" mask="true"  />
+                        </p:column>
+                        <p:column>
+                            <p:outputLabel value="Data final" style="font-weight: bold" /><br/>
+                            <p:calendar value="#{gerenciadorController.dataFinal}" pattern="dd/MM/yyyy" mask="true"  />
+                        </p:column>
+                        <p:column>
+                            <p:outputLabel value="Produto"  style="font-weight: bold" /><br/>
+                            <p:inputText style="width:70%; color: #000" disabled="true" value="#{gerenciadorController.produto.descricao}" /> 
+                            <p:commandLink onclick="PF('dlgProduto').show();"  >
+                                <h:graphicImage url="/Images/search.png"  style="vertical-align: bottom"  width="30px" height="30px"/>
+                            </p:commandLink>
+                        </p:column>
+                        <p:column>
+                            <p:outputLabel value="Doc.entrada/saida"  style="font-weight: bold" /><br/>
+                            <p:inputText value="#{gerenciadorController.docEntradaSaidaEstoque}" />
+                        </p:column>
+                        <p:column>
+                            <h:panelGrid style="border-radius: 10px 20px; text-align: center; background-color: salmon ; width: 99%" >
+                                <p:outputLabel value="Total compra período" style="color: white; font-weight: bold" />
+                                <p:outputLabel value="#{gerenciadorController.totalValorCompra}" style="font-weight: bold; color: white" >
+                                    <f:convertNumber  type="currency"/>
+                                </p:outputLabel>
+                                <br/>
+                            </h:panelGrid>
+                        </p:column>
+                    </h:panelGrid>
+                    <h:panelGrid columns="2" style="width: 10%">
+                        <p:outputLabel  value="Saidas " style="font-weight: bold" />
+                        <p:selectBooleanCheckbox value="#{gerenciadorController.saidaEstoque}" />
+                        <p:outputLabel  value="Entradas " style="font-weight: bold" />
+                        <p:selectBooleanCheckbox value="#{gerenciadorController.entradaEstoque}" />
+                    </h:panelGrid>
+
+                </p:outputPanel>
+                <br/>
+                <br/>
+                <p:outputLabel value="Movimentos(#{gerenciadorController.movimentosEstoque.size()})" style="font-weight: bold; font-size: large !important" />
+                <p:outputPanel autoUpdate="true" >
+
+                    <p:dataTable scrollable="true" scrollRows="10" scrollHeight="400" value="#{gerenciadorController.movimentosEstoque}" var="m" >
+                        <p:column headerText="Data mov.">
+                            <p:outputLabel value="#{m.dataMovimento}" >
+                                <f:convertDateTime pattern="dd/MM/yyyy" />
+                            </p:outputLabel>
+                        </p:column>
+                        <p:column headerText="Produto">
+                            #{m.estoque.produto.descricao}
+                        </p:column>
+                        <p:column headerText="Quantidade" style="text-align: center">
+                            #{m.quantidade}
+                        </p:column>
+                        <p:column headerText="Doc.entrada/saída">
+                            #{m.notaFiscal}
+                        </p:column>
+                        <p:column headerText="Venda" style="text-align: center">
+                            #{m.idOrcamento}
+                        </p:column>
+                        <p:column headerText="Usuario" style="text-align: center">
+                            #{m.usuario.nome}
+                        </p:column>
+                        <p:column headerText="Tipo" style="text-align: center">
+                            #{m.tipoMovimento.value}
+                        </p:column>
+                        <p:column headerText="Obs">
+                            #{m.observacao}
+                        </p:column>
+                        <p:column headerText="Valor mov.">
+                            <p:outputLabel value="#{m.valorMovimento}" >
+                                <f:convertNumber currencySymbol="R$" type="currency"/>
+                            </p:outputLabel>
+                        </p:column>
+                    </p:dataTable>
+                </p:outputPanel>
+
+                <p:dialog  style="background-color: lightslategray;" 
+                           widgetVar="dlgUsuario" id="dlgUsuario" height="60%" width="60%"  modal="true" header="Selecao de Vendedores">
+                    <p:dataTable    value="#{gerenciadorController.listarUsuarios()}" var="u" >
+                        <p:column headerText="#" width="8%">
+                            <p:commandLink actionListener="#{gerenciadorController.setUsuario(u)}"  oncomplete="PF('dlgUsuario').hide();"  >
+                                <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                            </p:commandLink>
+                        </p:column>
+                        <p:column headerText="Nome" filterBy="#{u.nome}">
+                            #{u.nome}   
+                        </p:column>
+                    </p:dataTable>
+                </p:dialog>
+
+                <p:dialog  style="background-color: lightslategray;" 
+                           widgetVar="dlgProduto" id="dlgProduto" height="80%" width="60%"  modal="true" header="Selecao de Produtos">
+                    <p:dataTable     value="#{gerenciadorController.listarProdutos()}" var="c"  
+                                     scrollable="true" scrollHeight="400" scrollRows="20"  >
+                        <p:column headerText="#" width="8%">
+                            <p:commandLink actionListener="#{gerenciadorController.setProduto(c)}"   >
+                                <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                            </p:commandLink>
+                        </p:column>
+                        <p:column headerText="Produto" filterBy="#{c.descricao}">
+                            #{c.descricao}   
+                        </p:column>
+                        <p:column headerText="Tipo" filterBy="#{c.tipoProduto.descricao}">
+                            #{c.tipoProduto.descricao}   
+                        </p:column>
+                        <p:column headerText="Fornecedor" filterBy="#{c.fornecedor.nome}">
+                            #{c.fornecedor.nome}   
+                        </p:column>
+                        <p:column headerText="Estoque" rendered="#{gerenciadorController.empresa.controlaEstoque}" >
+                            #{c.estoque.quantidade}
+                        </p:column>
+                        <p:column headerText="Un.Med" rendered="#{gerenciadorController.empresa.controlaEstoque}" >
+                            #{c.estoque.unidadeMedida.sigla}
+                        </p:column>
+                    </p:dataTable>
+                    <p:commandLink style="float:right" action="PF('dlgProduto').hide();"  />
+                </p:dialog>
+
+                <p:dialog  style="background-color: lightslategray;" 
+                           widgetVar="dlgCliente" id="dlgCliente" height="80%" width="70%"  modal="true" header="Selecao de Clientes">
+                    <p:dataTable    value="#{gerenciadorController.listarClientes()}" var="i" >
+                        <p:column headerText="#" width="8%">
+                            <p:commandLink actionListener="#{gerenciadorController.setCliente(i)}"  oncomplete="PF('dlgCliente').hide();"   >
+                                <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                            </p:commandLink>
+                        </p:column>
+                        <p:column headerText="Cliente" filterBy="#{i.nome}">
+                            #{i.nome}   
+                        </p:column>
+                        <p:column headerText="Cpf/Cnpj" filterBy="#{i.cpfCnpj}">
+                            #{i.cpfCnpj}   
+                        </p:column>
+                    </p:dataTable>
+                </p:dialog>
+
+                <p:dialog  style="background-color: lightslategray;" 
+                           widgetVar="dlgOrcamento" id="dlgOrcamento" height="80%" width="70%"  modal="true" header="Seleção de Orçamentos">
+                    <p:dataTable    value="#{gerenciadorController.listarOrcamentos()}" var="u" >
+                        <p:column headerText="#" width="8%">
+                            <p:commandLink actionListener="#{gerenciadorController.setOrcamento(u)}"  oncomplete="PF('dlgOrcamento').hide();"  >
+                                <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                            </p:commandLink>
+                        </p:column>
+                        <p:column headerText="Codigo" filterBy="#{u.id}">
+                            #{u.id}   
+                        </p:column>
+                        <p:column headerText="Cliente" filterBy="#{u.cliente.nome}">
+                            #{u.cliente.nome}   
+                        </p:column>
+                        <p:column headerText="Data" filterBy="#{u.dataOrcamento}">
+                            <h:outputText value="#{u.dataOrcamento}" >
+                                <f:convertDateTime pattern="dd/MM/yyyy" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Valor" filterBy="#{u.valorTotal}">
+
+                            <p:outputLabel value="#{u.valorTotal}"  >
+                                <f:convertNumber  type="currency"/>
+                            </p:outputLabel>
+                        </p:column>
+                    </p:dataTable>
+                </p:dialog>
+
+
+
+            </h:form>
+        </h:body>
+    </ui:define>
+</ui:composition>
+

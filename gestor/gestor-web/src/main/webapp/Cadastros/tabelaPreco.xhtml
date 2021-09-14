@@ -1,0 +1,146 @@
+<ui:composition  xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:p="http://primefaces.org/ui"
+                 template="/WEB-INF/templates/template.xhtml">
+
+    <h:head>
+        <title>Gestor - Tabela de preço</title>
+    </h:head>
+    <ui:define name="body" >
+        <script>
+            function somenteNumeros(num) {
+                var er = /[^0-9.]/;
+                er.lastIndex = 0;
+                var campo = num;
+                if (er.test(campo.value)) {
+                    campo.value = "";
+                    alert("Utilize apenas números e substitua vírgula(,) por ponto (.)");
+                }
+            }
+        </script>
+        <style>
+            .ui-widget {
+                font-size: 12px !important;
+            }
+        </style>
+        <h:body style="background-color: whitesmoke ; background-size: 100%">
+            <h:form id="form" style="height: 98% !important">
+                <h:panelGrid columns="4" cellpadding="3" cellspacing="3" style="width: 99%;  background-color: lightsteelblue; box-shadow: 10px 10px">
+                    <h:graphicImage url="/Images/movimento.png"  width="30px" height="30px" /> 
+                    <p:outputLabel value="PREÇO" style="font-size: large !important; color: white" />
+                    <h:outputLink target="_blank" value="https://youtu.be/7JS1vLJ46RM">ASSISTA AQUI O TUTORIAL</h:outputLink>
+                    <p:outputPanel >
+                        <p:commandButton  actionListener="#{tabelaPrecoController.salvar()}" rendered="#{tabelaPrecoController.tabelaPreco ne null}" value="SALVAR" style="color: white; background-color: green; float: right; font-weight: bold" />
+                        <p:commandButton  actionListener="#{tabelaPrecoController.cancelar()}" rendered="#{tabelaPrecoController.tabelaPreco ne null}" value="CANCELAR" style="color: white; background-color:grey ; float: right;  border: none" />
+                        <p:commandButton  actionListener="#{tabelaPrecoController.novo()}" rendered="#{tabelaPrecoController.tabelaPreco eq null}" value="NOVO" style="color: white; background-color: darkturquoise; float: right; font-weight: bold" />
+                        <p:commandButton actionListener="#{tabelaPrecoController.fechar()}"  ajax="false"  rendered="#{tabelaPrecoController.tabelaPreco eq null}"  value="FECHAR" style="color: white; background-color: red; float: right; border: none" />
+                        <p:commandButton value="EXCLUSÃO" actionListener="#{tabelaPrecoController.excluir()}"  rendered="#{tabelaPrecoController.tabelaPreco.id ne null}" 
+                                         update="messages" style="color: white; background-color:black ; float: right"  >
+                            <p:confirm header="Confirmação" message="Deseja realmente excluir o Registro?" icon="ui-icon-alert" />
+                        </p:commandButton>
+                    </p:outputPanel>
+                </h:panelGrid>
+                <p:separator  />
+                <p:outputPanel rendered="#{tabelaPrecoController.tabelaPreco eq null}" style="height: 90% !important; overflow: scroll !important ">
+                    <p:dataTable emptyMessage="Nenhuma tabela de preço cadastrada"   
+                                 scrollable="true"  style="height: 98%"  scrollHeight="500" value="#{tabelaPrecoController.tabelaPrecos}"  var="u" >
+
+                        <p:column headerText="#" width="4%" >
+                            <p:commandLink actionListener="#{tabelaPrecoController.setTabelaPreco(u)}"  update="form"  >
+                                <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                            </p:commandLink>
+                        </p:column>
+                        <p:column   width="70%" headerText="Tabela de preço" filterBy="#{u.descricao}" style="text-align: center">
+                            <p:outputLabel value="#{u.descricao}" style="text-align: center" /> 
+                        </p:column>
+                        <p:column   width="10%" headerText="Padrão" style="text-align: left">
+                            <p:outputLabel value="#{u.padrao? 'Sim' : 'Não'}" style="text-align: center" /> 
+                        </p:column>
+                    </p:dataTable>
+                </p:outputPanel>
+
+                <p:outputPanel id="panelDados" rendered="#{not empty tabelaPrecoController.tabelaPreco}" style="width: 98%; background-color: whitesmoke;border-radius: 20px 20px;" >
+                    <h:panelGrid columns="2" cellpadding="3" cellspacing="3" style="margin-left: 1%"  >
+                        <p:outputLabel value="Padrão:" />
+                        <p:selectBooleanCheckbox  value="#{tabelaPrecoController.tabelaPreco.padrao}"/>
+                    </h:panelGrid>
+                    <br/>
+                    <h:panelGrid columns="2" style="width: 98%;margin-left: 1%" >
+                        <p:column>
+                            <h:panelGrid columns="2" style="width: 40%;margin-left: 1%" ></h:panelGrid>
+                            <p:outputLabel value="Descrição" style="font-weight: bold" /><br/>
+                            <p:inputText value="#{tabelaPrecoController.tabelaPreco.descricao}" style="width: 70%"/>
+                        </p:column>
+                        <p:column>
+                            <p:commandButton value="SELECIONAR PRODUTOS" style="background-color: green; color: white; float: right" onclick="PF('dlgProduto').show();" />
+                        </p:column>
+                    </h:panelGrid>
+                </p:outputPanel>
+                <br/> 
+                <p:outputPanel id="panelInf" rendered="#{not empty tabelaPrecoController.tabelaPreco}">
+                    <p:outputPanel  id="panelLista" autoUpdate="true" style="overflow: scroll"  >
+                        <p:dataTable emptyMessage="Nenhum item"   
+                                     scrollable="true"  scrollHeight="400px" style="height: 500px" scrollRows="15" value="#{tabelaPrecoController.tabelaPreco.tabelaPrecoItemList}"  var="u" >
+                            <p:column   width="60%" headerText="Produto"  style="text-align: left">
+                                <p:outputLabel value="#{u.produto.descricao}" style="text-align: center" /> 
+                            </p:column>
+                            <p:column   width="10%" headerText="Un.Med" rendered="#{usuarioController.empresa.ramoAtividade.chave ne 'DESPACHANTE'}"  style="text-align: left">
+                                <p:outputLabel value="#{u.produto.estoque.unidadeMedida.sigla}" style="text-align: center" /> 
+                            </p:column>
+                            <p:column   width="30%" headerText="Vlr Unit. custo"  rendered="#{usuarioController.empresa.ramoAtividade.chave ne 'DESPACHANTE'}" style="text-align: left">
+                                <p:inputText value="#{u.valorCompra}"  onkeyup="somenteNumeros(this);" style="width: 80%; text-align: right" />
+                            </p:column>
+                            <p:column   width="30%" headerText="Vlr Unit. Venda"  style="text-align: left">
+                                <p:inputText value="#{u.valorVenda}" onkeyup="somenteNumeros(this);" style="width: 80%; text-align: right" />
+                            </p:column>
+                            <p:column   width="30%" headerText="% Max Desconto" rendered="#{usuarioController.empresa.ramoAtividade.chave ne 'DESPACHANTE'}" style="text-align: left">
+                                <p:inputText value="#{u.percMaxDesc}" onkeyup="somenteNumeros(this);"  style="width: 80%; text-align: right" />
+                            </p:column>
+                            <p:column   width="30%" headerText="Valor Max Desconto" rendered="#{usuarioController.empresa.ramoAtividade.chave ne 'DESPACHANTE'}"  style="text-align: left">
+                                <p:inputText value="#{u.valorMaxDesc}" onkeyup="somenteNumeros(this);" style="width: 80%; text-align: right" />
+                            </p:column>
+                            <p:column headerText="#" width="8%">
+                                <p:commandLink actionListener="#{tabelaPrecoController.removeItem(u)}"   >
+                                    <h:graphicImage url="/Images/remove.png"  width="20px" height="20px" />
+                                </p:commandLink>
+                            </p:column>
+                        </p:dataTable>
+                    </p:outputPanel>
+                </p:outputPanel>
+
+                <p:dialog  style="background-color: lightslategray;" 
+                           widgetVar="dlgProduto" id="dlgProduto" height="500px" width="50%"  modal="true" header="Seleção de Produtos">
+                    <p:dataTable    value="#{tabelaPrecoController.produtos}" var="c" scrollable="true"  scrollRows="15" scrollHeight="500px" >
+                        <p:column headerText="#" width="8%">
+                            <p:commandLink actionListener="#{tabelaPrecoController.addProduto(c)}"    >
+                                <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                            </p:commandLink>
+                        </p:column>
+                        <p:column headerText="Produto" filterBy="#{c.descricao}">
+                            #{c.descricao}   
+                        </p:column>
+                        <p:column headerText="Tipo" filterBy="#{c.tipoProduto.descricao}">
+                            #{c.tipoProduto.descricao}   
+                        </p:column>
+                        <p:column headerText="Fornecedor" filterBy="#{c.tipoProduto.descricao}">
+                            #{c.fornecedor.nome}   
+                        </p:column>
+
+                    </p:dataTable>
+                </p:dialog>
+                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                    <p:commandButton value="Excluir" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                    <p:commandButton value="Cancelar" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                </p:confirmDialog>
+            </h:form>
+        </h:body>
+    </ui:define>
+</ui:composition>
+
+
+
+
+
+

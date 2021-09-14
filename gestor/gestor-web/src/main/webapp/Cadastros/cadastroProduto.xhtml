@@ -1,0 +1,208 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    template="/WEB-INF/templates/template.xhtml">
+
+    <h:head>
+        <title>Gestor - Cadastro de Produtos</title>
+    </h:head>
+
+    <ui:define name="body" >
+        <script>
+            function somenteNumeros(num) {
+                var er = /[^0-9.]/;
+                er.lastIndex = 0;
+                var campo = num;
+                if (er.test(campo.value)) {
+                    campo.value = "";
+                    alert("Utilize apenas números e substitua vírgula(,) por ponto (.)");
+                }
+            }
+        </script>
+          <style type="text/css"> 
+                        .column1{}
+                        .column2{
+                            vertical-align: bottom;
+                        }
+                        .ui-widget {
+                            font-size: 12px !important;
+                        }
+                    </style>
+
+        <h:body style="background-color: whitesmoke ; background-size: 100%">
+            <h:form id="form" style="height: 100% !important">
+                <h:panelGrid columns="4" cellpadding="3" cellspacing="3" style="width: 98%;  background-color: lightsteelblue; box-shadow: 10px 10px">
+                    <h:graphicImage url="/Images/produto.png"  width="30px" height="30px" /> 
+                    <p:outputLabel value="CADASTRO DE PRODUTOS/SERVIÇOS" style="font-size: large !important; color: white" />
+                    <h:outputLink target="_blank" value="https://youtu.be/3MjCkdjCSWg"  >ASSISTA AQUI O TUTORIAL</h:outputLink>
+                    <p:outputPanel >
+                        <p:commandButton  actionListener="#{cadastroProdutoController.salvar()}" rendered="#{cadastroProdutoController.produto ne null}" value="SALVAR" style="color: white; background-color: green; float: right; font-weight: bold" />
+                        <p:commandButton  actionListener="#{cadastroProdutoController.cancelar()}" rendered="#{cadastroProdutoController.produto ne null}" value="CANCELAR" style="color: white; background-color:grey ; float: right; border: none" />
+                        <p:commandButton  actionListener="#{cadastroProdutoController.novo()}" rendered="#{cadastroProdutoController.produto eq null}" value="NOVO" style="color: white; background-color: darkturquoise; float: right; font-weight: bold" />
+                        <p:commandButton actionListener="#{cadastroProdutoController.fechar()}" ajax="false"   rendered="#{cadastroProdutoController.produto eq null}"  value="FECHAR" style="color: white; background-color: red; float: right; border: none" />
+                        <p:commandButton value="EXCLUSÃO" actionListener="#{cadastroProdutoController.excluir()}"  rendered="#{cadastroProdutoController.produto.id ne null}" 
+                                         update="messages" style="color: white; background-color:black ; float: right"  >
+                            <p:confirm header="Confirmação" message="Deseja realmente excluir o Registro?" icon="ui-icon-alert" />
+                        </p:commandButton>
+                    </p:outputPanel>
+                </h:panelGrid>
+                <p:separator  />
+                <p:tabView>
+                    <style type="text/css"> 
+                        .column1{}
+                        .column2{
+                            vertical-align: bottom;
+                        }
+                        .ui-widget {
+                            font-size: 12px !important;
+                        }
+                    </style>
+                    <p:tab title="INFORMAÇÕES">
+                        <p:outputPanel rendered="#{cadastroProdutoController.produto eq null}" style="height: 90% !important; overflow: scroll !important ">
+                            <p:dataTable emptyMessage="Nenhum produto cadastrado"   reflow="true"  
+                                         scrollRows="20"  scrollHeight="500" scrollable="true" 
+                                         value="#{cadastroProdutoController.listarProdutos()}"  var="u" >
+                                <p:column headerText="#" width="3%" >
+                                    <p:commandLink actionListener="#{cadastroProdutoController.setProduto(u)}"  update="form"  >
+                                        <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                                    </p:commandLink>
+                                </p:column>
+                                <p:column headerText="Cod" width="7%"  style="text-align: left" filterBy="#{u.codigo}" filterMatchMode="contains" >
+                                    <p:outputLabel value="#{u.codigo }" style="text-align: center" /> 
+                                </p:column>
+                                <p:column headerText="Descrição" width="30%" filterBy="#{u.descricao}" filterMatchMode="contains"  style="text-align: left">
+                                    <p:outputLabel value="#{u.descricao}" style="text-align: center" /> 
+                                </p:column>
+                                <p:column headerText="Tipo" width="10%" filterBy="#{u.tipoProduto.descricao}" filterMatchMode="contains"  style="text-align:left ">
+                                    <p:outputLabel value="#{u.tipoProduto.descricao}" style="text-align: center" /> 
+                                </p:column>
+                                <p:column headerText="Fornecedor" width="20%" filterBy="#{u.fornecedor.nome}" filterMatchMode="contains"  style="text-align: left">
+                                    <p:outputLabel value="#{u.fornecedor.nome}" style="text-align: center" /> 
+                                </p:column>
+
+                            </p:dataTable>
+                        </p:outputPanel>
+
+                        <p:outputPanel id="panelDados" rendered="#{not empty cadastroProdutoController.produto}" style="background-color: whitesmoke;border-radius: 20px 20px;" >
+                            <p:focus for="inputId"/>
+                            <p:outputPanel id="panelTpProdForn" autoUpdate="true" style="width: 90%" rendered="#{usuarioController.empresa.ramoAtividade.chave ne 'DESPACHANTE'}"  >
+                                <h:panelGrid columns="2" style="width: 60%; margin-left: 1%"  >
+                                    <p:column>
+                                        <h:panelGrid columns="2" columnClasses="column1, column2" cellpadding="2" cellspacing="2" style="margin-left: 1%; width: 100%"  >
+                                            <p:column>
+                                                <p:outputLabel value="Tipo de produto/serviço" style="font-weight: bold" /> <br/>
+                                                <p:inputText disabled="true" value="#{cadastroProdutoController.produto.tipoProduto.descricao}" style="width: 98%" />
+                                            </p:column>
+                                            <p:column>
+                                                <p:commandLink onclick="PF('dlgTpProduto').show();" >
+                                                    <h:graphicImage url="/Images/search.png"  width="27px" height="27px"/>
+                                                </p:commandLink>
+                                            </p:column>
+                                        </h:panelGrid>
+                                    </p:column>
+                                    <p:column>
+                                        <h:panelGrid columnClasses="column1, column2" columns="2" cellpadding="3" cellspacing="3"  style="margin-left: 1%; width: 98%"  >
+                                            <p:column>
+                                                <p:outputLabel  value="Fornecedor" style="font-weight: bold" />  <br/>
+                                                <p:inputText disabled="true" value="#{cadastroProdutoController.produto.fornecedor.nome}" style="width: 98%" />
+                                            </p:column>
+                                            <p:column>
+                                                <p:commandLink onclick="PF('dlgFornecedor').show();" >
+                                                    <h:graphicImage url="/Images/search.png"  width="27px" height="27px"/>
+                                                </p:commandLink>
+                                            </p:column>
+                                        </h:panelGrid>
+                                    </p:column>
+                                </h:panelGrid>
+                                <p:outputLabel style="margin-left: 2%; color: red" value="O produto do tipo INSUMO não ficará disponível para seleção na venda, ele é especificamente utilizado para vincular ao custo agregado de um produto/serviço principal" rendered="#{cadastroProdutoController.produto.tipoProduto.enumTiipoProduto eq 'INSUMO'}" />   
+                            </p:outputPanel>
+
+                            <h:panelGrid columns="1"  cellpadding="1" cellspacing="1"  style="margin-left: 1%">
+                                <p:outputLabel value="Código" style="font-weight: bold" />
+                                <p:inputText id="inputId" value="#{cadastroProdutoController.produto.codigo}" style="width: 80px" />
+                                <p:outputLabel value="Código Barras" style="font-weight: bold" />
+                                <p:inputText  value="#{cadastroProdutoController.produto.codigoBarras}" style="width: 250px" />
+                                <p:outputLabel value="Descrição" style="font-weight: bold" /> 
+                                <p:inputText  value="#{cadastroProdutoController.produto.descricao}"   style="width: 500px"  /><br/>
+                            </h:panelGrid>
+                            <p:panel style="border-radius:  15px 15px; border: aqua">
+                                <h:panelGrid columns="1" cellpadding="1" cellspacing="1" style="margin-left: 1%">
+                                    <p:outputLabel value="Período para retorno(quantidade)" style="font-weight: bold" />
+                                    <p:inputText  value="#{cadastroProdutoController.produto.periodoRetorno}" onkeyup="somenteNumeros(this);"  style="width: 10%" />
+                                    <p:outputLabel value="Tipo Periodo" style="font-weight: bold" />
+                                    <p:selectOneMenu id="tpProd" value="#{cadastroProdutoController.tipoPeriodoSelecionado}" editable="true" style="width: 40%"  >
+                                        <f:selectItems value="#{cadastroProdutoController.listarTipoPeriodos()}" />
+                                        <p:ajax event="change" listener="#{cadastroProdutoController.atualizarTipoPeriodo()}" />
+                                    </p:selectOneMenu>
+                                    <br/>
+                                    <p:outputLabel value="O sistema avisará em suas notificações, baseado nesse parâmetro quando o cliente deve retornar a utilizar o produto/serviço informado." style="font-size: x-small" />
+                                </h:panelGrid>
+                            </p:panel>
+                            <br/> <br/>
+                        </p:outputPanel>
+                    </p:tab>
+                    <p:tab title="PREÇO" rendered="#{not empty cadastroProdutoController.precos}">
+                        <p:dataTable value="#{cadastroProdutoController.precos}" var="p" emptyMessage="Nenhum preço cadastrado" >
+                            <p:column headerText="Tabela">
+                                #{p.descricao}
+                            </p:column>
+                            <p:column headerText="Valor Compra" style="text-align: center" >
+                                <p:outputLabel value="#{p.tabelaPrecoItemList.get(0).valorCompra}" style="text-align: center" >
+                                    <f:convertNumber currencySymbol="R$" type="currency"/>
+                                </p:outputLabel>
+                            </p:column>
+                            <p:column headerText="Valor Venda" style="text-align: center">
+                                <p:outputLabel value="#{p.tabelaPrecoItemList.get(0).valorVenda}" style="text-align: center" >
+                                    <f:convertNumber currencySymbol="R$" type="currency"/>
+                                </p:outputLabel>
+                            </p:column>
+                        </p:dataTable>
+                    </p:tab>
+                </p:tabView>
+                <p:dialog  style="background-color: lightslategray;" 
+                           widgetVar="dlgTpProduto" id="dlgTpProduto" height="400px" width="50%"  modal="true" header="Seleção de tipo de produto/serviço">
+                    <p:dataTable    value="#{cadastroProdutoController.listarTipoProdutos()}" var="c" scrollable="true" scrollHeight="400px" scrollRows="15" >
+                        <p:column headerText="#" width="8%">
+                            <p:commandLink actionListener="#{cadastroProdutoController.produto.setTipoProduto(c)}"  oncomplete="PF('dlgTpProduto').hide();" >
+                                <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                            </p:commandLink>
+                        </p:column>
+                        <p:column headerText="Tipo Produto" filterBy="#{c.descricao}">
+                            #{c.descricao}   
+                        </p:column>
+                    </p:dataTable>
+                </p:dialog>
+                <p:dialog  style="background-color: lightslategray;" 
+                           widgetVar="dlgFornecedor" id="dlgFornecedor" height="500px" width="50%"  modal="true" header="Seleção de fornecedor">
+                    <p:dataTable    value="#{cadastroProdutoController.listarFornecedores()}" var="c" scrollable="true" scrollRows="15" scrollHeight="450px" >
+                        <p:column headerText="#" width="8%">
+                            <p:commandLink actionListener="#{cadastroProdutoController.produto.setFornecedor(c)}"  oncomplete="PF('dlgFornecedor').hide();" >
+                                <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                            </p:commandLink>
+                        </p:column>
+                        <p:column headerText="Nome" filterBy="#{c.nome}">
+                            #{c.nome}   
+                        </p:column>
+                        <p:column headerText="CPF/CNPJ" filterBy="#{c.cpfCnpj}">
+                            #{c.cpfCnpj}   
+                        </p:column>
+                    </p:dataTable>
+                </p:dialog>
+
+
+
+                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                    <p:commandButton value="Excluir" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                    <p:commandButton value="Cancelar" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                </p:confirmDialog>
+            </h:form>
+        </h:body>
+    </ui:define>
+
+</ui:composition>
+
+
+

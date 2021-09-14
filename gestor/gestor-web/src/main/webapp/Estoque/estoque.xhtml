@@ -1,0 +1,386 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/template.xhtml">
+
+    <h:head>
+        <title>Gestor - Estoque</title>
+    </h:head>
+    <ui:define name="body" >
+        <h:body style="background-color: whitesmoke ; background-size: 100%">
+            <h:form id="form" style="height: 98% !important">
+                <h:panelGrid columns="4" cellpadding="3" cellspacing="3" style="width: 98%;  background-color: lightsteelblue; box-shadow: 10px 10px">
+                    <h:graphicImage url="/Images/estoque.png"  width="30px" height="30px" /> 
+                    <p:outputLabel value="ESTOQUE" style="font-size: large !important; color: white" />
+                    <h:outputLink target="_blank" value="https://youtu.be/7A_8-3PD9CY"  >ASSISTA AQUI O TUTORIAL</h:outputLink>
+                    <p:outputPanel >
+                        <p:commandButton  actionListener="#{estoqueController.salvar()}"  rendered="#{estoqueController.estoque ne null  }" value="SALVAR" style="color: white; background-color: green; float: right; font-weight: bold" />
+                        <p:commandButton  actionListener="#{estoqueController.cancelar()}" rendered="#{estoqueController.estoque ne null}" value="CANCELAR" style="color: white; background-color:grey ; float: right; border: none" />
+                        <p:commandButton  actionListener="#{estoqueController.novo()}" rendered="#{estoqueController.estoque eq null}" value="NOVO" style="color: white; background-color: darkturquoise; float: right; font-weight: bold" />
+                        <p:commandButton  actionListener="#{estoqueController.fechar()}" ajax="false"   rendered="#{estoqueController.estoque eq null}"  value="FECHAR" style="color: white; background-color: red; float: right; border: none" />
+
+                        <p:commandButton value="Exclusão" actionListener="#{estoqueController.excluir()}"  rendered="#{estoqueController.estoque.id ne null}" 
+                                         update="messages" style="color: white; background-color:black ; float: right"  >
+                            <p:confirm header="Confirmação" message="Deseja realmente excluir o Registro? Toda a sua movimentação será removida" icon="ui-icon-alert" />
+                        </p:commandButton>
+                    </p:outputPanel>
+                </h:panelGrid>
+                <p:separator  />
+                <p:tabView>
+
+                    <p:tab title="INFORMAÇÕES">
+                        <style type="text/css">
+                            .column1{
+                                vertical-align: top !important;
+                            }
+                            .column2{
+                                vertical-align: top !important;
+                            }
+                            .column3{
+                                vertical-align: bottom !important;
+                            }
+                        </style>
+                        <p:outputPanel id="panelList" rendered="#{estoqueController.estoque eq null}" style="height: 90% !important;  ">
+                            <h:panelGrid columns="2" style="margin-left: 80%" >
+                                <p:outputLabel  value="Listar sugestões de compra" style="font-weight: bold" />
+                                <p:selectBooleanCheckbox value="#{estoqueController.listarSugestoesCompra}" >
+                                    <p:ajax event="change" listener="#{estoqueController.listarEstoques()}" update="form" />
+                                </p:selectBooleanCheckbox>
+
+                            </h:panelGrid>
+                            <p:dataTable emptyMessage="Nenhum estoque cadastrado"    reflow="true" 
+                                         scrollable="true" scrollHeight="400" scrollRows="25" style="height: 70%; width: 99%" 
+                                         value="#{estoqueController.listarEstoques()}"  var="u"   >
+                                <p:column headerText="#" width="5%" >
+                                    <p:commandLink actionListener="#{estoqueController.setEstoque(u)}"  update="form"  >
+                                        <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                                    </p:commandLink>
+                                </p:column>
+
+                                <p:column   width="12%" headerText="Cód" filterBy="#{u.id}" style="text-align: center">
+                                    <p:outputLabel value="#{u.id}" /> 
+                                </p:column>
+                                <p:column   width="12%" headerText="Cód Barras" filterBy="#{u.produto.codigoBarras}" filterMatchMode="contains" >
+                                    <p:outputLabel value="#{u.produto.codigoBarras}" /> 
+                                </p:column>
+                                <p:column   width="22%" headerText="Produto" filterBy="#{u.produto.descricao}" filterMatchMode="contains" style="text-align: center">
+                                    <p:outputLabel value="#{u.produto.descricao}" /> 
+                                </p:column>
+                                <p:column headerText="Uni.Medida" width="10%" filterBy="#{u.unidadeMedida.descricao}">
+                                    <p:outputLabel value="#{u.unidadeMedida.descricao}" style="text-align: center" />
+                                </p:column>
+                                <p:column   width="15%" headerText="Fornecedor" filterBy="#{u.produto.fornecedor.nome}" style="text-align: center">
+                                    <p:outputLabel value="#{u.produto.fornecedor.nome}" style="text-align: center" /> 
+                                </p:column>
+                                <p:column   width="12%" headerText="Qdt atual" filterBy="#{u.quantidade}" style="text-align: center">
+                                    <p:outputLabel value="#{u.quantidade}" style="text-align: center" /> 
+                                </p:column>
+                                <p:column   width="12%" headerText="Qtd minima" filterBy="#{u.quantidade}" style="text-align: center">
+                                    <p:outputLabel value="#{u.quantidadeMinima}" style="text-align: center" /> 
+                                </p:column>
+                                <p:column   width="12%" headerText="Qtd máxima" filterBy="#{u.quantidade}" style="text-align: center">
+                                    <p:outputLabel value="#{u.quantidadeMaxima}" style="text-align: center" /> 
+                                </p:column>
+                                <p:column width="10%" headerText="Sugestão" rendered="#{estoqueController.listarSugestoesCompra}" style="text-align: center">
+                                    #{u.quantidadeMinima - u.quantidade}
+                                </p:column>
+                            </p:dataTable>
+                            <br/>
+
+                        </p:outputPanel>
+                        <script>
+                            function somenteNumeros(num) {
+                                var er = /[^0-9.]/;
+                                er.lastIndex = 0;
+                                var campo = num;
+                                if (er.test(campo.value)) {
+                                    campo.value = "";
+                                    alert("Utilize apenas números e substitua vírgula(,) por ponto (.)");
+                                }
+                            }
+                        </script>
+                        <p:outputPanel id="panelNovo" rendered="#{not empty estoqueController.estoque and empty estoqueController.estoque.id}" 
+                                       style=" background-color: whitesmoke;border-radius: 20px 20px; width: 98%" >
+                            <h:panelGrid columns="3" style="width: 99%" columnClasses="column1,column2,column3" >
+                                <p:column style="vertical-align: top">
+                                    <p:selectOneRadio id="entradaSaida" value="#{estoqueController.entrada}"  style="vertical-align: top; width: 100%"  >
+                                        <f:selectItem itemLabel="ENTRADA"  itemValue="true"  />
+                                        <f:selectItem itemLabel="SAÍDA" itemValue="false" />
+                                        <p:ajax event="change" update="form" />
+                                    </p:selectOneRadio>
+                                </p:column>
+                                <p:column>
+                                    <p:outputLabel value="Doc. Entrada/Saida" style="font-weight: bold" rendered="#{empty estoqueController.estoque.id}" /><br/>
+                                    <p:inputText value="#{estoqueController.docEntradaSaida}" style="width: 60%" rendered="#{empty estoqueController.estoque.id}" /><br/>
+                                </p:column>
+                                <p:column>
+                                    <p:outputLabel value="Observação" style="font-weight: bold" rendered="#{empty estoqueController.estoque.id}" />
+                                    <p:inputTextarea value="#{estoqueController.observacao}" style="width: 90%" rendered="#{empty estoqueController.estoque.id}" />
+                                </p:column>
+                            </h:panelGrid>
+                            <h:panelGrid columns="3" style="width: 98%" columnClasses="column1, column3">
+                                <p:column>
+                                    <p:outputLabel  value="Entrada/saída via Cód. Barras" style="font-weight: bold; margin-left: 1%" /><br/>
+                                    <p:inputText style="margin-left: 1%; width: 60%" value="#{estoqueController.codigoBarras}" >
+                                        <p:ajax event="change" listener="#{estoqueController.recuperaProdutoComCodBarras()}" />
+                                    </p:inputText>
+                                </p:column>
+                                <p:column>
+                                    <p:outputLabel  value="Aplicar % único sobre custo geral" style="font-weight: bold; margin-left: 1%" /><br/>
+                                    <p:inputText id="percMargem" style="margin-left: 1%; width: 60%" value="#{estoqueController.percentualMargem}" onkeyup="somenteNumeros(this);"    >
+                                    </p:inputText>
+                                    <p:tooltip  for="percMargem" value="Ao informar o valor de compra do produto, o % informado aqui será aplicado automaticamente no valor de venda"
+                                                position="top"/>
+                                    <p:commandButton rendered="#{ empty estoqueController.estoque.id}" value="APLICAR" 
+                                                     style="background-color: green; color: white;" actionListener="#{estoqueController.aplicarMargem()}" update="form"  />
+                                </p:column>
+                                <p:column>
+                                    <p:commandButton rendered="#{ empty estoqueController.estoque.id}" value="ADICIONAR PRODUTOS S/ COD BARRAS" 
+                                                     style="background-color: green; color: white; margin-left:  40%" onclick="PF('dlgProduto').show();"  />
+                                </p:column>
+                            </h:panelGrid>
+                            <br/>
+                            <br/>
+
+                            <p:outputPanel  id="panelProdutos"  autoUpdate="true" rendered="#{not empty estoqueController.estoque and empty estoqueController.estoque.id }"  >
+                                <p:dataTable emptyMessage="Nenhum produto selecionado"    reflow="true" 
+                                             scrollable="true"  style="height: 98%; width: 98%"  scrollRows="20"  scrollHeight="300" value="#{estoqueController.estoques}"  var="u" >
+                                    <p:column   width="35%" headerText="Produto"  style="text-align: left">
+                                        <p:outputLabel value="#{u.produto.descricao}" style="text-align: center" /> 
+                                    </p:column>
+                                    <p:column width="23%" headerText="Unidade">
+                                        <p:inputText disabled="true" value="#{u.unidadeMedida.descricao}"  style="width: 70%"/>
+                                        <p:commandLink onclick="PF('dlgUm').show();" actionListener="#{u.setSelecionado(true)}" disabled="#{not empty u.produto.estoque}" >
+                                            <h:graphicImage url="/Images/search.png"  width="27px" height="27px" style="vertical-align: bottom"/>
+                                        </p:commandLink>
+                                    </p:column>
+                                    <p:column   width="20%" headerText="Fornecedor"  style="text-align: left">
+                                        <p:outputLabel value="#{u.produto.fornecedor.nome}" style="text-align: center" /> 
+                                    </p:column>
+                                    <p:column   width="13%" headerText="Quantidade"  style="text-align: left">
+                                        <p:inputText value="#{u.quantidade}" style="width: 100%"   />
+                                    </p:column>
+                                    <p:column   width="13%" headerText="Qtd Minima" rendered="#{estoqueController.entrada}"  style="text-align: center">
+                                        <p:inputText value="#{u.quantidadeMinima}" onkeyup="somenteNumeros(this);"  style="width: 100%;text-align: center" />
+                                    </p:column>
+                                    <p:column   width="13%" headerText="Qtd Maxima"  rendered="#{estoqueController.entrada}" style="text-align: center">
+                                        <p:inputText value="#{u.quantidadeMaxima}" onkeyup="somenteNumeros(this);"   style="width: 100%;text-align: center" />
+                                    </p:column>
+
+                                    <p:column   width="18%" headerText="Valor unit. compra"  rendered="#{estoqueController.entrada}" style="text-align: center">
+                                        <p:inputText value="#{u.valorUnitCompra}" onkeyup="somenteNumeros(this);"  style="width: 100%;text-align: center" >
+                                        </p:inputText>
+                                    </p:column>
+                                    <p:column   width="18%" headerText="Valor unit. venda" rendered="#{estoqueController.entrada}"  style="text-align: center">
+                                        <p:inputText id="unit" value="#{u.valorUnitVenda}" onkeyup="somenteNumeros(this);"  style="width: 100%;text-align: center" >
+                                        </p:inputText> 
+                                    </p:column>
+                                    <p:column headerText="#" width="5%">
+                                        <p:commandLink actionListener="#{estoqueController.removeEstoque(u)}"  update="form"  >
+                                            <h:graphicImage url="/Images/remove.png"  width="20px" height="20px" />
+                                        </p:commandLink>
+                                    </p:column>
+                                </p:dataTable>
+                            </p:outputPanel>
+                        </p:outputPanel>
+
+                        <p:outputPanel id="panelEdit" rendered="#{not empty estoqueController.estoque.id}" 
+                                       style="width: 98%; background-color: whitesmoke;border-radius: 20px 20px;">
+
+                            <p:outputLabel  value="#{estoqueController.estoque.produto.descricao}" style="font-weight: bold; margin-left: 2%; font-size: x-large !important" rendered="#{not empty estoqueController.estoque.id}" />
+                            <br/>
+                            <br/>
+                            <h:panelGrid columns="6" cellpadding="3" cellspacing="3" style="margin-left: 1%; width: 60%">
+                                <p:column>
+                                    <p:outputLabel value="Unidade medida" style="font-weight: bold"  />
+                                    <p:inputText value="#{estoqueController.estoque.unidadeMedida.descricao}" disabled="true"  rendered="#{not empty estoqueController.estoque.id}" />
+                                </p:column>
+                                <p:column>
+                                    <p:outputLabel value="Quantidade" style="font-weight: bold"   /> <br/>
+                                    <p:inputText value="#{estoqueController.estoque.quantidade}" disabled="true"   />
+                                </p:column>
+                                <p:column>
+                                    <p:outputLabel value="Valor Compra" style="font-weight: bold"   />
+                                    <p:inputText value="#{estoqueController.valorCompra}" onkeyup="somenteNumeros(this);"  />
+                                </p:column>
+                                <p:column>
+                                    <p:outputLabel value="Valor Venda" style="font-weight: bold"  />
+                                    <p:inputText value="#{estoqueController.valorVenda}" onkeyup="somenteNumeros(this);"   />
+                                </p:column>
+                            </h:panelGrid>
+                            <h:panelGrid columns="2" style="margin-left: 1%; width: 40%">
+                                <p:column>
+                                    <p:outputLabel value="Qtd minima" style="font-weight: bold"  /> <br/>
+                                    <p:inputText value="#{estoqueController.estoque.quantidadeMinima}" onkeyup="somenteNumeros(this);"   />
+                                </p:column>
+                                <p:column>
+                                    <p:outputLabel value="Qtd maxima" style="font-weight: bold"  /> <br/>
+                                    <p:inputText value="#{estoqueController.estoque.quantidadeMaxima}" onkeyup="somenteNumeros(this);"   />
+                                </p:column>
+                            </h:panelGrid>
+                            <br/>
+                            <!--<p:outputLabel   style="margin-left: 1%" value="Atualizar valor do estoque existente:"  />-->
+                            <!--<p:selectBooleanCheckbox style="margin-left: 1%" value="#{estoqueController.atualizarEstoqueAntigo}"  />-->
+                            <br/>
+
+                        </p:outputPanel>
+                        <br/> <br/>
+
+                        <p:fieldset legend="Movimentações" rendered="#{not empty estoqueController.estoque.id}">
+                            <p:outputPanel id="panelMovimentos" rendered="#{not empty estoqueController.estoque.id}">
+                                <p:dataTable scrollable="true" scrollRows="10" scrollHeight="400" value="#{estoqueController.listarMovimentacao()}" var="m" >
+                                    <p:column headerText="Data mov.">
+                                        <p:outputLabel value="#{m.dataMovimento}" >
+                                            <f:convertDateTime pattern="dd/MM/yyyy" />
+                                        </p:outputLabel>
+                                    </p:column>
+                                    <p:column headerText="Quantidade">
+                                        #{m.quantidade}
+                                    </p:column>
+                                    <p:column headerText="Doc.entrada/saida">
+                                        #{m.notaFiscal}
+                                    </p:column>
+                                    <p:column headerText="Usuario">
+                                        #{m.usuario.nome}
+                                    </p:column>
+                                    <p:column headerText="Venda">
+                                        #{m.idOrcamento}
+                                    </p:column>
+                                    <p:column headerText="Tipo">
+                                        #{m.tipoMovimento.value}
+                                    </p:column>
+                                    <p:column headerText="Obs">
+                                        #{m.observacao}
+                                    </p:column>
+                                </p:dataTable>
+                            </p:outputPanel>
+                        </p:fieldset>
+                    </p:tab>
+                    <p:tab title="CURVA ABC" >
+                        <style>
+                            .ui-datatable .ui-datatable-data .vermelho td{
+                                background-color: tomato;
+                            }
+                            .ui-datatable .ui-datatable-data .azul td{
+                                background-color:#00BFFF;
+                            }
+                            .ui-datatable .ui-datatable-data .verde td{
+                                background-color:#32CD32;
+                            }
+                            .column1{}
+                            .column2{}
+                            .column3{
+                                vertical-align: bottom !important;
+                            }
+                            .ui-widget {
+                                font-size: 12px !important;
+                            }
+                        </style>
+                        #{estoqueController.carregarCurvaABC()}
+                        <p:outputPanel id="abc" >
+                            <h:panelGrid columns="3"  cellpadding="2" cellspacing="2" columnClasses="column1,column2,column3" >
+                                <p:column>
+                                    <p:outputLabel  value="Data Inicial" style="font-weight: bold" /> <br/>
+                                    <p:calendar value="#{estoqueController.dataInicial}" pattern="dd/MM/yyyy" mask="true"  >
+                                    </p:calendar>
+                                </p:column>
+                                <p:column>
+                                    <p:outputLabel value="Data final" style="font-weight: bold" /> <br/>
+                                    <p:calendar value="#{estoqueController.dataFinal}" pattern="dd/MM/yyyy" mask="true"  >
+                                    </p:calendar>
+                                </p:column>
+                                <p:column >
+                                    <p:commandButton value="FILTRAR" actionListener="#{estoqueController.carregarCurvaABC()}" update="abc" />
+                                </p:column>
+                            </h:panelGrid>
+                            <p:dataTable scrollable="true" scrollRows="20" reflow="true" 
+                                         rowStyleClass="#{v.classificacao eq 'A' ? 'verde' : v.classificacao eq 'B' ? 'azul'  : v.classificacao eq 'C' ? 'vermelho': ''}" 
+                                         scrollHeight="500" value="#{estoqueController.curvaAbcEstoques}" var="v" >
+                                <p:column headerText="Produto" width="30%">
+                                    <p:outputLabel value="#{v.produto.descricao}" />
+                                </p:column>
+                                <p:column headerText="Un.Medida" width="15%">
+                                    <p:outputLabel value="#{v.unidadeMedida.descricao}" />
+                                </p:column>
+                                <p:column headerText="Quantidade" style="text-align: center" width="10%" >
+                                    <p:outputLabel value="#{v.qtdVendida}" >
+                                        <f:convertNumber maxFractionDigits="1" />
+                                    </p:outputLabel>
+                                </p:column>
+                                <p:column headerText="Valor Total" style="text-align: center" width="105" >
+                                    <p:outputLabel value="#{v.valorTotal}" >
+                                        <f:convertNumber currencySymbol="R$" type="currency"/>
+                                    </p:outputLabel>
+                                </p:column>
+                                <p:column headerText="Percentual" style="text-align: center" width="10%" >
+                                    <p:outputLabel value="#{v.percentualFat}%" >
+                                        <f:convertNumber maxFractionDigits="2" />
+                                    </p:outputLabel>
+                                </p:column>
+                                <p:column headerText=" % Acumulado" style="text-align: center" width="10%" >
+                                    <p:outputLabel value="#{v.percentualAcumulado}%" >
+                                        <f:convertNumber maxFractionDigits="2" />
+                                    </p:outputLabel>
+                                </p:column>
+                                <p:column headerText="Classificação" style="text-align: center" width="10%">
+                                    #{v.classificacao}
+                                </p:column>
+                            </p:dataTable>
+                        </p:outputPanel>
+                    </p:tab>
+                </p:tabView>
+                <p:dialog  style="background-color: lightslategray;" 
+                           widgetVar="dlgUm" id="dlgUm" height="40%" width="50%"  modal="true" header="Seleção de Unidade de medida">
+                    <p:dataTable    value="#{estoqueController.listarUnidadeMedida()}" var="c" >
+                        <p:column headerText="#" width="12%">
+                            <p:commandLink actionListener="#{estoqueController.setUnidadeMedida(c)}"   oncomplete="PF('dlgUm').hide();" >
+                                <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                            </p:commandLink>
+                        </p:column>
+                        <p:column headerText="Unidade" filterBy="#{c.descricao}">
+                            #{c.descricao}   
+                        </p:column>
+                    </p:dataTable>
+                </p:dialog>
+
+                <p:dialog  style="background-color: lightslategray;" 
+                           widgetVar="dlgProduto" id="dlgProduto" height="90%" width="50%"  modal="true" header="Seleção de Produtos"> 
+                    <p:dataTable  reflow="true"   value="#{estoqueController.listarProdutos()}" var="c" scrollable="true" scrollRows="20" scrollHeight="400"  >
+                        <p:column headerText="#" width="8%">
+                            <p:commandLink actionListener="#{estoqueController.addProduto(c)}"   >
+                                <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                            </p:commandLink>
+                        </p:column>
+                        <p:column headerText="Codigo" filterBy="#{c.codigo}" style="width: 12%" >
+                            #{c.codigo}   
+                        </p:column>
+                        <p:column headerText="Produto" filterBy="#{c.descricao}">
+                            #{c.descricao}   
+                        </p:column>
+                        <p:column headerText="Tipo" filterBy="#{c.tipoProduto.descricao}">
+                            #{c.tipoProduto.descricao}   
+                        </p:column>
+                        <p:column headerText="Fornecedor" filterBy="#{c.fornecedor.nome}">
+                            #{c.fornecedor.nome}   
+                        </p:column>
+
+                    </p:dataTable>
+                    <p:commandButton style="color: white; background-color: green; float: right; width: 30%"  
+                                     onclick="PF('dlgProduto').hide();" value="CONFIRMAR" update="form" >
+                    </p:commandButton>
+                </p:dialog>
+
+                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                    <p:commandButton value="Excluir" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                    <p:commandButton value="Cancelar" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                </p:confirmDialog>
+            </h:form>
+        </h:body>
+    </ui:define>
+
+</ui:composition>
+
+
+

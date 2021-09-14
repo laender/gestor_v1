@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="UTF-8"  ?>
+<!-- Created with iReport - A designer for JasperReports -->
+<!DOCTYPE jasperReport PUBLIC "//JasperReports//DTD Report Design//EN" "http://jasperreports.sourceforge.net/dtds/jasperreport.dtd">
+<jasperReport
+		 name="OrcamentoItem"
+		 columnCount="1"
+		 printOrder="Vertical"
+		 orientation="Portrait"
+		 pageWidth="595"
+		 pageHeight="842"
+		 columnWidth="555"
+		 columnSpacing="0"
+		 leftMargin="20"
+		 rightMargin="20"
+		 topMargin="20"
+		 bottomMargin="20"
+		 whenNoDataType="NoPages"
+		 isTitleNewPage="false"
+		 isSummaryNewPage="false">
+	<property name="com.jaspersoft.studio.data.sql.tables" value="" />
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Sample DB" />
+	<property name="ireport.scriptlethandling" value="0" />
+	<property name="ireport.encoding" value="UTF-8" />
+	<import value="java.util.*" />
+	<import value="net.sf.jasperreports.engine.*" />
+	<import value="net.sf.jasperreports.engine.data.*" />
+
+	<parameter name="ID_ORCAMENTO" isForPrompting="true" class="java.lang.Integer"/>
+	<parameter name="OFICINA" isForPrompting="true" class="java.lang.Boolean"/>
+	<queryString language="SQL"><![CDATA[select 
+ case when  item.valor_embutido > 0
+    then item.valor_embutido
+   else item.valor_unitario
+ end valor_unitario,
+ item.quantidade,
+ p.descricao,
+ p.codigo,
+ item.observacao,
+ case when  item.valor_embutido > 0
+    then item.valor_embutido
+   else item.valor_total
+ end valor_total,
+ COALESCE(o.valor_desconto, 0) valor_desconto,
+ COALESCE( o.valor_acrescimo,0) valor_acrescimo,
+ um.sigla un_medida
+   from orcamento_item item
+   inner join orcamento o on o.id = item.id_orcamento
+   inner join produto p on p.id = item.id_produto
+   left join unidade_medida um on um.id = item.id_unidade_medida
+  WHERE item.id_orcamento = $P{ID_ORCAMENTO}
+   	and (item.insumo is null or item.insumo is false);]]></queryString>
+
+	<field name="valor_unitario" class="java.math.BigDecimal"/>
+	<field name="quantidade" class="java.math.BigDecimal"/>
+	<field name="descricao" class="java.lang.String"/>
+	<field name="codigo" class="java.lang.String"/>
+	<field name="observacao" class="java.lang.String"/>
+	<field name="valor_total" class="java.math.BigDecimal"/>
+	<field name="valor_desconto" class="java.math.BigDecimal"/>
+	<field name="valor_acrescimo" class="java.math.BigDecimal"/>
+	<field name="un_medida" class="java.lang.String"/>
+
+	<variable name="total" class="java.math.BigDecimal" resetType="Report" calculation="Sum">
+		<variableExpression><![CDATA[$F{valor_total}]]></variableExpression>
+	</variable>
+	<variable name="descricao" class="java.lang.String" resetType="Report" calculation="Nothing">
+		<variableExpression><![CDATA[!$P{OFICINA} ?
+($F{observacao} != null ? $F{descricao}+"("+$F{observacao}+")" : $F{descricao}) :
+($F{observacao} != null ?"["+$F{observacao}+"] "+  $F{descricao} : $F{descricao})]]></variableExpression>
+	</variable>
+	<variable name="total_geral" class="java.math.BigDecimal" resetType="Report" calculation="Nothing">
+		<variableExpression><![CDATA[$V{total}.subtract($F{valor_desconto}).add($F{valor_acrescimo} )]]></variableExpression>
+	</variable>
+		<background>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</background>
+		<title>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</title>
+		<pageHeader>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</pageHeader>
+		<columnHeader>
+			<band height="18"  isSplitAllowed="true" >
+				<rectangle>
+					<reportElement
+						x="-21"
+						y="2"
+						width="575"
+						height="15"
+						backcolor="#F2F2F2"
+						key="rectangle"/>
+					<graphicElement stretchType="NoStretch">
+					<pen lineWidth="1.0" lineColor="#FFFFFF"/>
+</graphicElement>
+				</rectangle>
+				<staticText>
+					<reportElement
+						x="-16"
+						y="1"
+						width="180"
+						height="17"
+						key="staticText">
+							<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="8029e0ea-9d60-4d3a-8843-5d934262397d" />
+						</reportElement>
+					<box></box>
+					<textElement>
+						<font size="12" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Produto/Serviço]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="305"
+						y="1"
+						width="48"
+						height="17"
+						key="staticText">
+							<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="27074a7a-5b4e-43bb-baf6-0c57d0d1e153" />
+						</reportElement>
+					<box></box>
+					<textElement>
+						<font size="12" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Qtd]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="381"
+						y="1"
+						width="91"
+						height="17"
+						key="staticText">
+							<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="cbe11aac-aa94-4cfe-9c03-337128add7cd" />
+						</reportElement>
+					<box></box>
+					<textElement textAlignment="Right">
+						<font size="12" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Valor unitário]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="469"
+						y="1"
+						width="84"
+						height="17"
+						key="staticText">
+							<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="1ee0d884-85b3-4b06-9241-17270cc1b1c0" />
+						</reportElement>
+					<box></box>
+					<textElement textAlignment="Right">
+						<font size="12" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Sub-total]]></text>
+				</staticText>
+			</band>
+		</columnHeader>
+		<detail>
+			<band height="17"  isSplitAllowed="true" >
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="-16"
+						y="0"
+						width="320"
+						height="14"
+						key="textField"
+						isPrintWhenDetailOverflows="true">
+							<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="8029e0ea-9d60-4d3a-8843-5d934262397d" />
+							<property name="com.jaspersoft.studio.unit.height" value="pixel" />
+						</reportElement>
+					<box></box>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$V{descricao}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="381"
+						y="0"
+						width="90"
+						height="14"
+						key="textField"
+						positionType="Float">
+							<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="cbe11aac-aa94-4cfe-9c03-337128add7cd" />
+							<property name="com.jaspersoft.studio.unit.height" value="pixel" />
+						</reportElement>
+					<box></box>
+					<textElement textAlignment="Center">
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{valor_unitario}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="471"
+						y="0"
+						width="84"
+						height="14"
+						key="textField"
+						positionType="Float">
+							<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="1ee0d884-85b3-4b06-9241-17270cc1b1c0" />
+							<property name="com.jaspersoft.studio.unit.height" value="pixel" />
+						</reportElement>
+					<box></box>
+					<textElement textAlignment="Center">
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{valor_total}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="true" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="305"
+						y="0"
+						width="48"
+						height="14"
+						key="textField"
+						positionType="Float">
+							<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="d107fbab-5d1d-4a34-a96d-a757931f514b" />
+						</reportElement>
+					<box></box>
+					<textElement textAlignment="Center">
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{quantidade}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="true" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="353"
+						y="0"
+						width="29"
+						height="14"
+						key="textField"
+						positionType="Float">
+							<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="d107fbab-5d1d-4a34-a96d-a757931f514b" />
+						</reportElement>
+					<box></box>
+					<textElement textAlignment="Left">
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{un_medida}]]></textFieldExpression>
+				</textField>
+			</band>
+		</detail>
+		<columnFooter>
+			<band height="75"  isSplitAllowed="true" >
+				<textField isStretchWithOverflow="true" pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="472"
+						y="7"
+						width="81"
+						height="15"
+						key="textField"/>
+					<box></box>
+					<textElement textAlignment="Center">
+						<font isBold="false"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$V{total}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement
+						x="383"
+						y="7"
+						width="85"
+						height="15"
+						key="staticText"/>
+					<box></box>
+					<textElement>
+						<font isBold="false"/>
+					</textElement>
+				<text><![CDATA[SUB TOTAL:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="383"
+						y="22"
+						width="85"
+						height="15"
+						key="staticText"
+						positionType="Float">
+							<printWhenExpression><![CDATA[$F{valor_desconto} != BigDecimal.ZERO]]></printWhenExpression>
+						</reportElement>
+					<box></box>
+					<textElement>
+						<font isBold="false"/>
+					</textElement>
+				<text><![CDATA[DESCONTO:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="383"
+						y="37"
+						width="85"
+						height="15"
+						key="staticText"
+						positionType="Float">
+							<printWhenExpression><![CDATA[$F{valor_acrescimo} != BigDecimal.ZERO]]></printWhenExpression>
+						</reportElement>
+					<box></box>
+					<textElement>
+						<font isBold="false"/>
+					</textElement>
+				<text><![CDATA[ACRÉSCIMO:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="383"
+						y="57"
+						width="85"
+						height="15"
+						key="staticText"
+						positionType="Float"/>
+					<box></box>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+				<text><![CDATA[TOTAL:]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="false" pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="472"
+						y="22"
+						width="81"
+						height="15"
+						key="textField"
+						positionType="Float">
+							<printWhenExpression><![CDATA[$F{valor_desconto} != BigDecimal.ZERO]]></printWhenExpression>
+						</reportElement>
+					<box></box>
+					<textElement textAlignment="Center">
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{valor_desconto}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="473"
+						y="38"
+						width="81"
+						height="15"
+						key="textField"
+						positionType="Float">
+							<printWhenExpression><![CDATA[$F{valor_acrescimo} != BigDecimal.ZERO]]></printWhenExpression>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel" />
+						</reportElement>
+					<box></box>
+					<textElement textAlignment="Center">
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{valor_acrescimo}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="¤#,##0.00;¤-#,##0.00" isBlankWhenNull="true" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="466"
+						y="57"
+						width="88"
+						height="15"
+						key="textField"
+						positionType="Float"/>
+					<box></box>
+					<textElement textAlignment="Center">
+						<font isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$V{total_geral}]]></textFieldExpression>
+				</textField>
+			</band>
+		</columnFooter>
+		<pageFooter>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</pageFooter>
+		<summary>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</summary>
+</jasperReport>

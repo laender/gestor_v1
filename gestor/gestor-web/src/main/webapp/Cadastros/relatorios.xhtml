@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Gestor - Financeiro</title>
+    </h:head>
+    <style type="text/css"> 
+        .footer {
+            position: fixed;
+            bottom:0;
+            right: 0;
+        }
+    </style>
+    <h:form>
+        #{cadastrosController.init()}
+        <h:body style="background-color: activecaption ; background-size: 100%">
+            <h:panelGrid columns="3"  cellpadding="3" cellspacing="3"  style="width:50%" >
+                <p:column>  
+                    <h:panelGrid columns="1">
+                        <h:commandLink title="Relatorios" action="/Financeiro/relatorioCaixa.xhtml" >
+                            <h:graphicImage url="/Images/notificacao.png" style="width: 100px; height: 100px"  />
+                        </h:commandLink>
+                        <p:outputLabel value="REL.CAIXA" />
+                    </h:panelGrid>
+                </p:column>
+                <p:column>  
+                    <h:panelGrid columns="1">
+                        <h:commandLink title="Relatorios" action="/Gerenciador/gerenciador.xhtml" >
+                            <h:graphicImage url="/Images/notificacao.png" style="width: 100px; height: 100px"  />
+                        </h:commandLink>
+                        <p:outputLabel value="ORÇAMENTOS" />
+                    </h:panelGrid>
+                </p:column>
+                <p:column rendered="#{usuarioController.empresa.fluxoCaixa}" >  
+                    <h:panelGrid columns="1">
+                        <h:commandLink title="Titulos" action="/Gerenciador/relatorioTitulos.xhtml" >
+                            <h:graphicImage url="/Images/notificacao.png" style="width: 100px; height: 100px"  />
+                        </h:commandLink>
+                        <p:outputLabel value="TITULOS" />
+                    </h:panelGrid>
+                </p:column>
+
+            </h:panelGrid>
+            <p:outputPanel styleClass="panelCentral">
+                <ui:include src="../menuDocker.xhtml"  />
+            </p:outputPanel>
+            <p:outputPanel styleClass="footer">
+                <p:commandButton actionListener="#{cadastrosController.fechar()}" ajax="false"    value="FECHAR" style="color: white; background-color: red; float: right" />
+            </p:outputPanel>
+        </h:body>
+    </h:form>
+
+</html>
+

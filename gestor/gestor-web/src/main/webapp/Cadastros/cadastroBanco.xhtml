@@ -1,0 +1,73 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/template.xhtml">
+
+    <h:head>
+        <title>Gestor - Cadastro de bancos</title>
+    </h:head>
+    <ui:define name="body" >
+        <style>
+            .ui-widget {
+                font-size: 12px !important;
+            }
+        </style>
+      
+            <h:form id="form" style="height: 100% !important">
+                <h:panelGrid columns="3" cellpadding="3" cellspacing="3" style="width: 98%;  background-color: lightsteelblue; box-shadow: 10px 10px">
+                    <h:graphicImage url="/Images/bank.png"  width="30px" height="30px" /> 
+                    <p:outputLabel value="CADASTRO DE BANCOS" style="font-size: large !important; color: white" />
+                    <p:outputPanel >
+                        <p:commandButton  actionListener="#{cadastroBancoController.salvar()}" rendered="#{cadastroBancoController.banco ne null}" value="SALVAR" style="color: white; background-color: green; float: right; font-weight: bold" />
+                        <p:commandButton  actionListener="#{cadastroBancoController.cancelar()}" rendered="#{cadastroBancoController.banco ne null}" value="CANCELAR" style="color: white; background-color:grey ; float: right; border: none" />
+                        <p:commandButton  actionListener="#{cadastroBancoController.novo()}" rendered="#{cadastroBancoController.banco eq null}" value="NOVO" style="color: white; background-color: darkturquoise; float: right; font-weight: bold" />
+                        <p:commandButton actionListener="#{cadastroBancoController.fechar()}"    ajax="false"  rendered="#{cadastroBancoController.banco eq null}"  value="FECHAR" style="color: white; background-color: red; float: right; border: none" />
+
+
+                        <p:commandButton value="Exclusão" actionListener="#{cadastroBancoController.excluir()}"  rendered="#{cadastroBancoController.banco.id ne null}" 
+                                         update="messages" style="color: white; background-color:black ; float: right"  >
+                            <p:confirm header="Confirmação" message="Deseja realmente excluir o Registro?" icon="ui-icon-alert" />
+                        </p:commandButton>
+                    </p:outputPanel>
+                </h:panelGrid>
+                <p:separator  />
+
+                <p:outputPanel rendered="#{cadastroBancoController.banco eq null}" style="height: 90% !important; overflow: scroll !important ">
+
+                    <p:dataTable emptyMessage="Nenhum banco cadastrado"       scrollHeight="200" scrollRows="20"   scrollable="true"  style="height: 98%"  
+                                 value="#{cadastroBancoController.listarBancos()}"  var="u" >
+                        <p:column headerText="#" width="8%" >
+                            <p:commandLink actionListener="#{cadastroBancoController.setBanco(u)}"  update="@this"  >
+                                <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                            </p:commandLink>
+                        </p:column>
+                        <p:column width="95%" headerText="Descrição" filterBy="#{u.descricao}" filterMatchMode="contains" style="text-align: left">
+                            <p:outputLabel value="#{u.descricao}" style="text-align: center" /> 
+                        </p:column>
+
+                    </p:dataTable>
+                </p:outputPanel>
+
+                <p:outputPanel id="panelDados" rendered="#{not empty cadastroBancoController.banco}" style="border-radius: 10px 10px;background-color: whitesmoke; " >
+                    <p:focus for="inputId"/>
+                    <h:panelGrid columns="1"  cellpadding="4" cellspacing="4" style="width: 90%" >
+                        <p:outputLabel value="Descrição" style="font-weight: bold" />
+                        <p:inputText id="inputId" value="#{cadastroBancoController.banco.descricao}" style="width: 60%" />
+                    </h:panelGrid>
+                </p:outputPanel>
+
+
+                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                    <p:commandButton value="Excluir" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                    <p:commandButton value="Cancelar" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                </p:confirmDialog>
+            </h:form>
+        
+    </ui:define>
+
+</ui:composition>
+
+
+

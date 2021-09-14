@@ -1,0 +1,156 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/template.xhtml" >
+
+    <h:head>
+        <title>Gestor - Cadastro de Fornecedores</title>
+    </h:head>
+    <ui:define name="body" >
+        <style type="text/css"> 
+            .column1{}
+            .column2{
+                vertical-align: bottom;
+            }
+            .ui-widget {
+                font-size: 12px !important;
+            }
+        </style>
+        <script>
+            function somenteNumeros(num) {
+                var er = /[^0-9.]/;
+                er.lastIndex = 0;
+                var campo = num;
+                if (er.test(campo.value)) {
+                    campo.value = "";
+                    alert("Utilize apenas números e substitua vírgula(,) por ponto (.)");
+                }
+            }
+        </script>
+
+        <h:body style="background-color: activecaption ; background-size: 100%;height: 98% !important">
+            <h:form id="form" style="overflow: auto" >
+                <h:panelGrid columns="3" cellpadding="3" cellspacing="3" style="width: 98%;  background-color: lightsteelblue; box-shadow: 10px 10px">
+                    <h:graphicImage url="/Images/empresa.png"  width="30px" height="30x" /> 
+                    <p:outputLabel value="CADASTRO DE FORNECEDORES" style="font-size: large !important; color: white" />
+                    <p:outputPanel class="footer">
+                        <p:commandButton  actionListener="#{cadastroFornecedorController.salvar()}" rendered="#{cadastroFornecedorController.fornecedor ne null}" value="SALVAR" style="color: white; background-color: green; float: right" />
+                        <p:commandButton  actionListener="#{cadastroFornecedorController.cancelar()}" rendered="#{cadastroFornecedorController.fornecedor ne null}" value="CANCELAR" style="color: white; background-color:grey ; float: right" />
+                        <p:commandButton  actionListener="#{cadastroFornecedorController.novo()}" rendered="#{cadastroFornecedorController.fornecedor eq null}" value="NOVO" style="color: white; background-color: darkturquoise; float: right" />
+                        <p:commandButton actionListener="#{cadastroFornecedorController.fechar()}" ajax="false" rendered="#{cadastroFornecedorController.fornecedor eq null}"  value="FECHAR" style="color: white; background-color: red; float: right" />
+                        <p:commandButton value="Exclusão" actionListener="#{cadastroFornecedorController.excluir()}" 
+                                         rendered="#{cadastroFornecedorController.fornecedor ne null and cadastroFornecedorController.fornecedor.id ne null}"
+                                         update="messages" style="color: white; background-color:black ; float: right"  >
+                            <p:confirm header="Confirmação" message="Deseja realmente excluir o Registro?" icon="ui-icon-alert" />
+                        </p:commandButton>
+                    </p:outputPanel>
+                </h:panelGrid>
+
+
+                <p:separator  />
+                <p:outputPanel id="panelNovo" rendered="#{cadastroFornecedorController.fornecedor ne null}" style="height: 98% !important; background-color: whitesmoke;border-radius: 20px 20px;" >
+                    <p:focus for="inputId"/>
+                    <h:panelGrid columns="1" cellpadding="3" cellspacing="2" style="margin-left: 1%; width: 50%"  >
+                        <p:outputLabel value="Nome"  style="font-weight: bold"/>
+                        <p:inputText id="inputId" value="#{cadastroFornecedorController.fornecedor.nome}" style="width: 90%"/>
+                        <p:outputLabel value="CPF/CNPJ" style="font-weight: bold;margin-top: 2%" />
+                        <p:inputText value="#{cadastroFornecedorController.fornecedor.cpfCnpj}" style="width: 30%" />
+                        <p:outputLabel value="Email" style="font-weight: bold" />
+                        <p:inputText value="#{cadastroFornecedorController.fornecedor.email}" style="width: 90%" />
+                        <p:outputLabel value="Telefone"  style="font-weight: bold" />
+                        <p:inputText value="#{cadastroFornecedorController.fornecedor.telefone}" style="width: 40%" />
+                        <p:outputLabel value="Endereço" style="font-weight: bold" />
+                        <p:inputText value="#{cadastroFornecedorController.fornecedor.endereco}" style="width: 90%" />
+                        <p:outputLabel value="Numero" style="font-weight: bold" />
+                        <p:inputText value="#{cadastroFornecedorController.fornecedor.numero}" style="width: 10%" onkeyup="somenteNumeros(this);"  >
+                            <f:convertNumber integerOnly="true" minIntegerDigits="1"  />
+                        </p:inputText>
+                        <p:outputLabel value="Observações" style="font-weight: bold" />
+                        <p:inputTextarea value="#{cadastroFornecedorController.fornecedor.observacao}" style="width: 90%" />
+                    </h:panelGrid>
+                    <br/>
+                    <p:outputPanel autoUpdate="true">
+                        <h:panelGrid columns="2" columnClasses="column1, column2"  style="margin-left: 1%; "  >
+                            <p:column>
+                                <p:outputLabel value="Cidade" style="font-weight: bold" /> 
+                                <br/>
+                                <p:inputText disabled="true" value="#{cadastroFornecedorController.fornecedor.cidade.nome}-#{cadastroFornecedorController.fornecedor.cidade.estado.sigla}"  />
+                            </p:column>
+                            <p:column>
+                                <p:commandLink onclick="PF('dlgCidade').show();" style="margin-bottom: 0" >
+                                    <h:graphicImage url="/Images/search.png"  width="27px" height="27px"/>
+                                </p:commandLink>
+                            </p:column>
+                        </h:panelGrid>
+                    </p:outputPanel>
+
+                    <br/> <br/>
+                </p:outputPanel>
+
+                <p:outputPanel  rendered="#{cadastroFornecedorController.fornecedor eq null}" style="height: 450px !important;width: 98%" >
+                    <p:dataTable   reflow="true"   scrollable="true" scrollHeight="500" scrollRows="20"  emptyMessage="Nenhum fornecedor cadastrado"
+                                   value="#{cadastroFornecedorController.fornecedors}"  var="u" >
+
+                        <p:column headerText="#" width="8%" >
+                            <p:commandLink actionListener="#{cadastroFornecedorController.setFornecedor(u)}"  update="form"  >
+                                <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                            </p:commandLink>
+                        </p:column>
+                        <p:column headerText="Cod" filterBy="#{u.id}"  width="12%"  style="text-align: center " >
+                            <p:outputLabel value="#{u.id}" style="text-align: center" />
+                        </p:column>
+                        <p:column headerText="Nome"  filterBy="#{u.nome}" filterMatchMode="contains" style="text-align: center " >
+                            <p:outputLabel value="#{u.nome}" style="text-align: center" />
+                        </p:column>
+                        <p:column headerText="CPF/CNPJ"  filterBy="#{u.cpfCnpj}" style="text-align: center " >
+                            <p:outputLabel value="#{u.cpfCnpj}" style="text-align: center" />
+                        </p:column>
+
+                        <p:column headerText="E-Mail" style="text-align: center " filterBy="#{e.email}" filterMatchMode="contains" >
+                            <p:outputLabel value="#{u.email}" style="text-align: center" />
+                        </p:column>
+                        <p:column headerText="Telefone" style="text-align: center " filterBy="#{u.telefone}" >
+                            <p:outputLabel value="#{u.telefone}" style="text-align: center" />
+                        </p:column>
+                    </p:dataTable>
+                </p:outputPanel>
+                <p:dialog  style="background-color: lightslategray;" 
+                           widgetVar="dlgCidade" id="dlgCidade" height="500px" width="50%"  modal="true" header="Seleção de Cidade">
+                    <p:dataTable    value="#{cadastroFornecedorController.modelCidade}" var="c" 
+                                    scrollable="true"  paginator="true" paginatorPosition="bottom"
+                                    rowsPerPageTemplate="25,50,100,200,500,1000,99999999" rows="15"
+                                    lazy="true" scrollRows="20" scrollHeight="500px" >
+                        <p:column headerText="#" width="8%">
+
+                            <p:commandLink actionListener="#{cadastroFornecedorController.fornecedor.setCidade(c)}"  oncomplete="PF('dlgCidade').hide();"  >
+                                <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                            </p:commandLink>
+                        </p:column>
+
+                        <p:column headerText="Nome" filterBy="#{c.nome}" filterMatchMode="contains" width="70%" sortBy="#{c.nome}" >
+                            #{c.nome}   
+                        </p:column>
+                        <p:column headerText="UF" filterBy="#{c.estado.sigla}" width="20%" >
+                            #{c.estado.sigla}   
+                        </p:column>
+                    </p:dataTable>
+                </p:dialog>
+
+
+                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                    <p:commandButton value="Excluir" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                    <p:commandButton value="Cancelar" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                </p:confirmDialog>
+
+
+            </h:form>
+        </h:body>
+    </ui:define>
+
+
+</ui:composition>
+
+
+

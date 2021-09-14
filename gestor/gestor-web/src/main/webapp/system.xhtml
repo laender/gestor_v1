@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Gestor - Administrador</title>
+    </h:head>
+    <style type="text/css">
+
+        .panelCentral{
+            margin-top: 5%; 
+            background-color: dodgerblue;
+            box-shadow: 7px 7px 7px 7px;
+            position: absolute;
+            left: 35%;
+            border-radius: 10px 10px;
+            top: 25%;
+            width: 20% !important;
+            margin-left: 3px !important;
+            margin-right: 2px !important;
+
+        }
+        .bodyBackGround{
+            no-repeat center center fixed;
+            background-size: cover;
+            height: 100%;
+
+        }
+        .ui-widget {
+            font-size: 12px !important;
+        }
+    </style>
+    <div class="bodyBackGround">
+        <h:body styleClass="bodyBackGround">
+            <h:form>
+                <p:messages id="messages" showDetail="true" autoUpdate="true" closable="true" />
+                <h:panelGrid columns="2" style="width: 100%;height: 90%">
+                    <p:column>
+                        <h:graphicImage url="/Images/backgroundLogin.png"  style="width: 100%"  />
+                    </p:column>
+                    <p:column>
+                        <p:outputPanel  styleClass="panelCentral" >
+                            <br/>
+                            <p:focus for="inputId"/>
+                            <h:panelGrid columns="1" cellpadding="3" cellspacing="2"  style="width: 94%; margin-left: 2%; margin-right: 2%" >
+                                <p:outputLabel value="GE$TOR" style="font-weight: bold; font-size: xx-large;  color: whitesmoke;text-align: center;margin-left: 25%" />
+                                <h3>Faça o login</h3>
+                                <p:inputText id="inputId"   value="#{usuarioController.login}"  placeholder="login" style="width: 98%"  />
+                                <p:password value="#{usuarioController.senha}" placeholder="senha" style="width: 98%"  />  
+                                <p:outputLabel value=""/>
+                                <p:commandButton ajax="false"  value="Acessar"  actionListener="#{usuarioController.logarAdmin()}" style=" color: white; background-color: midnightblue; border-radius: 15px 15px; width: 98%"  >
+                                </p:commandButton>
+                            </h:panelGrid>
+                        </p:outputPanel>
+                    </p:column>
+                </h:panelGrid>
+            </h:form>
+        </h:body>
+    </div> 
+
+</html>
+

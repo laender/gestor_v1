@@ -1,0 +1,133 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Gestor - Cadastros</title>
+    </h:head>
+    <style type="text/css"> 
+        .footer {
+            position:absolute;
+            bottom:0;
+            width:98%;
+            float: right;
+        }
+    </style>
+    <h:form>
+        #{cadastrosController.init()}
+        <h:body style="background-color: activecaption ; background-size: 100%">
+            <h:panelGrid columns="2" style="width: 98%">
+                <p:column style="width: 10%">
+                    <ui:include src="../menuLateral.xhtml"  />
+                </p:column>
+                <p:column style="width: 90%" >
+                    <h:panelGrid columns="8"  cellpadding="10" cellspacing="10"  style="width: 90%" >
+                        <p:column>
+                            <h:panelGrid columns="1" >
+                                <h:commandLink title="Usuarios" action="cadastroUsuario.xhtml" rendered="#{usuarioController.usuario.administrador}" >
+                                    <h:graphicImage url="/Images/usuario.png" style="width: 100px; height: 100px"  />
+                                </h:commandLink>
+                                <p:outputLabel value="USUÁRIOS" />
+                            </h:panelGrid>
+                        </p:column>
+                        <p:column>
+                            <h:panelGrid columns="1" >
+                                <h:commandLink title="Clientes" action="cadastroClientes.xhtml"  >
+                                    <h:graphicImage url="/Images/user-group.png" style="width: 100px; height: 100px"  />
+                                </h:commandLink>
+                                <p:outputLabel value="CLIENTES" />
+                            </h:panelGrid>
+                        </p:column>
+                        <p:column>
+                            <h:panelGrid columns="1">
+                                <h:commandLink title="Fornecedores" action="cadastroFornecedores.xhtml" >
+                                    <h:graphicImage url="/Images/empresa.png" style="width: 100px; height: 100px"  />
+                                </h:commandLink>
+                                <p:outputLabel value="FORNECEDORES" />
+                            </h:panelGrid>
+                        </p:column>
+
+                        <p:column>
+                            <h:panelGrid columns="1">
+                                <h:commandLink title="Tipo produto" action="cadastroTipoProduto.xhtml" >
+                                    <h:graphicImage url="/Images/tipoProduto.png" style="width: 100px; height: 100px"  />
+                                </h:commandLink>
+                                <p:outputLabel value="TIPO PRODUTO" />
+                            </h:panelGrid>
+                        </p:column>
+
+                        <p:column>
+                            <h:panelGrid columns="1">
+                                <h:commandLink title="Produtos" action="cadastroProduto.xhtml" >
+                                    <h:graphicImage url="/Images/produto.png" style="width: 100px; height: 100px"  />
+                                </h:commandLink>
+                                <p:outputLabel value="PRODUTOS" />
+                            </h:panelGrid>
+                        </p:column>
+                        <p:column>
+                            <h:panelGrid columns="1">
+                                <h:commandLink title="Tipo projeto" action="cadastroTipoOrcamento.xhtml" >
+                                    <h:graphicImage url="/Images/projectType.png" style="width: 100px; height: 100px"  />
+                                </h:commandLink>
+                                <p:outputLabel value="TIPO PROJETO" />
+                            </h:panelGrid>
+                        </p:column>
+                        <p:column>
+                            <h:panelGrid columns="1">
+                                <h:commandLink title="Tipo Pagamento" action="cadastroTipoPagamento.xhtml" >
+                                    <h:graphicImage url="/Images/money.png" style="width: 100px; height: 100px"  />
+                                </h:commandLink>
+                                <p:outputLabel value="TIPO PGTO" />
+                            </h:panelGrid>
+                        </p:column>
+                        <p:column >
+                            <h:panelGrid columns="1" rendered="#{usuarioController.empresa.fluxoCaixa}">
+                                <h:commandLink title="Forma Pagamento" action="cadastroFormaPagamento.xhtml"  >
+                                    <h:graphicImage url="/Images/fluxoCaixa.png" style="width: 100px; height: 100px"  />
+                                </h:commandLink>
+                                <p:outputLabel value="FORMA PGTO" />
+                            </h:panelGrid>
+                        </p:column>
+                        <p:column>
+                            <h:panelGrid columns="1">
+                                <h:commandLink title="Produto x Insumo" action="cadastroProdutoInsumo.xhtml" >
+                                    <h:graphicImage url="/Images/produtoInsumo.png" style="width: 100px; height: 100px"  />
+                                </h:commandLink>
+                                <p:outputLabel value="PRODUTO X INSUMO" />
+                            </h:panelGrid>
+                        </p:column>
+                        <p:column>
+                            <h:panelGrid columns="1">
+                                <h:commandLink title="Tabela de preço" rendered="#{usuarioController.usuario.administrador}" action="tabelaPreco.xhtml" >
+                                    <h:graphicImage url="/Images/movimento.png" style="width: 100px; height: 100px"  />
+                                </h:commandLink>
+                                <p:outputLabel value="PREÇO" />
+                            </h:panelGrid>
+                        </p:column>
+                        <p:column>
+                            <h:panelGrid columns="1">
+                                <h:commandLink title="Orçamento" action="orcamento.xhtml" >
+                                    <h:graphicImage url="/Images/orcamento.png" style="width: 100px; height: 100px"  />
+                                </h:commandLink>
+                                <p:outputLabel value="VENDA" />
+                            </h:panelGrid>
+                        </p:column>
+
+                    </h:panelGrid>
+                </p:column>
+            </h:panelGrid>
+
+            <p:outputPanel styleClass="panelCentral">
+                <ui:include src="../menuDocker.xhtml"  />
+            </p:outputPanel>
+            <p:outputPanel styleClass="footer">
+                <p:commandButton actionListener="#{cadastrosController.fechar()}" ajax="false"    value="FECHAR" style="color: white; background-color: red; float: right" />
+            </p:outputPanel>
+        </h:body>
+    </h:form>
+
+</html>
+

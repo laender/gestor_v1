@@ -1,0 +1,239 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                template="/WEB-INF/templates/template.xhtml">
+
+    <h:head>
+        <title>Gestor - Titulos</title>
+    </h:head>
+    <ui:define name="body" >
+
+
+        <style type="text/css"> 
+            .vermelho {
+                color: white !important;
+                font-weight: bold !important;
+                background-color: #FF0000!important;
+                background-image: none!important;
+            }
+            .verde {
+                color: white !important;
+                font-weight: bold !important;
+                background-color: green;
+            }
+            .column1{
+                vertical-align: top;
+            }
+            .column2{
+                vertical-align: top;
+            }
+            .ui-widget {
+                font-size: 12px !important;
+            }
+        </style>
+
+        <h:body style="background-color: whitesmoke ; background-size: 100%;height: 98% !important">
+            <h:form id="form" style="overflow: auto" >
+                <h:panelGrid columns="3" cellpadding="3" cellspacing="3" style="width: 99%;  background-color: lightsteelblue; box-shadow: 10px 10px">
+                    <h:graphicImage url="/Images/fluxoCaixa.png"  width="30px" height="30px" /> 
+                    <p:outputLabel value="RELATORIO TÍTULOS" style="font-size: large !important; color: white" />
+                    <p:outputPanel >
+                        <p:commandButton  actionListener="#{gerenciadorController.listarParcelas()}"  value="GERAR"  style="color: white; background-color: green; float: right; font-weight: bold" />
+                        <p:commandButton actionListener="#{gerenciadorController.fechar()}" ajax="false"  value="FECHAR" style="color: white; background-color: red; float: right; border: none" />
+                    </p:outputPanel>
+                </h:panelGrid>
+                <p:separator  />
+                <p:outputPanel id="panelFiltros" autoUpdate="true"  style="width:  98% !important;background-color: whitesmoke ;border-radius: 10px 10px;" >
+                    <h:panelGrid  columnClasses="column1, column2" columns="2" style="width: 99%" >
+                        <h:panelGrid columns="2" style="width: 99%"> 
+                            <p:column>
+                                <h:panelGrid columns="2" cellpadding="2" cellspacing="2">
+                                    <p:column>
+                                        <p:outputLabel id="inputId" value="Data vcto Inicial" style="font-weight: bold" /> <br/>
+                                        <p:calendar value="#{gerenciadorController.dataInicial}" pattern="dd/MM/yyyy" mask="true"  />
+                                    </p:column>
+                                    <p:column>
+                                        <p:outputLabel value="Data vcto final" style="font-weight: bold" /> <br/>
+                                        <p:calendar value="#{gerenciadorController.dataFinal}" pattern="dd/MM/yyyy" mask="true"  />
+                                    </p:column>
+                                </h:panelGrid>
+                                <br/>
+                                <h:panelGrid columns="2" cellpadding="3" cellspacing="3" >
+                                    <p:outputLabel  value="Titulos a pagar " />
+                                    <p:selectBooleanCheckbox value="#{gerenciadorController.titulosPagar}" />
+                                    <p:outputLabel  value="Titulos a receber " />
+                                    <p:selectBooleanCheckbox value="#{gerenciadorController.titulosReceber}" />
+                                    <p:outputLabel  value="Provisionados " />
+                                    <p:selectBooleanCheckbox value="#{gerenciadorController.titulosProvisionados}" />
+                                    <p:outputLabel  value="Realizados " />
+                                    <p:selectBooleanCheckbox value="#{gerenciadorController.titulosRealizados}" />
+                                </h:panelGrid>
+                            </p:column>
+                            <p:column>
+                                <h:panelGrid columns="1" cellpadding="2" cellspacing="2" style="margin-top: 0px"  >
+                                    <p:column>
+                                        <p:outputLabel value="Cliente" style="font-weight: bold" /> <br/>
+                                        <p:inputText style="width: 70%" disabled="true" value="#{gerenciadorController.cliente.nome}" /> 
+                                        <p:commandLink onclick="PF('dlgCliente').show();"  >
+                                            <h:graphicImage url="/Images/search.png" style="vertical-align: bottom"  width="30px" height="30px"/>
+                                        </p:commandLink>
+                                    </p:column>
+                                    <p:column>
+                                        <p:outputLabel value="Profissional" style="font-weight: bold" /><br/>
+                                        <p:inputText style="width: 70%" disabled="true" value="#{gerenciadorController.usuario.nome}" /> 							
+                                        <p:commandLink style="text-align: left" onclick="PF('dlgUsuario').show();" >
+                                            <h:graphicImage url="/Images/search.png" style="vertical-align: bottom"  width="30px" height="30px"/>
+                                        </p:commandLink>
+                                    </p:column>
+                                    <p:column>
+                                        <p:outputLabel value="Venda "  style="font-weight: bold" rendered="#{usuarioController.empresa.fluxoCaixa}" /><br/>
+                                        <p:inputText style="width: 70%" disabled="true" value="#{gerenciadorController.orcamento.id}" rendered="#{usuarioController.empresa.fluxoCaixa}" /> 
+                                        <p:commandLink onclick="PF('dlgOrcamento').show();" rendered="#{usuarioController.empresa.fluxoCaixa}"  >
+                                            <h:graphicImage url="/Images/search.png" style="vertical-align: bottom"  width="30px" height="30px"/>
+                                        </p:commandLink>
+                                    </p:column>
+
+                                </h:panelGrid>
+                            </p:column>
+                        </h:panelGrid>
+                        <h:panelGrid columns="2"   style="width: 100%" >
+                            <p:column>
+                                <h:panelGrid style="border-radius: 10px 20px; text-align: center; background-color: salmon ; width: 100%" >
+                                    <p:outputLabel value="Total a pagar" style="color: white; font-weight: bold" />
+                                    <p:outputLabel value="#{gerenciadorController.totalPagar}" style="font-weight: bold; color: white" >
+                                        <f:convertNumber  type="currency"/>
+                                    </p:outputLabel>
+                                    <br/>
+                                </h:panelGrid>
+                            </p:column>
+                            <p:column>
+                                <h:panelGrid style="border-radius: 10px 20px; text-align: center; background-color: limegreen; width: 100%" >
+                                    <p:outputLabel value="Total a receber" style="color: white; font-weight: bold" />
+                                    <p:outputLabel value="#{gerenciadorController.totalReceber}" style="font-weight: bold; color: white" >
+                                        <f:convertNumber  type="currency"/>
+                                    </p:outputLabel>
+                                    <br/>
+                                </h:panelGrid>
+                            </p:column>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                </p:outputPanel>
+                <br />
+                <p:outputPanel style="width: 100% ; overflow: scroll" >
+
+                    <p:outputLabel value="Parcelas(#{gerenciadorController.parcelas.size()})" style="font-size: large !important; font-weight: bold" />
+                    <p:dataTable value="#{gerenciadorController.parcelas}" var="p"    reflow="true" 
+                                 rowStyleClass="#{(p.dataVencimento.time le gerenciadorController.hoje) and (p.valorSaldo  > 0) ? 'vermelho' : null}" 
+                                 scrollable="true" scrollRows="20" scrollHeight="300px" emptyMessage="Nenhum titulo encontrado para os filtros informados" >
+                        <p:column headerText="Tipo"  style="width: 5%">
+                            <p:outputLabel value="#{p.titulo.tipo}" style="  color: #{p.titulo.tipo.value eq 'RECEBER' ? 'green': 'black'}; font-weight: bold" />
+                        </p:column>
+                        <p:column headerText="Parcela"  style="width: 4%; text-align: center">
+                            #{p.numeroParcela}   
+                        </p:column>
+
+                        <p:column headerText="Valor" filterBy="#{p.valorParcela}" filterMatchMode="contains"  style="width: 8%; text-align: center" >
+                            <p:outputLabel value="#{p.valorParcela}" style="text-align: center" >
+                                <f:convertNumber currencySymbol="R$" type="currency"/>
+                            </p:outputLabel> 
+                        </p:column>
+                        <p:column headerText="Saldo" filterBy="#{p.valorSaldo}" filterMatchMode="contains"   style="width: 8%; text-align: center" >
+                            <p:outputLabel value="#{p.valorSaldo}" style="text-align: center" >
+                                <f:convertNumber currencySymbol="R$" type="currency"/>
+                            </p:outputLabel> 
+                        </p:column>
+                        <p:column headerText="Data Vcto" style="width: 6%; text-align: center" >
+                            <p:outputLabel value="#{p.dataVencimento }"  style="text-align: center" >
+                                <f:convertDateTime pattern="dd/MM/yyyy"  />
+                            </p:outputLabel>
+                        </p:column>
+                        <p:column headerText="Sacado/Cedente" filterBy="#{p.titulo.sacadoCedente}" filterMatchMode="contains"  style="width: 18%; text-align: center" >
+                            <p:outputLabel value="#{p.titulo.sacadoCedente }" />
+                        </p:column>
+                        <p:column headerText="Tipo Pgto" style="width: 5%; text-align: center" >
+                            <p:outputLabel value="#{not empty p.titulo.orcamento ? p.titulo.tipoPagamento.descricao : p.titulo.lancamentoFinanceiro.tipoPagamento.descricao }" />
+                        </p:column>
+                        <p:column headerText="Venda" style="width: 5%">
+                            <p:outputLabel value="#{not empty p.titulo.orcamento ? p.titulo.orcamento.id: null}"   />
+                        </p:column>
+                        <p:column headerText="Obs" style="width: 15%" filterMatchMode="contains" filterBy="#{p.titulo.lancamentoFinanceiro.observacao}">
+                            <p:outputLabel value="#{p.titulo.lancamentoFinanceiro.observacao}"   />
+                        </p:column>
+
+                    </p:dataTable>
+                </p:outputPanel>
+
+                <p:dialog  style="background-color: lightslategray;" 
+                           widgetVar="dlgUsuario" id="dlgUsuario" height="500px" width="700px"  modal="true" header="Selecao de Profissionais">
+                    <p:dataTable    value="#{gerenciadorController.listarUsuarios()}" var="u" scrollable="true" scrollRows="15"  >
+                        <p:column headerText="#" width="8%">
+                            <p:commandLink actionListener="#{gerenciadorController.setUsuario(u)}"  oncomplete="PF('dlgUsuario').hide();"  >
+                                <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                            </p:commandLink>
+                        </p:column>
+                        <p:column headerText="Nome" filterBy="#{u.nome}">
+                            #{u.nome}   
+                        </p:column>
+                    </p:dataTable>
+                    <p:commandLink value="NENHUM REGISTRO" style="color: white !important; float: right" 
+                                   actionListener="#{gerenciadorController.setUsuario(null)}" oncomplete="PF('dlgUsuario').hide();"  />
+                </p:dialog>
+
+                <p:dialog  style="background-color: lightslategray;" 
+                           widgetVar="dlgCliente" id="dlgCliente" height="400px" width="700px"  modal="true" header="Selecao de Clientes">
+                    <p:dataTable    value="#{gerenciadorController.listarClientes()}" var="i" scrollable="true" scrollRows="15" style="overflow: scroll" >
+                        <p:column headerText="#" width="8%">
+                            <p:commandLink actionListener="#{gerenciadorController.setCliente(i)}"  oncomplete="PF('dlgCliente').hide();"  >
+                                <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                            </p:commandLink>
+                        </p:column>
+                        <p:column headerText="Cliente" filterBy="#{i.nome}">
+                            #{i.nome}   
+                        </p:column>
+                        <p:column headerText="Cpf/Cnpj" filterBy="#{i.cpfCnpj}">
+                            #{i.cpfCnpj}   
+                        </p:column>
+                    </p:dataTable>
+                    <p:commandLink value="NENHUM REGISTRO" style="color: white !important; float: right" 
+                                   actionListener="#{gerenciadorController.setCliente(null)}" oncomplete="PF('dlgCliente').hide();"  />
+                </p:dialog>
+
+                <p:dialog  style="background-color: lightslategray;" 
+                           widgetVar="dlgOrcamento" id="dlgOrcamento" height="600px" width="70%"  modal="true" header="Seleção de Vendas">
+                    <p:dataTable    value="#{gerenciadorController.listarOrcamentos()}" var="u" scrollRows="15" scrollable="true" scrollHeight="90%" >
+                        <p:column headerText="#" width="8%">
+                            <p:commandLink actionListener="#{gerenciadorController.setOrcamento(u)}"  oncomplete="PF('dlgOrcamento').hide();"  >
+                                <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                            </p:commandLink>
+                        </p:column>
+                        <p:column headerText="Codigo" filterBy="#{u.id}">
+                            #{u.id}   
+                        </p:column>
+                        <p:column headerText="Cliente" filterBy="#{u.cliente.nome}">
+                            #{u.cliente.nome}   
+                        </p:column>
+                        <p:column headerText="Data" filterBy="#{u.dataOrcamento}">
+                            <h:outputText value="#{u.dataOrcamento}" >
+                                <f:convertDateTime pattern="dd/MM/yyyy" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Valor" filterBy="#{u.valorTotal}">
+
+                            <p:outputLabel value="#{u.valorTotal}"  >
+                                <f:convertNumber  type="currency"/>
+                            </p:outputLabel>
+                        </p:column>
+                    </p:dataTable>
+                    <p:commandLink value="NENHUM REGISTRO" style="color: white !important; float: right" 
+                                   actionListener="#{gerenciadorController.setOrcamento(null)}" oncomplete="PF('dlgOrcamento').hide();"  />
+                </p:dialog>
+            </h:form>
+        </h:body>
+
+    </ui:define>
+
+</ui:composition>
+

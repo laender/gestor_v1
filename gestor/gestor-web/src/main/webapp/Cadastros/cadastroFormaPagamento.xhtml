@@ -1,0 +1,112 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/template.xhtml">
+    <h:head>
+        <title>Gestor - Cadastro de Forma de pagamento</title>
+    </h:head>
+
+    <ui:define name="body" >
+        <style>
+            .ui-widget {
+                font-size: 12px !important;
+            }
+        </style>
+        <h:body style="background-color: whitesmoke ; background-size: 100%">
+            <h:form id="form" style="height: 98% !important">
+                <h:panelGrid columns="4" cellpadding="3" cellspacing="3" style="width: 98%;  background-color: lightsteelblue; box-shadow: 10px 10px">
+                    <h:graphicImage url="/Images/fluxoCaixa.png"  width="30px" height="30px" /> 
+                    <p:outputLabel value="CADASTRO DE FORMAS DE PAGAMENTO" style="font-size: large !important; color: white" />
+                    <h:outputLink target="_blank" value="https://youtu.be/shJdXAbCZEU"  >ASSISTA AQUI O TUTORIAL</h:outputLink>
+                    <p:outputPanel class="footer">
+                        <p:commandButton  actionListener="#{cadastroFormaPagamentoController.salvar()}" rendered="#{cadastroFormaPagamentoController.formaPagamento ne null}" value="SALVAR" style="color: white; background-color: green; float: right; font-weight: bold" />
+                        <p:commandButton  actionListener="#{cadastroFormaPagamentoController.cancelar()}" rendered="#{cadastroFormaPagamentoController.formaPagamento ne null}" value="CANCELAR" style="color: white; background-color:grey ; float: right; border: none" />
+                        <p:commandButton  actionListener="#{cadastroFormaPagamentoController.novo()}" rendered="#{cadastroFormaPagamentoController.formaPagamento eq null}" value="NOVO" style="color: white; background-color: darkturquoise; float: right; font-weight: bold" />
+                        <p:commandButton actionListener="#{cadastroFormaPagamentoController.fechar()}"    ajax="false"  rendered="#{cadastroFormaPagamentoController.formaPagamento eq null}"  value="FECHAR" style="color: white; background-color: red; float: right; border: none" />
+                        <p:commandButton value="Exclusão" actionListener="#{cadastroFormaPagamentoController.excluir()}"  rendered="#{cadastroFormaPagamentoController.formaPagamento.id ne null}" 
+                                         update="messages" style="color: white; background-color:black ; float: right"  >
+                            <p:confirm header="Confirmação" message="Deseja realmente excluir o Registro?" icon="ui-icon-alert" />
+                        </p:commandButton>
+                    </p:outputPanel>
+                </h:panelGrid>
+                <p:separator  />
+
+                <p:outputPanel rendered="#{cadastroFormaPagamentoController.formaPagamento eq null}" style="height: 90% !important; overflow: scroll !important ">
+                    <p:dataTable emptyMessage="Nenhuma forma de pagamento cadastrada. Cadastre uma nova, por exemplo: A VISTA, prazo 30 dias direto, prazo 30/60 ..." 
+
+                                 scrollable="true" scrollHeight="500" scrollRows="20" style="height: 98%"
+                                 value="#{cadastroFormaPagamentoController.getFormaPagamentos()}"  var="u" >
+
+                        <p:column headerText="#" width="6%" >
+                            <p:commandLink actionListener="#{cadastroFormaPagamentoController.setFormaPagamento(u)}"  update="form"  >
+                                <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                            </p:commandLink>
+                        </p:column>
+
+                        <p:column width="70%" headerText="Descrição" filterBy="#{u.descricao}"  style="text-align: left;">
+                            <p:outputLabel value="#{u.descricao}" style="text-align: left" /> 
+                        </p:column>
+                        <p:column width="20%" headerText="Num Parcelas" filterBy="#{u.numeroParcelas}" style="text-align: center">
+                            <p:outputLabel value="#{u.numeroParcelas}" style="text-align: left" /> 
+                        </p:column>
+                        <p:column width="20%" headerText="Intervalo Parcelas" filterBy="#{u.intervaloParcelas}" style="text-align: center">
+                            <p:outputLabel value="#{u.intervaloParcelas}" style="text-align: left" /> 
+                        </p:column>
+                        <p:column width="10%" headerText="A prazo"  style="text-align: center">
+                            <p:selectBooleanCheckbox value="#{u.vendaAPrazo}" disabled="true" /> 
+                        </p:column>
+
+                    </p:dataTable>
+                </p:outputPanel>
+
+                <p:outputPanel id="panelDados" rendered="#{not empty cadastroFormaPagamentoController.formaPagamento}" style="width: 98%; background-color: whitesmoke;border-radius: 20px 20px;" >
+                    <p:focus for="inputId"/>
+                    <h:panelGrid columns="4" cellpadding="3" cellspacing="3" >
+                        <p:column>
+                            <h:panelGrid columns="1" >
+                                <p:outputLabel value="Descrição" style="font-weight: bold" />
+                                <p:inputText id="inputId" value="#{cadastroFormaPagamentoController.formaPagamento.descricao}" style="width: 400px" />
+                            </h:panelGrid>
+                        </p:column>
+                        <p:column>
+                            <h:panelGrid columns="1" >
+                                <p:outputLabel value="Número de Parcelas" style="font-weight: bold" />
+                                <p:inputText  value="#{cadastroFormaPagamentoController.formaPagamento.numeroParcelas}" style="width: 200px" />
+                            </h:panelGrid>
+                        </p:column>
+
+                    </h:panelGrid>
+                    <h:panelGrid columns="2">
+                        <p:column>
+                            <h:panelGrid columns="1" >
+                                <p:outputLabel value="Dias vcto primeira parcela"  style="font-weight: bold"/>
+                                <p:inputText  value="#{cadastroFormaPagamentoController.formaPagamento.diasVctoPrimeiraParcela}" style="width: 200px" />
+                            </h:panelGrid>
+                        </p:column>
+                    </h:panelGrid>
+                    <h:panelGrid columns="2" cellpadding="2" cellspacing="2">
+                        <p:column>
+                            <p:outputLabel value="Intervalo entre Parcelas" style="font-weight: bold" />
+                            <p:inputText  value="#{cadastroFormaPagamentoController.formaPagamento.intervaloParcelas}" style="width: 80%" />
+                        </p:column>
+                    </h:panelGrid>
+                    <br/>
+                    <p:selectOneRadio id="console" value="#{cadastroFormaPagamentoController.formaPagamento.vendaAPrazo}"  style="width: 15%"  >
+                        <f:selectItem itemLabel="A vista" itemValue="false" />
+                        <f:selectItem itemLabel="A prazo" itemValue="true" />
+                    </p:selectOneRadio>
+                </p:outputPanel>
+                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                    <p:commandButton value="Excluir" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                    <p:commandButton value="Cancelar" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                </p:confirmDialog>
+            </h:form>
+        </h:body>
+    </ui:define>
+</ui:composition>
+
+
+
+

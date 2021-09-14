@@ -1,0 +1,169 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                template="WEB-INF/templates/template.xhtml">
+
+
+    <ui:define name="body">
+        <p:growl autoUpdate="true" life="4000"/>
+        <style>
+            .ui-widget {
+                font-size: 12px !important;
+            }
+
+            .sixty-percent{
+                width: 75%;
+            }
+
+            .top-aligment{
+                width: 20%;
+                vertical-align: top;
+            }
+            .bodyBackGround{
+                no-repeat center center fixed;
+                background-size: cover;
+                height: 100%;
+
+            }
+            .ui-datalist ui-widget{
+                border: none !important;
+            }
+            .ui-widget-content{
+                border: none !important;
+            }
+
+            .count-notification{
+                color: white; 
+                background-color: orangered; 
+                text-align: center; 
+                vertical-align: middle;
+                align-content: center;
+                border-radius: 50%; 
+                height: 20px; 
+                width: 20px; 
+                position:  absolute;
+                margin-left: 3%;
+            }
+        </style>
+
+        <div class="bodyBackGround">
+            <h:body styleClass="bodyBackGround">
+                <h:form id="form">
+                    <div style="float:right; margin-left: 90%"> 
+                        <h:panelGrid columns="4" cellpadding="6" cellspacing="6">
+                            <p:commandLink style="float: right" onclick="PF('dlgParcela').show();"  rendered="#{not empty menuController.parcelasVencidas}"  immediate="true">
+                                <span  class="count-notification" >#{menuController.parcelasVencidas.size()}</span>
+                                <p:graphicImage id="financeiro" url="/Images/cash-clock.png" style="width: 55px; height: 55px" />
+                                <p:tooltip  for="financeiro" value="Exibe todos os titulos a pagar ou receber com o vencimento hoje e atrasados(a notificação é mantida até a baixa)" position="bottom"/>
+                            </p:commandLink>
+                            <p:commandLink style="float: right" onclick="PF('dlgSugCompra').show();" rendered="#{not empty menuController.sugestoesCompra}"  immediate="true">
+                                <span  class="count-notification" >#{menuController.sugestoesCompra.size()}</span>
+                                <p:graphicImage id="sugCompra" url="/Images/vendaRapida.png" style="width: 50px; height: 50px" />
+                                <p:tooltip  for="sugCompra" value="Exibe sugestões para compra de materiais com a quantidade atual abaixo da mínima definida" position="bottom"/>
+                            </p:commandLink>
+                            <p:commandLink style="float: right" onclick="PF('dlgRetorno').show();"  rendered="#{ not empty menuController.retornos}"  immediate="true">
+                                <span  class="count-notification" >#{menuController.retornos.size()}</span>
+                                <p:graphicImage id="retorno" url="/Images/return.png" style="width: 60px; height: 60px" />
+                                <p:tooltip  for="retorno" value="Exibe os clientes que devem retornar a realizar algum serviço ou comprar um produto com um retorno pré definido(a notificação é mantida por 5 dias)" position="bottom"/>
+                            </p:commandLink>
+                            <p:commandLink style="float: right" onclick="PF('dlgNotificacoes').show();"  rendered="#{ not empty menuController.notificacoes}"  immediate="true">
+                                <span  class="count-notification" >#{menuController.notificacoes.size()}</span>
+                                <p:graphicImage id="not" url="/Images/attention.png" style="width: 55px; height: 55px" />
+                                <p:tooltip  for="not" value="Exibe notificações gerais tais como aniversário de clientes, evoluçao no faturamento, clientes bons que não retornaram a mais de 60 dias..." position="bottom"/>
+                            </p:commandLink>
+                        </h:panelGrid>
+                        
+
+                        <br/>
+                        <br/>
+                    </div>
+
+                    <p:dialog modal="true" id="dlgRetorno" header="Retornos" widgetVar="dlgRetorno" width="600px"  showEffect="explode" height="400px"  hideEffect="slide">
+                        <p:dataTable value="#{menuController.retornos}" var="r" scrollable="true" scrollRows="10" scrollHeight="300px"  >
+                            <p:column width="10%">
+                                <p:rowToggler />
+                            </p:column>
+                            <p:column  headerText="Cliente" width="60%">
+                                <p:outputLabel value="#{r.cliente.nome}" />
+                            </p:column>
+                            <p:column  headerText="Telefone" width="20%">
+                                <p:outputLabel value="#{r.cliente.telefone}" />
+                            </p:column>
+                            <p:rowExpansion >
+                                <p:dataList value="#{r.produtos}" var="s" styleClass="ui-datalist ui-widget" >
+                                    <p:outputLabel value="#{s.produto.descricao}" style="float: left" />
+                                    <p:outputLabel value="#{menuController.getPrazo(s.qtdDiasFaltantes)}" style=" float: right" />
+                                </p:dataList>
+                            </p:rowExpansion>
+                        </p:dataTable>
+                    </p:dialog>
+
+                    <p:dialog modal="true" id="dlgSugCompra" header="Sugestões de compra"  widgetVar="dlgSugCompra" width="600px" height="400px"  showEffect="explode"  hideEffect="slide">
+                        <p:dataTable scrollable="true"  scrollRows="10"  scrollHeight="300px"  
+                                     value="#{menuController.sugestoesCompra}"  var="u"   >
+                            <p:column   width="22%" headerText="Produto"  >
+                                <p:outputLabel value="#{u.produto.descricao}" style="font-size: x-small" /> 
+                            </p:column>
+                            <p:column headerText="Uni.Medida" width="10%" style="font-size: x-small" >
+                                <p:outputLabel value="#{u.unidadeMedida.descricao}" style="text-align: center;font-size: x-small" />
+                            </p:column>
+                            <p:column   width="15%" headerText="Fornecedor" style="text-align: center">
+                                <p:outputLabel value="#{u.produto.fornecedor.nome}" style="text-align: center; font-size: x-small" /> 
+                            </p:column>
+                            <p:column   width="9%" headerText="Qdt atual"  style="text-align: center; font-size: small">
+                                <p:outputLabel value="#{u.quantidade}" style="text-align: center; font-size: x-small" /> 
+                            </p:column>
+                            <p:column   width="9%" headerText="Qtd minima"  style="text-align: center; font-size: x-small">
+                                <p:outputLabel value="#{u.quantidadeMinima}" style="text-align: center; font-size: x-small" /> 
+                            </p:column>
+                            <p:column width="9%" headerText="Sugestão"  style="text-align: center; font-size: x-small">
+                                <p:outputLabel value="#{u.quantidadeMinima - u.quantidade}" style="font-size: x-small" />
+                            </p:column>
+                        </p:dataTable>
+                    </p:dialog>
+                    <p:dialog modal="true" id="dlgNotificacoes" header="Notificações"  widgetVar="dlgNotificacoes" width="700px"  showEffect="explode"  height="400px"  hideEffect="slide">
+                        <p:dataList value="#{menuController.notificacoes}" var="n" styleClass="ui-datalist ui-widget" style="overflow: scroll; background-color: dodgerblue" >
+                            <p:outputPanel style="background-color: lightblue; border-radius: 15px 15px ">
+                                <h:panelGrid columns="2" style="overflow: scroll">
+                                    <p:graphicImage url="#{not empty n.cliente ? '/Images/user-group.png': not empty n.produto ? '/Images/produto.png' : '/Images/financas.png'}" width="40px" height="40px"  />
+                                    <p:outputLabel value="#{n.texto}" style="float: left; ;font-weight: bold; color:#{menuController.getCorLabelNotFaturamento(n)} ; margin-left: 2%; margin-top: 1%" /><br/>
+                                </h:panelGrid>
+                            </p:outputPanel><br/>
+                        </p:dataList>
+                    </p:dialog>
+
+                    <p:dialog modal="true" id="dlgParcela" header="Contas a pagar/receber pendentes"  widgetVar="dlgParcela" width="600px" height="400px"  showEffect="explode"  hideEffect="slide">
+                        <p:dataTable value="#{menuController.parcelasVencidas}"  var="p"  
+                                     scrollable="true" scrollRows="10" scrollHeight="200px"  >
+                            <p:column headerText="Tipo"  style="width: 7%">
+                                <p:outputLabel value="#{p.titulo.tipo}" style="color: #{p.titulo.tipo.value eq 'RECEBER' ? 'green': 'red'}; font-weight: bold; font-size: small" />
+                            </p:column>
+                            <p:column headerText="Sacado/Cedente" style="width: 13%; text-align: center" >
+                                <p:outputLabel value="#{p.titulo.sacadoCedente }"  style="font-size: small" />
+                            </p:column>
+                            <p:column headerText="Vcto" style="width: 10%; text-align: center" >
+                                <p:outputLabel value="#{p.dataVencimento }"  style="text-align: center; font-size: x-small" >
+                                    <f:convertDateTime pattern="dd/MM/yyyy"  />
+                                </p:outputLabel>
+                            </p:column>
+                            <p:column headerText="Saldo"  style="width: 10%; text-align: center" >
+                                <p:outputLabel value="#{p.valorSaldo}" style="text-align: center; font-size: small" >
+                                    <f:convertNumber  type="currency"/>
+                                </p:outputLabel> 
+                            </p:column>
+                            <p:column headerText="Tipo Pgto" style="width: 8%; text-align: center" >
+                                <p:outputLabel value="#{not empty p.titulo.orcamento ? p.titulo.tipoPagamento.descricao : p.titulo.lancamentoFinanceiro.tipoPagamento.descricao }" style="font-size: x-small" />
+                            </p:column>
+                        </p:dataTable>
+                    </p:dialog>
+
+                </h:form>
+            </h:body>
+        </div> 
+
+    </ui:define>
+
+
+</ui:composition>

@@ -1,0 +1,181 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                template="/WEB-INF/templates/template.xhtml">
+    <h:head>
+        <title>Gestor - Caixa</title>
+    </h:head>
+
+    <ui:define name="body" >
+        <style type="text/css"> 
+            .footer {
+                position: fixed;
+                bottom:0;
+                right: 0;
+            }
+            .ui-widget {
+                font-size: 12px !important;
+            }
+        </style>
+        <script>
+            function somenteNumeros(num) {
+                var er = /[^0-9.]/;
+                er.lastIndex = 0;
+                var campo = num;
+                if (er.test(campo.value)) {
+                    campo.value = "";
+                    alert("Utilize apenas números e substitua vírgula(,) por ponto (.)");
+                }
+            }
+        </script>
+        <h:body style="background-color: whitesmoke ; background-size: 100%">
+            <h:form id="form" style="height: 98% !important">
+                <h:panelGrid columns="4" cellpadding="3" cellspacing="3" style="width: 100%;  background-color: lightsteelblue; box-shadow: 10px 10px">
+                    <h:graphicImage url="/Images/caixa.png"  width="30px" height="30px" /> 
+                    <p:outputLabel value="CAIXA" style="font-size: large !important; color: white" />
+                    <h:outputLink target="_blank" value="https://www.youtube.com/watch?v=xpIXEcSms_Y"  >ASSISTA AQUI O TUTORIAL</h:outputLink>
+                    <p:outputPanel>
+                        <!--<p:commandButton  actionListener="# {caixaController.salvar()}" rendered="# {caixaController.caixa ne null and caixaController.caixa.aberto and  empty caixaController.caixa.id}" value="SALVAR" style="color: white; background-color: green; float: right; font-weight: bold" />-->
+                        <p:commandButton  actionListener="#{caixaController.salvar()}" rendered="#{caixaController.caixa ne null }" value="SALVAR" style="color: white; background-color: green; float: right; font-weight: bold" />
+                        <p:commandButton  actionListener="#{caixaController.cancelar()}" rendered="#{caixaController.caixa ne null}" value="CANCELAR" style="color: white; background-color:grey ; float: right; border: none" />
+                        <p:commandButton  actionListener="#{caixaController.novo()}" rendered="#{caixaController.caixa eq null}" value="ABRIR CAIXA" style="color: white; background-color: green; float: right; font-weight: bold" />
+                        <p:commandButton  actionListener="#{caixaController.fechar()}" ajax="false"  rendered="#{caixaController.caixa eq null}"  value="SAIR" style="color: white; background-color: red; float: right; border: none" />
+                    </p:outputPanel>
+                </h:panelGrid>
+                <p:separator />
+                <p:outputPanel rendered="#{caixaController.caixa eq null}" style="height: 90% !important; overflow: scroll !important ">
+
+                    <p:dataTable emptyMessage="Nenhum caixa cadastrado"    reflow="true" 
+                                 scrollable="true" scrollHeight="500" scrollRows="20"  style="height: 98%" value="#{caixaController.caixas}"  
+                                 selection="#{caixaController.caixa}" selectionMode="single" rowKey="#{u.id}"
+                                 var="u" >
+                        <p:ajax process="@this" listener="#{caixaController.setCaixa(u)}" event="rowSelect"  update="form" immediate="true" />
+                        <p:column   width="6%" headerText="Código"  style="text-align: center">
+                            <p:outputLabel value="#{u.id}" style="text-align: center" /> 
+                        </p:column>
+                        <p:column   width="18%" headerText="Resp. Ab." filterBy="#{u.usuarioAbertura.nome}" style="text-align: center">
+                            <p:outputLabel value="#{not empty u.usuarioAbertura ? u.usuarioAbertura.nome : null}" style="text-align: center" /> 
+                        </p:column>
+                        <p:column   width="18%" headerText="Resp. Fech." filterBy="#{u.usuarioFechamento.nome}" style="text-align: center">
+                            <p:outputLabel value="#{not empty u.usuarioFechamento ? u.usuarioFechamento.nome : null}" style="text-align: center" /> 
+                        </p:column>
+                        <p:column   width="15%" headerText="Data Ab." style="text-align: center">
+                            <p:outputLabel value="#{u.dataAbertura}" >
+                                <f:convertDateTime pattern="dd/MM/yyyy" />
+                            </p:outputLabel>
+                        </p:column>
+                        <p:column   width="15%" headerText="Data Fech."  style="text-align: center">
+                            <p:outputLabel value="#{u.dataFechamento}" >
+                                <f:convertDateTime pattern="dd/MM/yyyy" />
+                            </p:outputLabel>
+                        </p:column>
+                        <p:column   width="12%" headerText="Entradas "  style="text-align: center">
+                            <p:outputLabel value="#{u.totalEntradas }" style="text-align: right" >
+                                <f:convertNumber currencySymbol="R$" type="currency"/>
+                            </p:outputLabel> 
+                        </p:column>
+                        <p:column   width="12%" headerText="Inicial "  style="text-align: center">
+                            <p:outputLabel value="#{u.valorInicial }" style="text-align: right" >
+                                <f:convertNumber currencySymbol="R$" type="currency"/>
+                            </p:outputLabel> 
+                        </p:column>
+                        <p:column   width="12%" headerText="Saídas "  style="text-align: center">
+                            <p:outputLabel value="#{u.totalSaidas }" style="text-align: right" >
+                                <f:convertNumber currencySymbol="R$" type="currency"/>
+                            </p:outputLabel> 
+                        </p:column>
+                        <p:column   width="12%" headerText="Saldo"  style="text-align: left">
+                            <p:outputLabel value="#{u.saldo }" style="text-align: right;color: #{caixaController.getColor(u.saldo)}" >
+                                <f:convertNumber currencySymbol="R$" type="currency"/>
+                            </p:outputLabel> 
+                        </p:column>
+                        <p:column headerText="#" width="12%" style="text-align: center">
+                            <p:commandButton value="FECHAR"  rendered="#{u.aberto}" actionListener="#{caixaController.fecharCaixa(u)}"   immediate="true" update="form"  style="background-color: red !important" >
+                                <p:confirm header="Confirmação" message="Deseja realmente fechar o caixa?" icon="ui-icon-alert" />
+                            </p:commandButton>
+                            <p:commandLink value="REABRIR"  rendered="#{not u.aberto}" actionListener="#{caixaController.reabrir(u)}"  immediate="true" style="color: dodgerblue" >
+                                <p:confirm header="Confirmação" message="Deseja realmente reabrir o caixa?" icon="ui-icon-alert" />
+                            </p:commandLink>
+                        </p:column>
+                    </p:dataTable>
+
+                </p:outputPanel>
+
+                <p:outputPanel id="panelDados" autoUpdate="true" rendered="#{not empty caixaController.caixa}" style="width: 70%">
+                    <p:focus for="inputId"/>
+                    <h:panelGrid  columns="3" cellpadding="2" cellspacing="2" style="width: 80%; margin-left: 2%"  >
+                        <p:column>
+                            <h:outputLabel value="Data abertura" style="font-weight: bold" /><br/>
+                            <p:calendar  value="#{caixaController.caixa.dataAbertura}"  pattern="dd/MM/yyyy" mask="true" disabled="#{not empty caixaController.caixa.id }"  />
+                        </p:column>
+                        <p:column>
+                            <p:outputLabel value="Valor Inicial R$" style="font-weight: bold" /><br/>
+                            <p:inputText id="inputId" value="#{caixaController.caixa.valorInicial}" 
+                                         onkeyup="somenteNumeros(this);" />
+                                         disabled="# {not empty caixaController.caixa.id or (usuarioController.empresa.caixaAcumulativo and not empty caixaController.caixa.valorInicial) }"
+                                        
+                        </p:column>
+                        <p:column>
+                            <p:outputLabel value="Saldo R$" style="font-weight: bold" /><br/>
+                            <p:inputText id="inputId1" value="#{caixaController.caixa.valorFinal}"  disabled="true"  style="color: #{caixaController.getColor(caixaController.caixa.valorFinal)}" />
+                        </p:column>
+
+                    </h:panelGrid>
+                </p:outputPanel>
+                <br/><br/>
+                <p:outputPanel rendered="#{caixaController.caixa ne null}" style="height: 98% !important; overflow: scroll !important ">
+                    <p:outputLabel value="Lançamentos realizados" style="font-weight: bold; font-size: large !important" />
+                    <p:dataTable emptyMessage="Nenhuma lançamento realizado"   
+                                 scrollable="true" scrollHeight="400" scrollRows="15"  
+                                 style="height: 98%" value="#{caixaController.lancamentosFinanceiros}"  var="u" >
+                        <p:column   width="12%" headerText="Código" style="text-align: left">
+                            <p:outputLabel value="#{u.id}" style="text-align: center" /> 
+                        </p:column>
+                        <p:column   width="25%" headerText="Cliente"  style="text-align: left">
+                            <p:outputLabel value="#{not empty u.cliente ? u.cliente.nome : not empty u.parcelas ? u.parcelas.get(0).parcela.titulo.sacadoCedente : null}" style="text-align: center" /> 
+                        </p:column>
+                        <p:column   width="20%" headerText="Vendedor" style="text-align: left">
+                            <p:outputLabel value="#{not empty u.usuario ? u.usuario.nome : null}" style="text-align: center" /> 
+                        </p:column>
+                        <p:column   width="20%" headerText="Fornecedor" style="text-align: left">
+                            <p:outputLabel value="#{not empty u.fornecedor ? u.fornecedor.nome : null}" style="text-align: center" /> 
+                        </p:column>
+
+                        <p:column   width="20%" headerText="Tipo $"  style="text-align: left">
+                            <p:outputLabel value="#{u.tipoPagamento.descricao}" style="text-align: center" /> 
+                        </p:column>
+                        <p:column   width="15%" headerText="Data" style="text-align: left">
+                            <p:outputLabel value="#{u.dataLancamento}" >
+                                <f:convertDateTime pattern="dd/MM/yyyy" />
+                            </p:outputLabel>
+                        </p:column>
+                        <p:column   width="15%" headerText="Valor "  style="text-align: left">
+                            <p:outputLabel value="#{u.valor }" style="text-align: right" >
+                                <f:convertNumber currencySymbol="R$" type="currency"/>
+                            </p:outputLabel> 
+                        </p:column>
+                        <p:column   width="15%" headerText="E/S "  style="text-align: left">
+                            <p:outputLabel value="#{u.tipoLancamento.value }" style="font-weight: bold; text-align: right; color: #{u.tipoLancamento.value eq 'SAIDA' ? 'red': 'green' }" />
+                        </p:column>
+                        <p:column   width="25%" headerText="Obs "  style="text-align: left">
+                            <p:outputLabel value="#{u.observacao }"  />
+                        </p:column>
+
+                    </p:dataTable>
+                </p:outputPanel>
+
+                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                    <p:commandButton value="Sim" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                    <p:commandButton value="Cancelar" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                </p:confirmDialog>
+            </h:form>
+        </h:body>
+    </ui:define>
+
+</ui:composition>
+
+
+

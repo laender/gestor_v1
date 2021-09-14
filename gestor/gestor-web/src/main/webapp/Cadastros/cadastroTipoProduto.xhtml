@@ -1,0 +1,77 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    template="/WEB-INF/templates/template.xhtml">
+
+    <h:head>
+        <title>Gestor - Cadastro de tipos de produtos</title>
+    </h:head>
+    <ui:define name="body" >
+        <style>
+            .ui-widget {
+                font-size: 12px !important;
+            }
+        </style>
+
+
+        <h:body style="background-color: whitesmoke ; background-size: 100%">
+            <h:form id="form" style="height:100% !important">
+                <h:panelGrid columns="4" cellpadding="3" cellspacing="3" style="width: 98%;  background-color: lightsteelblue; box-shadow: 10px 10px">
+                    <h:graphicImage url="/Images/tipoProduto.png"  width="30px" height="30px" /> 
+                    <p:outputLabel value="CADASTRO DE TIPOS DE PRODUTOS/SERVIÇOS" style="font-size: large !important; color: white" />
+                    <h:outputLink target="_blank" value="https://www.youtube.com/watch?v=RONxWGBpCcI"  >ASSISTA AQUI O TUTORIAL</h:outputLink>
+                    <p:outputPanel >
+                        <p:commandButton  actionListener="#{cadastroTipoProdutoController.salvar()}" rendered="#{cadastroTipoProdutoController.tipoProduto ne null}" value="SALVAR" style="color: white; background-color: green; float: right; font-weight: bold" />
+                        <p:commandButton  actionListener="#{cadastroTipoProdutoController.cancelar()}" rendered="#{cadastroTipoProdutoController.tipoProduto ne null}" value="CANCELAR" style="color: white; background-color:grey ; float: right; border: none" />
+                        <p:commandButton  actionListener="#{cadastroTipoProdutoController.novo()}" rendered="#{cadastroTipoProdutoController.tipoProduto eq null}" value="NOVO" style="color: white; background-color: darkturquoise; float: right;font-weight: bold" />
+                        <p:commandButton actionListener="#{cadastroTipoProdutoController.fechar()}" ajax="false" rendered="#{cadastroTipoProdutoController.tipoProduto eq null}"  value="FECHAR" style="color: white; background-color: red; float: right; border: none" />
+
+
+                        <p:commandButton value="Exclusão" actionListener="#{cadastroTipoProdutoController.excluir()}"  rendered="#{cadastroTipoProdutoController.tipoProduto.id ne null}" 
+                                         update="messages" style="color: white; background-color:black ; float: right"  >
+                            <p:confirm header="Confirmação" message="Deseja realmente excluir o Registro?" icon="ui-icon-alert" />
+                        </p:commandButton>
+                    </p:outputPanel>
+                </h:panelGrid>
+                <p:separator  />
+
+                <p:outputPanel rendered="#{cadastroTipoProdutoController.tipoProduto eq null}" style="height: 90% !important; overflow: scroll !important ">
+
+                    <p:dataTable emptyMessage="Nenhum tipo de produto cadastrado"   
+                                 scrollable="true" scrollHeight="500" scrollRows="20"  style="height: 98%"
+                                 value="#{cadastroTipoProdutoController.listarTipoProdutos()}" var="u" >
+                        <p:column headerText="#" width="8%" >
+                            <p:commandLink actionListener="#{cadastroTipoProdutoController.setTipoProduto(u)}"  update="form"  >
+                                <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                            </p:commandLink>
+                        </p:column>
+
+                        <p:column width="95%" headerText="Descrição" filterBy="#{u.descricao}" style="text-align: left">
+                            <p:outputLabel value="#{u.descricao}" style="font-size: small;text-align: center" /> 
+                        </p:column>
+
+                    </p:dataTable>
+                </p:outputPanel>
+
+                <p:outputPanel id="panelDados" rendered="#{not empty cadastroTipoProdutoController.tipoProduto}" style="width: 98%">
+                    <p:focus for="inputId"/>
+                    <h:panelGrid columns="2"  cellpadding="4" cellspacing="4" style="width: 50%">
+                        <p:outputLabel value="Descrição" style="font-weight: bold" /> <br/>
+                        <p:inputText id="inputId"  value="#{cadastroTipoProdutoController.tipoProduto.descricao}" style="width: 90%" />
+                    </h:panelGrid>
+                </p:outputPanel>
+
+
+                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                    <p:commandButton value="Excluir" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                    <p:commandButton value="Cancelar" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                </p:confirmDialog>
+            </h:form>
+        </h:body>
+    </ui:define>
+</ui:composition>
+
+

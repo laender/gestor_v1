@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Gestor - Painel</title>
+    </h:head>
+    <style type="text/css"> 
+        .footer {
+            position:absolute;
+            bottom:0;
+            width:98%;
+            float: right;
+        }
+    </style>
+    <h:form>
+
+        <h:body style="background-color: activecaption ; background-size: 100%">
+            <h:panelGrid columns="8"  cellpadding="10" cellspacing="10"  style="width: 90%" >
+                <p:column>
+                    <h:panelGrid columns="1"  rendered="#{usuarioController.usuario.userSystem}"  >
+                        <h:commandLink title="Empresas" action="/Cadastros/cadastroEmpresa.xhtml" >
+                            <h:graphicImage url="/Images/empresas.png" style="width: 100px; height: 100px"  />
+                        </h:commandLink>
+                        <p:outputLabel value="EMPRESAS" />
+                    </h:panelGrid>
+                </p:column>
+                <p:column>
+                    <h:panelGrid columns="1"  rendered="#{usuarioController.usuario.userSystem}"  >
+                        <h:commandLink title="Backup/Restore" action="/Cadastros/backupRestore.xhtml" >
+                            <h:graphicImage url="/Images/backup.png" style="width: 100px; height: 100px"  />
+                        </h:commandLink>
+                        <p:outputLabel value="BACKUP/RESTORE" />
+                    </h:panelGrid>
+                </p:column>
+
+            </h:panelGrid>
+            <p:outputPanel styleClass="footer">
+                <p:commandButton actionListener="#{usuarioController.fecharAdmin()}" ajax="false"    value="FECHAR" style="color: white; background-color: red; float: right" />
+            </p:outputPanel>
+        </h:body>
+    </h:form>
+
+</html>
+
+
+

@@ -1,0 +1,151 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/template.xhtml">
+
+    <h:head>
+        <title>Gestor - Cadastro de Produção</title>
+    </h:head>
+    <ui:define name="body" >
+        <style>
+            .ui-widget {
+                font-size: 12px !important;
+            }
+            .column1{
+                width: 60%
+            }
+            .column2{
+                width: 20%
+            }
+            .column3 {
+                width: 20%
+            }
+        </style>
+        <script>
+            function somenteNumeros(num) {
+                var er = /[^0-9.]/;
+                er.lastIndex = 0;
+                var campo = num;
+                if (er.test(campo.value)) {
+                    campo.value = "";
+                    alert("Utilize apenas números e substitua vírgula(,) por ponto (.)");
+                }
+            }
+        </script>
+
+        <h:form id="form" style="height: 100% !important">
+            <h:panelGrid columns="3" cellpadding="3" cellspacing="3" style="width: 98%;  background-color: lightsteelblue; box-shadow: 10px 10px">
+                <h:graphicImage url="/Images/bank.png"  width="30px" height="30px" /> 
+                <p:outputLabel value="CADASTRO DE PRODUÇAO" style="font-size: large !important; color: white" />
+                <p:outputPanel >
+                    <p:commandButton  actionListener="#{producaoController.salvar()}" rendered="#{producaoController.producao ne null}" value="SALVAR" style="color: white; background-color: green; float: right; font-weight: bold" />
+                    <p:commandButton  actionListener="#{producaoController.cancelar()}" rendered="#{producaoController.producao ne null}" value="CANCELAR" style="color: white; background-color:grey ; float: right; border: none" />
+                    <p:commandButton  actionListener="#{producaoController.novo()}" rendered="#{producaoController.producao eq null}" value="NOVO" style="color: white; background-color: darkturquoise; float: right; font-weight: bold" />
+                    <p:commandButton actionListener="#{producaoController.fechar()}"    ajax="false"  rendered="#{producaoController.producao eq null}"  value="FECHAR" style="color: white; background-color: red; float: right; border: none" />
+
+
+                    <p:commandButton value="Exclusão" actionListener="#{producaoController.excluir()}"  rendered="#{producaoController.producao.id ne null}" 
+                                     update="messages" style="color: white; background-color:black ; float: right"  >
+                        <p:confirm header="Confirmação" message="Deseja realmente excluir o Registro?" icon="ui-icon-alert" />
+                    </p:commandButton>
+                </p:outputPanel>
+            </h:panelGrid>
+            <p:separator  />
+
+            <p:outputPanel rendered="#{producaoController.producao eq null}" style="height: 90% !important; overflow: scroll !important ">
+
+                <p:dataTable emptyMessage="Nenhum producão cadastrada"       scrollHeight="200" scrollRows="20"   scrollable="true"  style="height: 98%"  
+                             value="#{producaoController.listarProducoes()}"  var="u" >
+                    <p:column headerText="#" width="8%" >
+                        <p:commandLink actionListener="#{producaoController.setProducao(u)}"    >
+                            <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                        </p:commandLink>
+                    </p:column>
+                    <p:column width="50%" headerText="Produção" filterBy="#{u.observacao}" filterMatchMode="contains" style="text-align: left">
+                        <p:outputLabel value="#{u.observacao}" style="text-align: center" /> 
+                    </p:column>
+                    <p:column width="40%" headerText="Cliente" filterBy="#{u.cliente.nome}" filterMatchMode="contains" style="text-align: left">
+                        <p:outputLabel value="#{u.cliente.nome}" style="text-align: center" /> 
+                    </p:column>
+
+                    <p:column   width="14%" headerText="Entrega"  style="text-align: center"  sortBy="#{u.dataEntrega}" >
+                        <p:outputLabel value="#{u.dataEntrega}" >
+                            <f:convertDateTime pattern="dd/MM/yyyy" />
+                        </p:outputLabel>
+                    </p:column>
+                    <p:column   width="15%" headerText="Valor"   sortBy="#{u.valorProducao}"  filterBy="#{u.valorProducao}" filterMatchMode="contains" style="text-align: center">
+                        <p:outputLabel value="#{u.valorProducao }" style="text-align: right" >
+                            <f:convertNumber currencySymbol="R$" type="currency"/>
+                        </p:outputLabel> 
+                    </p:column>
+
+                </p:dataTable>
+            </p:outputPanel>
+
+            <p:outputPanel id="panelDados"  autoUpdate="true" rendered="#{not empty producaoController.producao}" style="border-radius: 10px 10px;background-color: whitesmoke; " >
+                <p:focus for="inputId"/>
+                <h:panelGrid columns="2" style="width: 40%" >
+                    <p:column>
+                        <p:outputLabel value="Cliente" style="font-weight: bold" /> <br/>
+                        <p:inputText style="width: 70%" disabled="true" value="#{producaoController.producao.cliente.nome}" /> 
+                        <p:commandLink onclick="PF('dlgCliente').show();"  >
+                            <h:graphicImage url="/Images/search.png" style="vertical-align: bottom"  width="30px" height="30px"/>
+                        </p:commandLink>  
+                    </p:column>
+                    <p:column>
+
+                    </p:column>
+                </h:panelGrid>
+                <h:panelGrid columns="3"  cellpadding="4" cellspacing="4" style="width: 99%" columnClasses="column1,column2,column3" >
+                    <p:column>
+                        <p:outputLabel value="Produção" style="font-weight: bold" /><br/>
+                        <p:inputText id="inputId" value="#{producaoController.producao.observacao}" style="width: 99%" />
+                    </p:column>
+                    <p:column>
+                        <p:outputLabel  value="Valor" style="font-weight: bold"/> <br/>
+                        <p:inputText value="#{producaoController.producao.valorProducao}" onkeyup="somenteNumeros(this);" 
+                                     style="width: 80%; text-align: right" />
+                    </p:column>
+                    <p:column>
+                        <p:outputLabel value="Data entrega" style="font-weight: bold" /> <br/>
+                        <p:calendar  value="#{producaoController.producao.dataEntrega}"  pattern="dd/MM/yyyy" mask="true"    />
+                    </p:column>
+
+                </h:panelGrid>
+
+            </p:outputPanel>
+
+            <p:dialog  style="background-color: lightslategray;" 
+                       widgetVar="dlgCliente" id="dlgCliente" height="400px" width="700px"  modal="true" header="Selecao de Clientes">
+                <p:dataTable    value="#{producaoController.listarClientes()}" var="i" scrollable="true" scrollRows="15" style="overflow: scroll" >
+                    <p:column headerText="#" width="8%">
+                        <p:commandLink actionListener="#{producaoController.producao.setCliente(i)}"  oncomplete="PF('dlgCliente').hide();"  >
+                            <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                        </p:commandLink>
+                    </p:column>
+                    <p:column headerText="Cliente" filterBy="#{i.nome}">
+                        #{i.nome}   
+                    </p:column>
+                    <p:column headerText="Cpf/Cnpj" filterBy="#{i.cpfCnpj}">
+                        #{i.cpfCnpj}   
+                    </p:column>
+                </p:dataTable>
+                <p:commandLink value="NENHUM REGISTRO" style="color: white !important; float: right" 
+                               actionListener="#{gerenciadorController.setCliente(null)}" oncomplete="PF('dlgCliente').hide();"  />
+            </p:dialog>
+
+
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                <p:commandButton value="Excluir" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                <p:commandButton value="Cancelar" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+            </p:confirmDialog>
+        </h:form>
+
+    </ui:define>
+
+</ui:composition>
+
+
+

@@ -1,0 +1,126 @@
+<ui:composition  xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:p="http://primefaces.org/ui"
+                 template="/WEB-INF/templates/template.xhtml">
+
+    <h:head>
+        <title>Gestor - Cadastro de tipos de Orçamento</title>
+    </h:head>
+
+    <ui:define name="body" >
+        <style type="text/css"> 
+            .ui-widget {
+                font-size: 12px !important;
+            }
+        </style>
+        <h:body style="background-color: whitesmoke ; background-size: 100%">
+            <h:form id="form" style="height: 100% !important">
+                <h:panelGrid columns="4" cellpadding="3" cellspacing="3" style="width: 100%;  background-color: lightsteelblue; box-shadow: 10px 10px">
+                    <h:graphicImage url="/Images/projectType.png"  width="30px" height="30px" /> 
+                    <p:outputLabel value="CADASTRO DE TIPOS DE ORÇAMENTO" style="font-size: large !important; color: white" />
+                    <h:outputLink target="_blank" value="https://youtu.be/95qVY0r_OlQ">ASSISTA AQUI O TUTORIAL</h:outputLink>
+                    <p:outputPanel >
+                        <p:commandButton  actionListener="#{cadastroTipoOrcamentoController.salvar()}" rendered="#{cadastroTipoOrcamentoController.tipoOrcamento ne null}" value="SALVAR" style="color: white; background-color: green; float: right; font-weight: bold" />
+                        <p:commandButton  actionListener="#{cadastroTipoOrcamentoController.cancelar()}" rendered="#{cadastroTipoOrcamentoController.tipoOrcamento ne null}" value="CANCELAR" style="color: white; background-color:grey ; float: right;  border: none" />
+                        <p:commandButton  actionListener="#{cadastroTipoOrcamentoController.novo()}" rendered="#{cadastroTipoOrcamentoController.tipoOrcamento eq null}" value="NOVO" style="color: white; background-color: darkturquoise; float: right; font-weight: bold" />
+                        <p:commandButton actionListener="#{cadastroTipoOrcamentoController.fechar()}" ajax="false"  rendered="#{cadastroTipoOrcamentoController.tipoOrcamento eq null}"  value="FECHAR" style="color: white; background-color: red; float: right; border: none" />
+                        <p:commandButton value="Exclusão" actionListener="#{cadastroTipoOrcamentoController.excluir()}"  rendered="#{cadastroTipoOrcamentoController.tipoOrcamento.id ne null}" 
+                                         update="messages" style="color: white; background-color:black ; float: right"  >
+                            <p:confirm header="Confirmação" message="Deseja realmente excluir o Registro?" icon="ui-icon-alert" />
+                        </p:commandButton>
+                    </p:outputPanel>
+                </h:panelGrid>
+                <p:separator  />
+
+                <p:outputPanel rendered="#{cadastroTipoOrcamentoController.tipoOrcamento eq null}" style="height: 90% !important; overflow: scroll !important ">
+
+                    <p:dataTable emptyMessage="Nenhum tipo de orçamento cadastrado"   
+                                 scrollable="true"  style="height: 98%" value="#{cadastroTipoOrcamentoController.getTipoOrcamentos()}" 
+                                 scrollHeight="500" scrollRows="20"   var="u" >
+                        <p:column headerText="#" width="8%" >
+                            <p:commandLink actionListener="#{cadastroTipoOrcamentoController.setTipoOrcamento(u)}"  update="form"  >
+                                <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                            </p:commandLink>
+                        </p:column>
+                        <p:column   width="95%" headerText="Descrição" filterBy="#{u.descricao}" style="text-align: left">
+                            <p:outputLabel value="#{u.descricao}" style="text-align: center" /> 
+                        </p:column>
+
+                    </p:dataTable>
+                </p:outputPanel>
+
+                <p:outputPanel id="panelDados" rendered="#{not empty cadastroTipoOrcamentoController.tipoOrcamento}" style="width: 100%; background-color: whitesmoke;border-radius: 20px 20px" >
+                    <p:focus for="inputId"/>
+                    <h:panelGrid columns="2"  cellpadding="4" cellspacing="4" style="width: 98%">
+                        <p:column>
+                            <p:outputLabel value="Descrição" style="font-weight: bold" /> <br/>
+                            <p:inputText id="inputId" value="#{cadastroTipoOrcamentoController.tipoOrcamento.descricao}" style="width: 80%" />
+                        </p:column>
+                        <p:column>
+                            <p:commandButton value="SELECIONAR PRODUTOS" style="background-color: green; color: white; margin-left: 70%" onclick="PF('dlgProduto').show();" />
+                        </p:column>
+                    </h:panelGrid>
+                    <br/>
+                    <br/>
+                </p:outputPanel>
+                <br/> <br/> 
+                <p:outputPanel id="panelInf" rendered="#{not empty cadastroTipoOrcamentoController.tipoOrcamento}">
+                    <p:fieldset legend="Produtos vinculados">
+                        <br/>
+                        <p:outputPanel autoUpdate="true">
+                            <p:dataTable emptyMessage="Nenhum produto vinculado"   
+                                         scrollable="true"  scrollHeight="300" scrollRows="15" 
+                                         style="height: 98%" value="#{cadastroTipoOrcamentoController.tipoOrcamento.produtos}"  var="u" >
+                               
+                                <p:column   width="95%" headerText="Descrição"  style="text-align: left">
+                                    <p:outputLabel value="#{u.descricao}" style="text-align: center" /> 
+                                </p:column>
+                                <p:column headerText="#" width="8%">
+                                    <p:commandLink actionListener="#{cadastroTipoOrcamentoController.removeProduto(u)}" >
+                                        <h:graphicImage url="/Images/remove.png"  width="20px" height="20px" />
+                                    </p:commandLink>
+                                </p:column>
+                            </p:dataTable>
+                        </p:outputPanel>
+                    </p:fieldset>
+
+                </p:outputPanel>
+
+                <p:dialog  style="background-color: lightslategray;" 
+                           widgetVar="dlgProduto" id="dlgProduto" height="500px" width="50%"  modal="true" header="Seleção de produtos">
+                    <p:dataTable    value="#{cadastroTipoOrcamentoController.produtos}" var="c" scrollable="true" scrollRows="15" scrollHeight="500px"  >
+                        <p:column headerText="#" width="8%">
+                            <p:commandLink actionListener="#{cadastroTipoOrcamentoController.addProduto(c)}"   >
+                                <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                            </p:commandLink>
+                        </p:column>
+
+                        <p:column headerText="Produto" filterBy="#{c.descricao}">
+                            #{c.descricao}   
+                        </p:column>
+                        <p:column headerText="Tipo" filterBy="#{c.tipoProduto.descricao}">
+                            #{c.tipoProduto.descricao}   
+                        </p:column>
+                    </p:dataTable>
+                    <p:commandButton style="color: white; background-color: green; float: right; width: 30%"  
+                                     onclick="PF('dlgProduto').hide();" value="CONFIRMAR" update="form" >
+                    </p:commandButton>
+                </p:dialog>
+
+
+                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                    <p:commandButton value="Excluir" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                    <p:commandButton value="Cancelar" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                </p:confirmDialog>
+            </h:form>
+        </h:body>
+       
+    </ui:define>
+
+</ui:composition>
+
+
+
+

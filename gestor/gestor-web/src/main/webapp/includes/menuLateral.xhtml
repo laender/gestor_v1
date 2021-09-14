@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <div style="height: 600px; overflow-x:  auto; ">
+        <ul class="sidebar-menu" >
+
+            <li class="header">
+                CADASTROS
+            </li>
+
+            <li>
+
+                <p:link id="cadUsu" href="/Cadastros/cadastroUsuario.xhtml" rendered="#{usuarioController.usuario.administrador}">
+                    <p:tooltip for="cadUsu" value="Cadastro de profissionais" />
+                    <i class="fa fa-edit"></i>
+                    <span>Profissionais</span>
+                </p:link>
+            </li>
+            <li>
+                <p:link id="cadCli" href="/Cadastros/cadastroClientes.xhtml">
+                    <p:tooltip for="cadCli" value="Cadastro de Clientes" />
+                    <i class="fa fa-edit"></i>
+                    <span>Clientes</span>
+                </p:link>
+            </li>
+            <li>
+                <p:link id="cadFr" href="/Cadastros/cadastroFornecedores.xhtml" 
+                        rendered="#{usuarioController.usuario.empresa.ramoAtividade.chave ne 'DESPACHANTE'}" >
+                    <p:tooltip for="cadFr" value="Cadastro de Fornecedores" />
+                    <i class="fa fa-edit"></i>
+                    <span>Fornecedores</span>
+                </p:link>
+            </li>
+
+            <li>
+
+                <p:link id="cadTpP" href="/Cadastros/cadastroProducao.xhtml" rendered="#{usuarioController.usuario.empresa.loginKey eq 'BBERTUZZI'}"  >
+                    <p:tooltip for="cadTpP" value="Cadastro Produção" />
+                    <i class="fa fa-edit"></i>
+                    <span>Produção</span>
+                </p:link>
+
+            </li>
+
+            <!--            <li>
+                            <p:link id="cadTpP" href="/Cadastros/cadastroTipoProduto.xhtml" 
+                                    rendered="# {usuarioController.usuario.empresa.ramoAtividade.chave ne 'DESPACHANTE'}" >
+                                    <p:tooltip for="cadTpP" value="Cadastro Tipo Produto" />
+                                <i class="fa fa-edit"></i>
+                                <span>Tipo de produto/serviço</span>
+                            </p:link>
+                        </li>-->
+            <li>
+                <p:link id="cProd" href="/Cadastros/cadastroProduto.xhtml">
+                    <p:tooltip for="cProd" value="Cadastro de Prdutos" />
+                    <i class="fa fa-edit"></i>
+                    <span>Produtos/Serviços</span>
+                </p:link>
+            </li>
+            <li>
+                <p:link id="cadBan" href="/Cadastros/cadastroBanco.xhtml"  rendered="#{usuarioController.usuario.empresa.exibirCadBanco}">
+                    <p:tooltip for="cadBan" value="Cadastro de Bancos" />
+                    <i class="fa fa-edit"></i>
+                    <span>Bancos</span>
+                </p:link>
+            </li>
+            <li>
+                <p:link id="tpOrc" href="/Cadastros/cadastroTipoOrcamento.xhtml" 
+                        rendered="#{usuarioController.usuario.empresa.ramoAtividade.chave eq 'FABRICA'}" >
+                    <p:tooltip for="tpOrc" value="Cadastro Tipo Orçamento" />
+                    <i class="fa fa-edit"></i>
+                    <span>Tipo de orçamento</span>
+                </p:link>
+            </li>
+            <li>
+                <p:link id="tpPg" href="/Cadastros/cadastroTipoPagamento.xhtml" rendered="#{usuarioController.usuario.empresa.ramoAtividade.chave ne 'DESPACHANTE'}" >
+                    <p:tooltip for="tpPg" value="Cadastro Tipo Pagamento" />
+                    <i class="fa fa-edit"></i>
+                    <span>Tipo de pagamento</span>
+                </p:link>
+            </li>
+            <li>
+                <p:link id="frPg" href="/Cadastros/cadastroFormaPagamento.xhtml" rendered="#{usuarioController.usuario.empresa.ramoAtividade.chave ne 'DESPACHANTE'}" >
+                    <p:tooltip for="frPg" value="Cadastro Forma Pagamento" />
+                    <i class="fa fa-edit"></i>
+                    <span>Forma de pagamento</span>
+                </p:link>
+            </li>
+            <li>
+                <p:link id="prIns" href="/Cadastros/cadastroProdutoInsumo.xhtml" 
+                        rendered="#{usuarioController.usuario.empresa.ramoAtividade.chave ne 'DESPACHANTE' and 
+                               usuarioController.usuario.empresa.ramoAtividade.chave ne 'OFICINA'}" >
+                    <p:tooltip for="prIns" value="Caastro Produto x Insumos" />
+                    <i class="fa fa-edit"></i>
+                    <span>Produtos x insumos</span>
+                </p:link>
+            </li>
+            <li>
+                <p:link id="tbPr" href="/Cadastros/tabelaPreco.xhtml" rendered="#{usuarioController.usuario.administrador}" >
+                    <p:tooltip for="tbPr" value="Cadastro de Tabela de Preço" />
+                    <i class="fa fa-edit"></i>
+                    <span>Tabela de preço</span>
+                </p:link>
+            </li>
+            <li>
+                <p:link id="cadMut" href="/Cadastros/cadastroMultiplicador.xhtml" rendered="#{usuarioController.empresa.exibirMultiplicador}"  >
+                    <p:tooltip for="cadMut" value="Cadastro de Multiplicador" />
+                    <i class="fa fa-edit"></i>
+                    <span>Muliplicador</span>
+                </p:link>
+            </li>
+            <li>
+                <p:link id="cadE" href="/Cadastros/cadastroEmpresa.xhtml" rendered="#{usuarioController.usuario.userSystem}" >
+                    <p:tooltip for="cadE" value="Cadastro de Empresa" />
+                    <i class="fa fa-edit"></i>
+                    <span>Empresas</span>
+                </p:link>
+            </li>
+            <li class="header" rendered="#{usuarioController.usuario.empresa.controlaEstoque 
+                                           and usuarioController.usuario.administrador 
+                                           and usuarioController.usuario.empresa.ramoAtividade.chave ne 'DESPACHANTE'}">
+                ESTOQUE
+            </li>
+            <li>
+                <p:link id="estoQ" href="/Estoque/estoque.xhtml" rendered="#{usuarioController.usuario.empresa.controlaEstoque 
+                                                                             and usuarioController.usuario.administrador 
+                                                                             and usuarioController.usuario.empresa.ramoAtividade.chave ne 'DESPACHANTE'}" >
+                    <p:tooltip for="estoQ" value="Estoque" />
+                    <i class="fa fa-cube"></i>
+                    <span>Estoque</span>
+                </p:link>
+            </li>
+
+            <li class="header"  rendered="#{usuarioController.usuario.empresa.ramoAtividade.chave eq 'DESPACHANTE'}">
+                ORDEM DE SERVIÇO
+            </li>
+            <li  >
+                <p:link id="ordServico" href="/Cadastros/ordemServico.xhtml" rendered="#{usuarioController.usuario.empresa.ramoAtividade.chave eq 'DESPACHANTE'}"  >
+                    <p:tooltip for="ordServico" value="Ordem de serviço" />
+                    <i class="fa fa-taxi"></i>
+                    <span>Ordem Serviço</span>
+                </p:link>
+            </li>
+
+            <li class="header" rendered="#{usuarioController.usuario.empresa.ramoAtividade.chave ne 'DESPACHANTE'}">
+                VENDAS
+            </li>
+            <li>
+                <p:link id="orcVenda" href="/Cadastros/orcamento.xhtml" rendered="#{usuarioController.usuario.empresa.ramoAtividade.chave ne 'DESPACHANTE'}" >
+                    <p:tooltip for="orcVenda" value="Orçamento/Venda" />
+                    <i class="fa fa-users"></i>
+                    <span>Orçamento/Venda</span>
+                </p:link>
+            </li>
+            <li>
+                <p:link id="vdRapida" href="/Cadastros/vendaRapida.xhtml" rendered="#{usuarioController.usuario.empresa.exibirVendaRapida and usuarioController.usuario.empresa.ramoAtividade.chave ne 'DESPACHANTE'}" >
+                    <p:tooltip for="vdRapida" value="Venda Rápida" />
+                    <i class="fa fa-users"></i>
+                    <span>Venda rápida</span>
+                </p:link>
+            </li>
+
+            <li class="header" rendered="#{usuarioController.usuario.empresa.ramoAtividade.chave ne 'DESPACHANTE'}">
+                FINANCEIRO
+            </li>
+            <li>
+                <p:link id="cx" href="/Financeiro/caixa.xhtml" rendered="#{usuarioController.usuario.empresa.ramoAtividade.chave ne 'DESPACHANTE'}">
+                    <p:tooltip for="cx" value="Caixa" />
+                    <i class="fa fa-money"></i>
+                    <span>Caixa</span>
+                </p:link>
+            </li>
+            <li>
+                <p:link id="sai" href="/Financeiro/lancamentoFinanceiroSaida.xhtml" rendered="#{usuarioController.usuario.empresa.ramoAtividade.chave ne 'DESPACHANTE'}" >
+                    <p:tooltip  for="sai" value="Pagamentos" />
+                    <i class="fa fa-money"></i>
+                    <span>Pagamentos</span>
+                </p:link>
+            </li>
+            <li>
+                <p:link  id="rec" href="/Financeiro/lancamentoFinanceiroEntrada.xhtml" rendered="#{usuarioController.usuario.empresa.ramoAtividade.chave ne 'DESPACHANTE'}">
+                    <p:tooltip  for="rec" value="Recebimentos" />
+                    <i class="fa fa-money"></i>
+                    <span>Recebimentos</span>
+                </p:link>
+            </li>
+
+
+
+            <li class="header" rendered="#{usuarioController.usuario.empresa.ramoAtividade.chave ne 'DESPACHANTE' and usuarioController.usuario.administrador}">
+                RELATÓRIOS
+            </li>
+
+            <li>
+                <p:link id="relCx" href="/Financeiro/relatorioCaixa.xhtml" rendered="#{usuarioController.usuario.empresa.ramoAtividade.chave ne 'DESPACHANTE'}">
+                    <p:tooltip for="relCx" value="Relatório de Caixa" />
+                    <i class="fa fa-file-text"></i>
+                    <span>Caixa</span>
+                </p:link>
+                <p:link id="relVen" href="/Gerenciador/relatorioVendas.xhtml" rendered="#{usuarioController.usuario.empresa.ramoAtividade.chave ne 'DESPACHANTE'}">
+                    <p:tooltip for="relVen" value="Relatório de Vendas" />
+                    <i class="fa fa-file-text"></i>
+                    <span>Vendas</span>
+                </p:link>
+                <p:link id="relTit" href="/Gerenciador/relatorioTitulos.xhtml" rendered="#{usuarioController.usuario.empresa.ramoAtividade.chave ne 'DESPACHANTE'}">
+                    <p:tooltip for="relTit" value="Relatório Financeiro" />
+                    <i class="fa fa-file-text"></i>
+                    <span>Financeiro</span>
+                </p:link>
+                <p:link id="relEst" href="/Gerenciador/relatorioEstoque.xhtml" 
+                        rendered="#{usuarioController.usuario.empresa.ramoAtividade.chave ne 'DESPACHANTE' and usuarioController.usuario.administrador and usuarioController.usuario.empresa.controlaEstoque}">
+                    <p:tooltip for="relEst" value="Relatório de Estoque" />
+                    <i class="fa fa-file-text"></i>
+                    <span>Estoque</span>
+                </p:link>
+                <p:link id="relCom" href="/Gerenciador/relatorioComissao.xhtml" rendered="#{usuarioController.usuario.empresa.ramoAtividade.chave ne 'DESPACHANTE'}">
+                    <p:tooltip for="relCom" value="Relatório de Comissões" />
+                    <i class="fa fa-file-text"></i>
+                    <span>Comissões</span>
+                </p:link>
+            </li>
+            <li></li>
+            <li></li>
+            <br/>
+            <br/>
+
+        </ul>
+    </div>
+
+
+</ui:composition>

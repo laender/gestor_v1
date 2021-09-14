@@ -1,0 +1,379 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/template.xhtml">
+
+    <h:head>
+        <title>Gestor - Cadastro de Clientes</title>
+    </h:head>
+    <style type="text/css">
+        .layout{
+            position: absolute;
+        }
+    </style>
+    <script>
+        function somenteNumeros(num) {
+            var er = /[^0-9.]/;
+            er.lastIndex = 0;
+            var campo = num;
+            if (er.test(campo.value)) {
+                campo.value = "";
+                alert("Utilize apenas números e substitua vírgula(,) por ponto (.)");
+            }
+        }
+    </script>
+
+    <ui:define name="body" class="layout" >
+        <style type="text/css">
+            .ui-grid-row .ui-grid-col-2,
+            .ui-grid-row .ui-grid-col-10 {
+                padding: 0.5em 0;
+                margin-left: 10px;
+            }
+
+            .ui-orderlist .ui-orderlist-list {
+                height: auto;
+            }
+
+            .ui-orderlist .ui-grid-row .ui-grid-col-2,
+            .ui-orderlist .ui-grid-row .ui-grid-col-10 {
+                padding: 0;
+            }
+            .ui-datatable .ui-datatable-data .vermelho td{
+                background-color: tomato;
+            }
+            .ui-datatable .ui-datatable-data .azul td{
+                background-color:#00BFFF;
+            }
+            .ui-datatable .ui-datatable-data .verde td{
+                background-color:#32CD32;
+            }
+            .column1{
+                width: 50%;
+            }
+            .column2{
+                vertical-align: bottom;
+            }
+            .columnTop{
+                width: 50%;
+                vertical-align: top;
+            }
+            .columnRanking1{
+
+            }
+            .columnRanking2{
+                vertical-align: middle;
+            }
+            .columnAbc1{}
+            .columnAbc2{}
+            .columnAbc3{
+                vertical-align: bottom;
+            }
+            .ui-widget {
+                font-size: 12px !important;
+            }
+        </style>
+        <script>
+            function somenteNumeros(num) {
+                var er = /[^0-9.]/;
+                er.lastIndex = 0;
+                var campo = num;
+                if (er.test(campo.value)) {
+                    campo.value = "";
+                    alert("Utilize apenas números e substitua vírgula(,) por ponto (.)");
+                }
+            }
+        </script>
+        <h:form id="form" style="height: 100%" >
+            <h:panelGrid    columns="3" cellpadding="3" cellspacing="3" style="width: 100%;  background-color: lightsteelblue; box-shadow: 10px 10px">
+                <h:graphicImage url="/Images/user-group.png"  width="30px" height="30px" /> 
+                <p:outputLabel value="CADASTRO DE CLIENTES" style="font-size: large !important; color: white" />
+                <p:outputPanel >
+                    <p:commandButton  actionListener="#{cadastroClienteController.salvar()}" rendered="#{cadastroClienteController.cliente ne null}" value="SALVAR" style="color: white; background-color: green; float: right; font-weight: bold" />
+                    <p:commandButton  actionListener="#{cadastroClienteController.cancelar()}" rendered="#{cadastroClienteController.cliente ne null}" value="CANCELAR" style="color: white; background-color:grey ; float: right; border: none" />
+                    <p:commandButton  actionListener="#{cadastroClienteController.novo()}" rendered="#{cadastroClienteController.cliente eq null}" value="NOVO" style="color: white; background-color: darkturquoise; float: right; font-weight: bold" />
+                    <p:commandButton actionListener="#{cadastroClienteController.fechar()}" ajax="false" rendered="#{cadastroClienteController.cliente eq null}"  value="FECHAR" style="color: white; background-color: red; float: right; border:none" />
+                    <p:commandButton value="Exclusão" actionListener="#{cadastroClienteController.excluir()}" 
+                                     rendered="#{cadastroClienteController.cliente ne null and cadastroClienteController.cliente.id ne null}"
+                                     update="messages" style="color: white; background-color:black ; float: right"  >
+                        <p:confirm header="Confirmação" message="Deseja realmente excluir o Registro?" icon="ui-icon-alert" />
+                    </p:commandButton>
+                </p:outputPanel>
+            </h:panelGrid>
+            <p:separator  />
+            <p:tabView>
+                <p:tab title="Informações">
+                    <p:outputPanel id="panelNovo" rendered="#{cadastroClienteController.cliente ne null}" style="height: 100% !important; background-color: whitesmoke;border-radius: 20px 20px;" >
+                        <p:focus for="inputId"/>
+                        <h:panelGrid columns="2" style="width: 99%" columnClasses="column1, columnTop">
+                            <p:column>
+                                <h:panelGrid columns="1" cellpadding="2" cellspacing="2" style="margin-left: 1%; width: 90%" >
+                                    <p:outputLabel value="Nome" style="font-weight: bold; margin-top: 5px" />
+                                    <p:inputText id="inputId" value="#{cadastroClienteController.cliente.nome}" style="width: 90%"/>
+                                    <p:outputLabel value="CPF/CNPJ" style="font-weight: bold" />
+                                    <p:inputText value="#{cadastroClienteController.cliente.cpfCnpj}" style="width: 50%" />
+                                    <p:outputLabel value="RG" style="font-weight: bold" />
+                                    <p:inputText value="#{cadastroClienteController.cliente.rg}" style="width: 50%" />
+                                    <p:outputLabel value="Email" style="font-weight: bold" />
+                                    <p:inputText value="#{cadastroClienteController.cliente.email}" style="width: 90%" />
+                                    <p:outputLabel value="Telefone" style="font-weight: bold" />
+                                    <p:inputText value="#{cadastroClienteController.cliente.telefone}" style="width: 50%" />
+                                    <p:outputLabel value="Endereço" style="font-weight: bold" />
+                                    <p:inputText value="#{cadastroClienteController.cliente.endereco}" style="width: 90%" />
+                                    <p:outputLabel value="Numero" style="font-weight: bold" />
+                                    <p:inputText value="#{cadastroClienteController.cliente.numero}" style="width: 20%" onkeyup="somenteNumeros(this);"  >
+                                        <f:convertNumber integerOnly="true" minIntegerDigits="1"  />
+                                    </p:inputText>
+                                    <p:outputLabel value="Data aniversário" style="font-weight: bold" />
+                                    <p:calendar id="aniversario" navigator="true"  value="#{cadastroClienteController.cliente.dataAniversario}" pattern="dd/MM/yyyy" mask="true" />
+                                    <p:tooltip  for="aniversario" value="O sistema avisará em suas notificações quando o cliente estiver de aniversário" position="top"/>
+                                    <p:outputLabel value="Observações" style="font-weight: bold" />
+                                    <p:inputTextarea value="#{cadastroClienteController.cliente.observacao}" style="width: 90%" />
+
+                                </h:panelGrid>
+                                <p:outputPanel autoUpdate="true">
+
+                                    <h:panelGrid columns="2" cellpadding="2" columnClasses="column1, column2" cellspacing="2" style="margin-left: 1% ; margin-top: 1%" >
+                                        <p:column>
+                                            <p:outputLabel value="Cidade" style="font-weight: bold" />  <br/>
+                                            <p:inputText disabled="true" value="#{cadastroClienteController.cliente.cidade.nome}-#{cadastroClienteController.cliente.cidade.estado.sigla}" />
+                                        </p:column>
+                                        <p:column>
+                                            <p:commandLink onclick="PF('dlgCidade').show();" style="margin-bottom: 0px" >
+                                                <h:graphicImage url="/Images/search.png"  width="27px" height="27px"/>
+                                            </p:commandLink>
+                                        </p:column>
+                                    </h:panelGrid>
+                                </p:outputPanel>
+                            </p:column>
+                            <p:column >
+                                <h:panelGrid columns="3" style="width: 98%; height: 30%" rendered="#{not empty cadastroClienteController.cliente.id and usuarioController.usuario.empresa.ramoAtividade.chave ne 'DESPACHANTE'}" >
+                                    <h:panelGrid columns="1" style="background-image: linear-gradient(45deg, greenyellow, green );  border-radius: 10px 20px;width: 99%;" >
+                                        <p:outputLabel  value="Valor total Compras" style="color: white; margin-left: 5%; font-weight: bold " />
+                                        <br/>
+                                        <br/>
+                                        <p:outputLabel value="#{cadastroClienteController.valorTotalCompra}" 
+                                                       style="color: white; margin-left: 5%; font-weight: bold; font-size: xx-large" >
+                                            <f:convertNumber currencySymbol="R$" type="currency"/>
+                                        </p:outputLabel>
+                                    </h:panelGrid>
+                                    <h:panelGrid columns="1" style="background-image: linear-gradient(45deg, orangered, orange ); border-radius: 10px 20px;width: 99%" >
+                                        <p:outputLabel  value="Quantidade compras" style="color: white; margin-left: 5%; font-weight: bold" />
+                                        <br/>
+                                        <br/>
+                                        <p:outputLabel value="#{cadastroClienteController.qtdTotalCompras}" style="font-weight: bold; color: white; margin-left: 45%; font-size: xx-large" >
+                                        </p:outputLabel>
+                                    </h:panelGrid>
+                                    <h:panelGrid columns="1" style="background-image: linear-gradient(45deg, blue, buttonface ); border-radius: 10px 20px;width: 99%" >
+                                        <p:outputLabel  value="Data ultima compra" style="color: white; margin-left: 5%; font-weight: bold" />
+                                        <br/>
+                                        <br/>
+                                        <p:outputLabel value="#{cadastroClienteController.dataUltimaCompra}" style="font-weight: bold; color: white; margin-left: 5%; font-size: xx-large" >
+                                            <f:convertDateTime  pattern="dd/MM/yyyy"/>
+                                        </p:outputLabel>
+                                    </h:panelGrid> 
+                                </h:panelGrid>
+                                <br/>
+                                <p:outputPanel style="width: 99%" rendered="#{not empty cadastroClienteController.cliente.id and usuarioController.usuario.empresa.ramoAtividade.chave ne 'DESPACHANTE'}" >
+                                    <h:panelGrid columns="1" style="background-image: linear-gradient(45deg, purple, powderblue ); border-radius: 10px 20px;width: 99%" >
+
+                                        <p:outputLabel value="Produtos mais comprados" style="font-weight: bold; color: white; margin-left: 30%; " />
+                                        <br/>
+                                        <br/>
+                                        <h:dataTable  value="#{cadastroClienteController.produtosMaisComprados}" var="p" style="width: 80%; margin-left: 1%">
+                                            <p:column >
+                                                <p:outputLabel value="#{p.produto.descricao}" style="color: white; font-size: x-large"  />
+                                            </p:column>
+                                            <p:column style="text-align: right">
+                                                <p:outputLabel value="#{p.quantidade}"  style="color: white; text-align: right;font-size: x-large">
+                                                    <f:convertNumber maxFractionDigits="1"  />
+                                                </p:outputLabel>
+                                            </p:column>
+                                        </h:dataTable>
+                                    </h:panelGrid>
+                                </p:outputPanel>
+
+                            </p:column>
+                        </h:panelGrid>
+                        <br/> <br/>
+                    </p:outputPanel>
+                    <p:outputPanel  rendered="#{cadastroClienteController.cliente eq null}" style="height: 450px !important;width: 100% " >
+                        <p:dataTable  scrollRows="20"  reflow="true"  scrollHeight="500" scrollable="true"  emptyMessage="Nenhum cliente cadastrado"
+                                      value="#{cadastroClienteController.clientes}"  var="u">
+                            <p:column headerText="#" width="4%" >
+                                <p:commandLink actionListener="#{cadastroClienteController.setCliente(u)}" update="form"  >
+                                    <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                                </p:commandLink>
+                            </p:column>
+                            <p:column headerText="Cod" width="5%"  style="text-align: center " >
+                                <p:outputLabel value="#{u.id}" style="text-align: center" />
+                            </p:column>
+                            <p:column headerText="Nome" width="20%"  filterBy="#{u.nome}" filterMatchMode="contains" style="text-align: center " >
+                                <p:outputLabel value="#{u.nome}" style="text-align: center" />
+                            </p:column>
+                            <p:column headerText="CPF/CNPJ" width="15%" filterBy="#{u.cpfCnpj}" filterMatchMode="contains" style="text-align: center " >
+                                <p:outputLabel value="#{u.cpfCnpj}" style="text-align: center" />
+                            </p:column>
+
+                            <p:column headerText="E-Mail" style="text-align: center " filterBy="#{u.email}" filterMatchMode="contains" >
+                                <p:outputLabel value="#{u.email}" style="text-align: center" />
+                            </p:column>
+                            <p:column headerText="Telefone" style="text-align: center " filterBy="#{u.telefone}" filterMatchMode="contains" >
+                                <p:outputLabel value="#{u.telefone}" style="text-align: center" />
+                            </p:column>
+                        </p:dataTable>
+                    </p:outputPanel>
+                </p:tab>
+                <p:tab title="Veículos" rendered="#{usuarioController.empresa.ramoAtividade.chave eq 'OFICINA' 
+                                                    and cadastroClienteController.cliente.id ne null}"   >                    
+                    <p:outputPanel autoUpdate="true" style="width: 60%">
+                        <h:panelGrid columns="3" width="100%" >
+                            <p:column>
+                                <p:outputLabel value="Veículo" style="font-weight: bold" /><br/>
+                                <p:inputText value="#{cadastroClienteController.veiculoCliente.veiculo}" style="width: 90%" />
+                            </p:column>
+                            <p:column>
+                                <p:outputLabel value="Placa" style="font-weight: bold"/> <br/>
+                                <p:inputText value="#{cadastroClienteController.veiculoCliente.placaVeiculo}"  />
+                        </p:column>
+                        <p:column>
+                            <p:commandButton value="ADICIONAR" style="background-color: green; color: white; float: right" 
+                                             actionListener="#{cadastroClienteController.addVeiculo()}"  />
+                        </p:column>
+                    </h:panelGrid>
+                </p:outputPanel>
+                <br/>
+                <p:outputPanel autoUpdate="true"  >
+                    <p:dataTable emptyMessage="Nenhum veiculo"   
+                                 scrollable="true"  scrollHeight="400px" style="max-height: 300px; overflow-y: scroll" scrollRows="15"  
+                                 value="#{cadastroClienteController.cliente.veiculosAtivos}"  var="u" >
+                        <p:column   width="60%" headerText="Veículo"  style="text-align: left">
+                            <p:outputLabel value="#{u.veiculo}" style="text-align: center" /> 
+                        </p:column>
+                        <p:column   width="10%" headerText="Placa" style="text-align: left">
+                            <p:outputLabel value="#{u.placaVeiculo}" style="text-align: center" /> 
+                        </p:column>
+                      
+                        <p:column headerText="#" width="8%">
+                            <p:commandLink actionListener="#{cadastroClienteController.removeVeiculo(u)}"   >
+                                <h:graphicImage url="/Images/remove.png"  width="20px" height="20px" />
+                            </p:commandLink>
+                        </p:column>
+                    </p:dataTable>
+                </p:outputPanel>
+            </p:tab>
+            <p:tab title="Ranking">
+                <p:outputPanel>
+                    <h:panelGrid columns="2" style="width: 60%" columnClasses="columnRanking1,columnRanking2">
+                        <p:column> 
+                            <h:graphicImage url="/Images/trofeu.png"  width="100px" height="100px" /> 
+                        </p:column>
+                        <p:column>
+                            <p:outputLabel value="Ranking de clientes" style="font-weight: bold;  margin-left: 20%; font-size: xx-large " />
+                        </p:column>
+                    </h:panelGrid>
+                    <br/>
+                    <br/>
+                    <h:dataTable  value="#{cadastroClienteController.rankingClientes}"  cellpadding="3" cellspacing="3" var="p" style="width: 80%; margin-left: 1%">
+                        <p:column headerText="Posição" >
+                            <p:outputLabel value="#{p.posicao}" style=" font-size: x-large"  />
+                        </p:column>
+                        <p:column headerText="Cliente" >
+                            <p:outputLabel value="#{p.cliente.nome}" style=" font-size: x-large"  />
+                        </p:column>
+                        <p:column headerText="Total em compras">
+                            <p:outputLabel value="#{p.valor}"  style="text-align: right;font-size: x-large">
+                                <f:convertNumber currencySymbol="R$" type="currency"/>
+                            </p:outputLabel>
+                        </p:column>
+                    </h:dataTable>
+                </p:outputPanel>
+            </p:tab>
+            <p:tab title="CURVA ABC" >
+                #{cadastroClienteController.carregarCurvaABC()}
+                <p:outputPanel id="abc" >
+                    <h:panelGrid columns="3" cellpadding="2" cellspacing="2" columnClasses="columnAbc1,columnAbc2,columnAbc3" >
+                        <p:column>
+                            <p:outputLabel  value="Data Inicial" style="font-weight: bold" /> <br/>
+                            <p:calendar value="#{cadastroClienteController.dataInicial}" pattern="dd/MM/yyyy" mask="true"  >
+                            </p:calendar>
+                        </p:column>
+                        <p:column>
+                            <p:outputLabel value="Data final" style="font-weight: bold" /> <br/>
+                            <p:calendar value="#{cadastroClienteController.dataFinal}" pattern="dd/MM/yyyy" mask="true"  >
+                            </p:calendar>
+                        </p:column>
+                        <p:column  style="vertical-align: bottom !important">
+                            <p:commandButton value="FILTRAR" actionListener="#{cadastroClienteController.carregarCurvaABC()}" update="abc" style="vertical-align: bottom" />
+                        </p:column>
+                    </h:panelGrid>
+                    <p:dataTable scrollable="true" scrollRows="20"
+                                 rowStyleClass="#{v.classificacao eq 'A' ? 'verde' : v.classificacao eq 'B' ? 'azul' : v.classificacao eq 'C' ?  'vermelho': ''}" 
+                                 scrollHeight="500" value="#{cadastroClienteController.curvaAbcClientes}" var="v" >
+                        <p:column headerText="Cliente" width="30%">
+                            <p:outputLabel value="#{v.cliente.nome}" />
+                        </p:column>
+                        <p:column headerText="Quantidade" style="text-align: center"  width="10%">
+                            <p:outputLabel value="#{v.qtdCompras}" >
+                                <f:convertNumber maxFractionDigits="1" />
+                            </p:outputLabel>
+                        </p:column>
+                        <p:column headerText="Valor Total" style="text-align: center" width="10%" >
+                            <p:outputLabel value="#{v.valorTotal}" >
+                                <f:convertNumber currencySymbol="R$" type="currency"/>
+                            </p:outputLabel>
+                        </p:column>
+                        <p:column headerText="Percentual" style="text-align: center" width="10%" >
+                            <p:outputLabel value="#{v.percentualFat}%" >
+                                <f:convertNumber maxFractionDigits="2" />
+                            </p:outputLabel>
+                        </p:column>
+                        <p:column headerText=" % Acumulado" style="text-align: center" width="10%" >
+                            <p:outputLabel value="#{v.percentualAcumulado}%" >
+                                <f:convertNumber maxFractionDigits="2" />
+                            </p:outputLabel>
+                        </p:column>
+                        <p:column headerText="Classificação" style="text-align: center" width="10%">
+                            #{v.classificacao}
+                        </p:column>
+                    </p:dataTable>
+                </p:outputPanel>
+            </p:tab>
+        </p:tabView>
+
+        <p:dialog  style="background-color: lightslategray;" 
+                   widgetVar="dlgCidade" id="dlgCidade" height="500px" width="50%"  modal="true" header="Seleção de Cidade">
+            <p:dataTable    value="#{cadastroClienteController.modelCidade}" var="c" 
+                            scrollable="true"  paginator="true" paginatorPosition="bottom"
+                            rowsPerPageTemplate="25,50,100,200,500,1000,99999999" rows="15"
+                            lazy="true" scrollRows="20" scrollHeight="500px" >
+                <p:column headerText="#" width="8%">
+                    <p:commandLink actionListener="#{cadastroClienteController.cliente.setCidade(c)}"  oncomplete="PF('dlgCidade').hide();" >
+                        <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                    </p:commandLink>
+                </p:column>
+
+                <p:column headerText="Nome" filterBy="#{c.nome}" filterMatchMode="contains" width="70%" sortBy="#{c.nome}" >
+                    #{c.nome}   
+                </p:column>
+                <p:column headerText="UF" filterBy="#{c.estado.sigla}" width="20%">
+                    #{c.estado.sigla}
+                </p:column>
+            </p:dataTable>
+        </p:dialog>
+
+
+        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+            <p:commandButton value="Excluir" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+            <p:commandButton value="Cancelar" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+        </p:confirmDialog>
+
+
+    </h:form>
+</ui:define>
+
+
+</ui:composition>
+

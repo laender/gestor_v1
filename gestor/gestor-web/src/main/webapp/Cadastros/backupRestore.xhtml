@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+    <h:head>
+        <title>Gestor - Backup/Restore</title>
+
+    </h:head>
+    <style type="text/css"> 
+        .footer {
+            position: fixed;
+            bottom:0;
+            right: 0;
+        }
+    </style>
+
+    <h:body style="background-color: activecaption ; background-size: 100%;height: 98% !important">
+        <h:form id="form" style="overflow: auto" >
+            <p:messages id="messages"  showDetail="true" autoUpdate="true"  />
+            <h:panelGrid columns="2" cellpadding="3" cellspacing="3">
+                <h:graphicImage url="/Images/empresas.png"  width="50px" height="50px" /> 
+                <p:outputLabel value="BACKUP/RESTORE" style="font-size: x-large" />
+            </h:panelGrid>
+
+            <p:outputPanel class="footer">
+                <p:commandButton  actionListener="#{backupRestoreController.backup()}" rendered="#{usuarioController.usuario.userSystem}" value="FAZER BACKUP" style="color: white; background-color: green; float: right" />
+                <p:commandButton  actionListener="#{backupRestoreController.restore()}" rendered="#{usuarioController.usuario.userSystem}" value="RESTAURAR BACKUP" style="color: white; background-color:grey ; float: right" />
+                <p:commandButton actionListener="#{backupRestoreController.fechar()}" ajax="false"  value="FECHAR" style="color: white; background-color: red; float: right" />
+            </p:outputPanel>
+
+        </h:form>
+    </h:body>
+</html>
+

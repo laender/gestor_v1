@@ -1,0 +1,368 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <h:head>
+        <title>Gestor - Venda Rapida</title>
+    </h:head>
+    <style type="text/css"> 
+        .border {
+            border: 1px solid #000;
+        }
+        .column1{
+            width: 30%;
+        }
+        column2{
+            width: 70%;
+        }
+        .ui-widget {
+            font-size: 12px !important;
+        }
+        .columnBody1{
+            width: 20% !important;
+            vertical-align: top;
+        }
+        .columnBody2{
+            width: 60% !important;
+            height: 300px !important;
+        }
+        .columnBody3{
+            vertical-align: bottom;
+            width: 30% !important;
+        }
+        .inputText{
+            font-weight: bold;
+            border-radius: 15px 15px;
+            font-size: x-large !important;
+            width: 78% !important
+        }
+        .columnConf1{
+            vertical-align: bottom;
+        }
+        .columnConf2{
+            vertical-align: bottom;
+        }
+    </style>
+    <script>
+        function somenteNumeros(num) {
+            var er = /[^0-9.]/;
+            er.lastIndex = 0;
+            var campo = num;
+            if (er.test(campo.value)) {
+                campo.value = "";
+                alert("Utilize apenas números e substitua vírgula(,) por ponto (.)");
+            }
+        }
+    </script>
+    <h:body style="background-color: whitesmoke ; background-size: 100%">
+        <h:form id="form" style="height: 100% !important; margin-left: 1%">
+            <p:messages id="messages" showDetail="true" autoUpdate="true" closable="true" />
+            <h:panelGrid columns="4" cellpadding="3" cellspacing="3" style="width: 100%; border-radius: 15px 15px; background-color: lightsteelblue; ">
+                <h:graphicImage url="/Images/vendaRapida.png"  width="30px" height="30px" /> 
+                <p:outputLabel value="VENDA RÁPIDA" style="font-size: x-large !important; color: white;  font-weight: bold" />
+                <h:outputLink target="_blank" value="https://youtu.be/pYvupqqVk2c">ASSISTA AQUI O TUTORIAL</h:outputLink>
+                <p:outputPanel >
+                    <p:commandButton  onclick="PF('dlgConfirmacao').show();"  rendered="#{vendaRapidaController.orcamento ne null}" value="SALVAR" style="color: white; background-color: green; float: right; font-weight: bold"   />
+                    <p:commandButton actionListener="#{vendaRapidaController.fechar()}" ajax="false"   value="FECHAR" style="color: white; background-color: red; float: right; border: none" />
+                    <p:commandButton value="Exclusao" actionListener="#{vendaRapidaController.excluir()}"  rendered="#{vendaRapidaController.orcamento.id ne null and vendaRapidaController.orcamento.status ne 'CANCELADO'}" 
+                                     update="messages" style="color: white; background-color:black ; float: right"  >
+                        <p:confirm header="Confirmacao" message="Deseja realmente excluir o Registro? O orçamento será cancelado e seu vinculo financeiro será excluido/estornado." icon="ui-icon-alert" />
+                    </p:commandButton>
+                </p:outputPanel>
+            </h:panelGrid>
+            <p:outputLabel value="Ops. Está faltando alguma parametrização. Verifique se o caixa está aberto e se existe tipos e formas de pagamento cadastrados e depois tente novamente." rendered="#{not vendaRapidaController.enableButtons}" style="font-weight: bold; color: red; margin-left: 2%" />
+            <br/>
+            <h:panelGrid columns="2" style="width: 100%"> 
+                <p:column>
+                    <p:outputLabel value="Cliente" style="font-weight: bold" /><br/>
+                    <p:inputText style="width: 60%; color: black; background-color: white "  disabled="true" value="#{vendaRapidaController.orcamento.cliente.nome}" /> 
+                    <p:commandLink onclick="PF('dlgCliente').show();"  >
+                        <h:graphicImage url="/Images/search.png"  style="vertical-align: bottom"  width="27px" height="27px"/>
+                    </p:commandLink>
+                </p:column>
+                <p:column>
+                    <h:panelGrid   columns="2" style="width: 98%;background-color: whitesmoke ;border-radius: 10px 10px;">
+                        <p:inputText id="input" value="#{vendaRapidaController.codigoBarras}" style="width: 95%" disabled="#{not vendaRapidaController.enableButtons}" placeholder="CÓDIGO DE BARRAS" >
+                            <p:ajax event="change" listener="#{vendaRapidaController.recuperaProdutoComCodBarras()}" />
+                        </p:inputText>
+                        <p:commandButton value="SELECIONAR PRODUTOS" disabled="#{not vendaRapidaController.enableButtons}" style="background-color: green; color: white;" onclick="PF('dlgProduto').show();"  />
+                    </h:panelGrid>
+                </p:column>
+            </h:panelGrid>
+            <br/>
+            <p:outputPanel autoUpdate="true" style="width: 98%;box-shadow: 3px 3px 3px #888" >
+
+                <h:panelGrid columns="3" cellpadding="3" cellspacing="3"  style="width: 98%" columnClasses="columnBody1,columnBody2,columnBody3">
+                    <p:column>    
+                        <p:outputLabel value="#{vendaRapidaController.itemSelecionado.produto.descricao}" 
+                                       style="font-weight: bold !important; font-size: x-large !important"/><br/>
+                        <br/>
+                        <p:outputLabel value="Quantidade" style="font-weight: bold !important"/><br/>
+                        <p:inputText value="#{vendaRapidaController.itemSelecionado.quantidade}" onkeyup="somenteNumeros(this);" 
+                                     class="inputText"  >
+                            <p:ajax event="change" update="form" listener="#{vendaRapidaController.calcularSubtotal()}" />
+                        </p:inputText> <br/><br/>
+                        <p:outputLabel value="Preço Unitário" style="font-weight: bold !important"/><br/>
+                        <p:inputText value="#{vendaRapidaController.itemSelecionado.valorUnitario}"  onkeyup="somenteNumeros(this);"
+                                     class="inputText"  >
+                            <p:ajax event="change" listener="#{vendaRapidaController.calcularSubtotal()}" />
+                        </p:inputText><br/><br/>
+                        <p:outputLabel value="Quant. Produtos" style="font-weight: bold !important"/><br/>
+                        <p:inputText value="#{vendaRapidaController.orcamento.orcamentoItemList.size()}" disabled="true" style="font-weight: bold; border-radius: 15px 15px; text-align: right" /><br/><br/>
+                        <p:outputLabel value="Quant. Itens" style="font-weight: bold !important"/><br/>
+                        <p:inputText value="#{vendaRapidaController.recuperaQtdItens()}" disabled="true" style="font-weight: bold; border-radius: 15px 15px; text-align: right" /><br/><br/>
+
+                    </p:column>
+                    <p:column>
+                        <p:panel style="width: 99%; height: 99%" >
+                            <p:dataTable emptyMessage="Nenhum produto selecionado"   
+                                         scrollHeight="300" scrollRows="20"  scrollable="true"  style="height: 98%"  
+                                         value="#{vendaRapidaController.orcamento.orcamentoItemList}"  var="o" >
+                                <p:column headerText="#" width="6%" >
+                                    <p:commandLink actionListener="#{vendaRapidaController.setItemSelecionado(o)}"    >
+                                        <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                                    </p:commandLink>
+                                </p:column>
+                                <p:column headerText="Cód barras" width="15%">
+                                    <p:outputLabel  value="#{o.produto.codigoBarras}"/> 
+                                </p:column>
+                                <p:column headerText="Produto" width="25%">
+                                    <p:outputLabel  value="#{o.produto.descricao}"/>
+                                </p:column>
+                                <p:column headerText="Valor Unit." width="15%">
+                                    <p:outputLabel  value="#{o.valorUnitario}">
+                                        <f:convertNumber  type="currency"/>
+                                    </p:outputLabel>
+                                </p:column>
+                                <p:column headerText="Qtd" width="9%">
+                                    <p:outputLabel  value="#{o.quantidade}"/>
+                                </p:column>
+                                <p:column headerText="Valor Total" width="15%">
+                                    <p:outputLabel  value="#{o.valorTotal}">
+                                        <f:convertNumber  type="currency"/>
+                                    </p:outputLabel>
+                                </p:column>
+                                <p:column headerText="#" width="5%">
+                                    <p:commandLink actionListener="#{vendaRapidaController.removeItem(o)}"  >
+                                        <h:graphicImage url="/Images/remove.png"  width="20px" height="20px" />
+                                    </p:commandLink>
+                                </p:column>
+                            </p:dataTable>
+                        </p:panel>
+                    </p:column>
+                    <p:column>
+
+                        <p:outputLabel value="Sub-total" style="font-weight: bold !important; font-size: large !important"/><br/>
+                        <p:inputText value="#{vendaRapidaController.totalSubTotal}" disabled="true" 
+                                     style="font-weight: bold; border-radius: 15px 15px; font-size: x-large !important; text-align: right; width: 99%" >
+                            <f:convertNumber currencySymbol="R$" type="currency"/>
+                        </p:inputText><br/><br/>
+                        <p:outputLabel value="% Desconto" style="font-weight: bold !important; font-size: large !important"/><br/>
+                        <p:inputText value="#{vendaRapidaController.percentualDesconto}"  onkeyup="somenteNumeros(this);" 
+                                     style="font-weight: bold; border-radius: 15px 15px; font-size: large !important; text-align: right; width: 99%" >
+                            <p:ajax event="change" listener="#{vendaRapidaController.calcularSubtotal()}" />
+                        </p:inputText><br/><br/>
+                        <p:outputLabel value="$ Desconto" style="font-weight: bold !important; font-size: large !important"/><br/>
+                        <p:inputText value="#{vendaRapidaController.orcamento.valorDesconto}" disabled="true"
+                                     style="font-weight: bold; border-radius: 15px 15px; font-size: large !important; text-align: right; width: 99%" >
+                            <f:convertNumber currencySymbol="R$" type="currency"/>
+                        </p:inputText><br/><br/>
+                        <p:outputLabel value="Total" style="font-weight: bold !important; font-size: large !important"/><br/>
+                        <p:inputText value="#{vendaRapidaController.totalGeral}" readonly="true" 
+                                     style="font-weight: bold; border-radius: 15px 15px; font-size: x-large !important; text-align: right; width: 99%; color: red" >
+                            <f:convertNumber currencySymbol="R$" type="currency"/>
+                        </p:inputText><br/><br/>
+
+                        <p:outputLabel value="Pago" style="font-weight: bold !important; font-size: large !important"/><br/>
+                        <p:inputText value="#{vendaRapidaController.valorPago}"  onkeyup="somenteNumeros(this);" 
+                                     style="font-weight: bold; border-radius: 15px 15px; font-size: x-large !important; text-align: right; width: 99%; color: blue" >
+                            <p:ajax event="change" listener="#{vendaRapidaController.calcularTroco()}" update="troco" />
+                        </p:inputText><br/>
+                        <p:outputLabel value="Troco" style="font-weight: bold !important; font-size: large !important"/><br/>
+                        <p:inputText id="troco" value="#{vendaRapidaController.valorTroco}"   readonly="true"
+                                     style="font-weight: bold; border-radius: 15px 15px; font-size: x-large !important; text-align: right; width: 99%; color: green" >
+                            <f:convertNumber currencySymbol="R$" type="currency"/>
+                        </p:inputText><br/><br/>
+                    </p:column>
+
+                </h:panelGrid>
+            </p:outputPanel>
+            <br/>
+
+            <p:dialog  style="background-color: lightslategray;" 
+                       widgetVar="dlgProduto" id="dlgProduto" height="500px" width="60%"  modal="true" header="Selecao de Produtos">
+                <p:dataTable     value="#{vendaRapidaController.listarProdutos()}" var="c"  
+                                 scrollable="true" scrollHeight="400" scrollRows="20"  >
+                    <p:column headerText="#" width="4%">
+                        <p:commandLink actionListener="#{vendaRapidaController.addProduto(c)}"  oncomplete="PF('dlgProduto').hide();"  >
+                            <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                        </p:commandLink>
+                    </p:column>
+                    <p:column headerText="Produto" width="30%" filterBy="#{c.descricao}">
+                        #{c.descricao}   
+                    </p:column>
+                    <p:column headerText="Un.Med" width="10%" rendered="#{usuarioController.empresa.controlaEstoque}" >
+                        #{c.estoque.unidadeMedida.sigla}
+                    </p:column>
+                    <p:column headerText="Tipo" width="18%" filterBy="#{c.tipoProduto.descricao}">
+                        #{c.tipoProduto.descricao}   
+                    </p:column>
+                    <p:column headerText="Fornecedor" width="20%" filterBy="#{c.fornecedor.nome}">
+                        #{c.fornecedor.nome}   
+                    </p:column>
+                    <p:column headerText="Estoque" width="10%" rendered="#{usuarioController.empresa.controlaEstoque}" >
+                        #{c.estoque.quantidade}
+                    </p:column>
+
+                </p:dataTable>
+                <p:commandButton value="NOVO PRODUTO" onclick="PF('dlgNovoProduto').show();" 
+                                 actionListener="#{vendaRapidaController.novoProduto()}" onsuccess="PF('dlgProduto').hide();" />
+                <p:commandButton style="color: white; background-color: green; float: right; width: 30%"  
+                                 onclick="PF('dlgProduto').hide();" value="CONFIRMAR"  >
+                </p:commandButton>
+            </p:dialog>
+
+            <p:dialog  style="background-color: whitesmoke;" 
+                       widgetVar="dlgConfirmacao" id="dlgConfirmacao" height="250px" width="400px"  modal="true" header="Confirmar venda">
+                <p:outputPanel autoUpdate="true">
+                    <h:panelGrid columns="1" style="width: 98%; height: 200px; background-color: whitesmoke;">
+                        <h:panelGrid columnClasses="columnConf1,columnConf2" columns="2" style="width: 100%">
+                            <p:column>
+                                <p:outputLabel value="Forma Pagamento" style="font-weight: bold"  /> <br/>
+                                <p:inputText  style="width: 95%"  readonly="true" value="#{vendaRapidaController.orcamento.formaPagamento.descricao}" /> 							
+                            </p:column>
+                            <p:column>
+                                <p:commandLink   onclick="PF('dlgFrmPagamento').show();" >
+                                    <h:graphicImage url="/Images/search.png"  style="vertical-align: bottom"  width="30px" height="30px"/>
+                                </p:commandLink>
+                            </p:column>
+                        </h:panelGrid>
+                        <h:panelGrid  columnClasses="columnConf1,columnConf2" columns="2" style="width: 100%" >
+                            <p:column>
+                                <p:outputLabel value="Tipo Pagamento" style="font-weight: bold" /> <br/>
+                                <p:inputText  style="width: 95%" readonly="true"  value="#{vendaRapidaController.orcamento.tipoPagamento.descricao}" /> 							
+                            </p:column>
+                            <p:column>
+                                <p:commandLink   onclick="PF('dlgTipoPgto').show();"  >
+                                    <h:graphicImage url="/Images/search.png"  style="vertical-align: bottom"  width="30px" height="30px"/>
+                                </p:commandLink>
+                            </p:column>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                </p:outputPanel>
+                <p:commandButton style="color: white; background-color: green; float: right; width: 30%; height: 40px"  
+                                 onclick="PF('dlgImpr').show();" value="CONFIRMAR"   oncomplete="PF('dlgConfirmacao').hide();"  >
+                </p:commandButton>
+            </p:dialog>
+
+            <p:dialog   
+                widgetVar="dlgNovoProduto" id="dlgNovoProduto" height="300px" width="40%"  modal="true" header="Cadastro rápido Produto">
+                <p:outputPanel autoUpdate="true">
+                    <h:panelGrid columns="2" columnClasses="columnCidade1, columnCidade2" cellpadding="2" cellspacing="2" style="margin-left: 1%; width: 100%"  >
+                        <p:column>
+                            <p:outputLabel value="Tipo de produto" style="font-weight: bold" /> <br/>
+                            <p:inputText disabled="true" value="#{vendaRapidaController.produto.tipoProduto.descricao}" style="width: 98%" />
+                        </p:column>
+                        <p:column>
+                            <p:commandLink onclick="PF('dlgTpProduto').show();" >
+                                <h:graphicImage url="/Images/search.png"  width="27px" height="27px"/>
+                            </p:commandLink>
+                        </p:column>
+                    </h:panelGrid>
+                </p:outputPanel>
+                <h:panelGrid columns="1" cellpadding="2" cellspacing="2" style="margin-left: 1%; width: 90%" >
+                    <p:outputLabel value="Descrição" style="font-weight: bold; margin-top: 5px" />
+                    <p:inputText  value="#{vendaRapidaController.produto.descricao}" style="width: 90%"/>
+                </h:panelGrid>
+                <p:commandButton value="SALVAR"  style="float:right" actionListener="#{vendaRapidaController.gravarNovoProduto()}"  onsuccess="PF('dlgNovoProduto').hide();"  />
+            </p:dialog>
+
+            <p:dialog  style="background-color: lightslategray;" 
+                       widgetVar="dlgTpProduto" id="dlgTpProduto" height="400px" width="50%"  modal="true" header="Seleção de tipo de produto">
+                <p:dataTable    value="#{vendaRapidaController.listarTiposProduto()}" var="c" scrollable="true" scrollHeight="400px" scrollRows="15" >
+                    <p:column headerText="#" width="8%">
+                        <p:commandLink actionListener="#{vendaRapidaController.produto.setTipoProduto(c)}"  oncomplete="PF('dlgTpProduto').hide();" >
+                            <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                        </p:commandLink>
+                    </p:column>
+                    <p:column headerText="Tipo Produto" filterBy="#{c.descricao}">
+                        #{c.descricao}   
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+            <p:dialog  style="background-color: lightslategray;" 
+                       widgetVar="dlgImpr" id="dlgImpr" height="100px" width="300px"  modal="true" header="Gerar PDF da venda?" >
+                <br/>
+                <p:commandLink style="float: left; width: 30%; height: 40px"  
+                               onclick="PF('dlgImpr').hide();" target="_blank"  ajax="false" oncomplete="#{vendaRapidaController.init()}" update="form" actionListener="#{vendaRapidaController.salvar(true)}"  >
+                    <h:graphicImage url="/Images/print.png"  width="60px" height="60px" />
+                </p:commandLink> 
+
+                <p:commandButton style="color: white; background-color: green; float: right; width: 30%; height: 40px"  
+                                 onclick="PF('dlgImpr').hide();" value="SAIR" actionListener="#{vendaRapidaController.salvar(false)}"  >
+                </p:commandButton>
+            </p:dialog>
+            <p:dialog  style="background-color: lightslategray;" 
+                       widgetVar="dlgTipoPgto" id="dlgTipoPgto" height="400px" width="40%"  modal="true" header="Selecao de tipo de pagamento">
+                <p:dataTable    value="#{vendaRapidaController.listarTipoPagamentos()}" var="t" scrollable="true" scrollRows="15" scrollHeight="500px"   >
+                    <p:column headerText="#" width="8%">
+                        <p:commandLink actionListener="#{vendaRapidaController.orcamento.setTipoPagamento(t)}"  oncomplete="PF('dlgTipoPgto').hide();"   >
+                            <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                        </p:commandLink>
+                    </p:column>
+                    <p:column headerText="Tipo de Pagamento" filterBy="#{t.descricao}">
+                        #{t.descricao}   
+                    </p:column>
+                </p:dataTable>
+                <p:commandLink value="NENHUM REGISTRO" style="color: white !important; float: right" actionListener="#{orcamentoController.orcamento.setTipoPagamento(null)}" oncomplete="PF('dlgTipoPgto').hide();" update="@this" />
+            </p:dialog>
+            <p:dialog  style="background-color: lightslategray;" 
+                       widgetVar="dlgFrmPagamento" id="dlgFrmPagamento" height="500px" width="50%"  modal="true" header="Selecao de forma de pagamento">
+                <p:dataTable    value="#{vendaRapidaController.listarFormaPagamentos()}" var="t" scrollable="true" scrollRows="15" scrollHeight="500px"  >
+                    <p:column headerText="#" width="8%">
+                        <p:commandLink actionListener="#{vendaRapidaController.orcamento.setFormaPagamento(t)}"  oncomplete="PF('dlgFrmPagamento').hide();"   >
+                            <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                        </p:commandLink>
+                    </p:column>
+                    <p:column headerText="Forma pagamento" filterBy="#{t.descricao}">
+                        #{t.descricao}   
+                    </p:column>
+                    <p:column headerText="Num Parcelas" filterBy="#{t.numeroParcelas}">
+                        #{t.numeroParcelas}   
+                    </p:column>
+                </p:dataTable>
+                <p:commandLink value="NENHUM REGISTRO" style="color: white !important; float: right" actionListener="#{orcamentoController.orcamento.setFormaPagamento(null)}" oncomplete="PF('dlgFrmPagamento').hide();" update="@this" />
+            </p:dialog>
+
+            <p:dialog  style="background-color: lightslategray;" 
+                       widgetVar="dlgCliente" id="dlgCliente" height="500px" width="50%"  modal="true" header="Selecao de Clientes">
+                <p:dataTable    value="#{vendaRapidaController.listarClientes()}" var="i"  scrollable="true" scrollRows="15" scrollHeight="500px"  >
+                    <p:column headerText="#" width="8%">
+                        <p:commandLink actionListener="#{vendaRapidaController.orcamento.setCliente(i)}"  oncomplete="PF('dlgCliente').hide();"  >
+                            <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                        </p:commandLink>
+                    </p:column>
+                    <p:column headerText="Cliente" filterBy="#{i.nome}">
+                        #{i.nome}   
+                    </p:column>
+                    <p:column headerText="Cpf/Cnpj" filterBy="#{i.cpfCnpj}">
+                        #{i.cpfCnpj}   
+                    </p:column>
+                </p:dataTable>
+                <p:commandLink value="NENHUM REGISTRO" style="color: white !important; float: right" actionListener="#{vendaRapidaController.orcamento.setCliente(null)}" oncomplete="PF('dlgCliente').hide();" update="form" />
+            </p:dialog>
+
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                <p:commandButton value="Excluir" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                <p:commandButton value="Cancelar" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+            </p:confirmDialog>
+        </h:form>
+    </h:body>
+</html>
+
+

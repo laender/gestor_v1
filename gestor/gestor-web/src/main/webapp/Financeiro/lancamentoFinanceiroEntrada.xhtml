@@ -1,0 +1,470 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                template="/WEB-INF/templates/template.xhtml">
+
+    <h:head>
+        <title>Gestor - Recebimentos</title>
+    </h:head>
+    <ui:define name="body" >
+        <script>
+            function somenteNumeros(num) {
+                var er = /[^0-9.]/;
+                er.lastIndex = 0;
+                var campo = num;
+                if (er.test(campo.value)) {
+                    campo.value = "";
+                    alert("Utilize apenas números e substitua vírgula(,) por ponto (.)");
+                }
+            }
+        </script>
+        <style>
+            .column1{}
+            .column2{
+                vertical-align: bottom;
+            }
+            .ui-widget {
+                font-size: 12px !important;
+            }
+        </style>
+        <h:body style="background-color: white  !important; background-size: 100%">
+            <h:form id="form" style="height: 100% !important ">
+                #{lancamentoController.lancamentoEntrada(true)}
+
+                <h:panelGrid columns="4" cellpadding="3" cellspacing="3" style="width: 100%;  background-color: lightsteelblue; box-shadow: 10px 10px">
+                    <h:graphicImage url="/Images/cash-clock.png"  width="30px" height="30px" /> 
+                    <p:outputLabel value="RECEBIMENTOS" style="font-size: large !important; color: white" />
+                    <h:outputLink target="_blank" value="https://www.youtube.com/watch?v=cpudwD5d8lA"  >ASSISTA AQUI O TUTORIAL</h:outputLink>
+                    <p:outputPanel >
+                        <p:commandButton  actionListener="#{lancamentoController.salvar(false)}" disabled="#{not empty lancamentoController.lancamentoFinanceiro.id}"  rendered="#{lancamentoController.lancamentoFinanceiro ne null}" value="SALVAR" style="color: white; background-color: green; float: right; font-weight: bold" />
+                        <p:commandButton  actionListener="#{lancamentoController.cancelar()}" rendered="#{lancamentoController.lancamentoFinanceiro ne null}" value="CANCELAR" style="color: white; background-color:grey ; float: right; border: none" />
+                        <p:commandButton  actionListener="#{lancamentoController.novo()}" rendered="#{lancamentoController.lancamentoFinanceiro eq null}" value="NOVO" style="color: white; background-color: darkturquoise; float: right; font-weight: bold" />
+                        <p:commandButton  actionListener="#{lancamentoController.fechar()}"  ajax="false"  rendered="#{lancamentoController.lancamentoFinanceiro eq null}"  value="FECHAR" style="color: white; background-color: red; float: right; border: none" />
+                        <p:commandButton value="Exclusão" actionListener="#{lancamentoController.excluir()}" 
+                                         rendered="#{lancamentoController.lancamentoFinanceiro ne null and lancamentoController.lancamentoFinanceiro.id ne null}"
+                                         update="messages" style="color: white; background-color:black ; float: right"  >
+                            <p:confirm header="Confirmação" message="Deseja realmente excluir o Registro?" icon="ui-icon-alert" />
+                        </p:commandButton>
+                    </p:outputPanel>
+                </h:panelGrid>
+
+                <p:separator />
+                <p:outputPanel rendered="#{lancamentoController.lancamentoFinanceiro eq null}" style="height: 90% !important; width: 98% ">
+                    <p:dataTable emptyMessage="Nenhuma lançamento cadastrado"  
+                                 scrollRows="20"    reflow="true"
+                                 style="height: 70%; " scrollable="true" scrollHeight="500" value="#{lancamentoController.listarLancamentosEntrada()}"
+                                 var="u" >
+                        <p:column headerText="#" width="5%">
+                            <p:commandLink actionListener="#{lancamentoController.setLancamentoFinanceiro(u)}" ajax="false"  immediate="true" >
+                                <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                            </p:commandLink>
+                        </p:column>
+                        <p:column   width="6%" headerText="Cód" >
+                            <p:outputLabel value="#{u.id}" style="text-align: center" /> 
+                        </p:column>
+                        <p:column   width="20%" headerText="Responsavel" filterBy="#{u.usuario.nome}" >
+                            <p:outputLabel value="#{not empty u.usuario ? u.usuario.nome : null}" style="text-align: center" /> 
+                        </p:column>
+                           <p:column rendered="#{usuarioController.empresa.loginKey ne 'BBERTUZZI'}"   width="20%" headerText="Colaborador" filterBy="#{u.usuarioFornecedor.nome}" >
+                            <p:outputLabel value="#{not empty u.usuarioFornecedor ? u.usuarioFornecedor.nome : null}" style="text-align: center" /> 
+                        </p:column>
+                        <p:column rendered="#{usuarioController.empresa.loginKey eq 'BBERTUZZI'}"   width="20%" headerText="Produção" filterBy="#{u.producao.observacao}" >
+                            <p:outputLabel value="#{u.producao.observacao}" style="text-align: center" /> 
+                        </p:column>
+                         <p:column   width="20%" headerText="Cliente" filterBy="#{u.cliente.nome}" >
+                             <p:outputLabel value="#{not empty u.cliente ? u.cliente.nome : null}" style="text-align: center" /> 
+                        </p:column>
+                        <p:column   width="20%" headerText="Sacado/Cedente" filterBy="#{u.sacadoCedente}" >
+                            <p:outputLabel value="#{u.sacadoCedente}" style="text-align: center" /> 
+                        </p:column>
+
+                        <p:column   width="15%" headerText="Lçto/baixa"  >
+                            <p:outputLabel value="#{not empty u.parcelas ? 'BAIXA': 'LANÇAMENTO'}" style="text-align: center" /> 
+                        </p:column>
+
+                        <p:column   width="15%" headerText="Data"  >
+                            <p:outputLabel value="#{u.dataLancamento}"  >
+                                <f:convertDateTime pattern="dd/MM/yyyy" />
+                            </p:outputLabel>
+                        </p:column>
+                        <p:column   width="16%" headerText="Valor " filterBy="#{u.valor}" >
+                            <p:outputLabel value="#{u.valor }" style="text-align: right" >
+                                <f:convertNumber currencySymbol="R$" type="currency"/>
+                            </p:outputLabel> 
+                        </p:column>
+                        <p:column   width="20%" headerText="Observaçoes "  style="text-align: left">
+                            <p:outputLabel value="#{u.observacao }" style="text-align: left" >
+                            </p:outputLabel> 
+                        </p:column>
+                          <p:column width="5%" headerText="#" style="text-align: center"> 
+                                <p:commandLink target="_blank" actionListener="#{lancamentoController.imprimirRecibo(u) }"   ajax="false"   >
+                                    <h:graphicImage url="/Images/print.png"  width="20px" height="20px" />
+                                </p:commandLink>
+                            </p:column>
+                    </p:dataTable>
+                </p:outputPanel>
+                <style>
+                    .column1{}
+                    .column2{
+                        vertical-align: bottom;
+                    }
+                    .ui-widget {
+                        font-size: 12px !important;
+                    }
+                </style>
+
+                <p:outputPanel id="panelDados" autoUpdate="true" rendered="#{not empty lancamentoController.lancamentoFinanceiro}" style="width: 98%; background-color: white">
+                    <br/>
+                    <h:panelGrid columns="1" cellpadding="10" cellspacing="10" style="width: 70%; padding: 5px !important ; background-color: white; margin-left: 2%" >
+                        <p:selectOneRadio id="console" value="#{lancamentoController.origemDiversas}" style="width: 70%" disabled="#{not empty lancamentoController.lancamentoFinanceiro.id}"   >
+                            <f:selectItem itemLabel="LANÇAR RECEBIMENTOS"  itemValue="true"  />
+                            <f:selectItem itemLabel="RECEBER PARCELAS" itemValue="false"  />
+                            <p:ajax update="form" event="change"/>
+                        </p:selectOneRadio>
+                    </h:panelGrid>
+                    <br/>
+                    <h:panelGrid  columns="2" style=" width: 40%;  border-radius: 10px 10px;background-color: white !important ; margin-left: 1%">
+                        <p:column>
+                            <p:outputLabel value="Data de lançamento" style="font-weight: bold" /> <br/>
+                            <p:calendar  value="#{lancamentoController.lancamentoFinanceiro.dataLancamento}"  pattern="dd/MM/yyyy" mask="true" disabled="#{not empty lancamentoController.lancamentoFinanceiro.id}"  />
+                        </p:column>
+                        <p:column rendered="#{usuarioController.usuario.empresa.exibirCadBanco}" >
+                            <h:panelGrid columns="2" columnClasses="column1, column2">
+                                <p:column>
+                                    <p:outputLabel value="Banco"  style="font-weight: bold" /><br/>
+                                    <p:inputText  disabled="true" value="#{lancamentoController.lancamentoFinanceiro.banco.descricao}" /> 							
+                                </p:column>
+                                <p:column>
+                                    <p:commandLink   onclick="PF('dlgBanco').show();"  >
+                                        <h:graphicImage url="/Images/search.png"  width="30px" height="30px" style="vertical-align: bottom" />
+                                    </p:commandLink>
+
+                                </p:column>
+                            </h:panelGrid>
+                        </p:column>
+
+                    </h:panelGrid>
+                    <br/>
+                    <h:panelGrid  columns="5"     
+                                  style=" width: 99%;  border-radius: 10px 10px; background-color: white; margin-left: 1% ">
+                        <p:column style="margin-left: 1%">
+                            <p:outputLabel value="Tipo de Recebimento" style="font-weight: bold; margin-left: 2%" /> <br/>
+                            <p:inputText   disabled="true" value="#{lancamentoController.lancamentoFinanceiro.tipoPagamento.descricao}" style="margin-left: 2%; color: black; font-weight: bold" /> 							
+                            <p:commandLink onclick="PF('dlgTpPagamento').show();" disabled="#{not empty lancamentoController.lancamentoFinanceiro.id}"  >
+                                <h:graphicImage url="/Images/search.png"  width="30px" height="30px" style="vertical-align: bottom"/>
+                            </p:commandLink>
+                        </p:column>
+                        <p:column  >
+                            <p:outputLabel value="Forma Recebimento"  style="font-weight: bold" /> <br/>
+                            <p:inputText  disabled="true" value="#{lancamentoController.lancamentoFinanceiro.formaPagamento.descricao}"  style="color: black !important;font-weight: bold; " />  							
+                            <p:commandLink  disabled="#{not empty lancamentoController.lancamentoFinanceiro.id}"  onclick="PF('dlgFrmPagamento').show();"  >
+                                <h:graphicImage url="/Images/search.png"  width="30px" height="30px" style="vertical-align: bottom" />
+                            </p:commandLink>
+                        </p:column>
+                        <p:column rendered="#{lancamentoController.origemDiversas}">
+                            <p:outputLabel value="Data Vencimento inicial" style="font-weight: bold" /> <br/>
+                            <p:calendar  value="#{lancamentoController.lancamentoFinanceiro.dataVencimento}"  pattern="dd/MM/yyyy" mask="true" disabled="#{not empty lancamentoController.lancamentoFinanceiro.id or not lancamentoController.lancamentoFinanceiro.formaPagamento.vendaAPrazo }"  >
+                                <p:ajax event="dateSelect" update="form" />
+                            </p:calendar>
+                        </p:column>
+                        <p:column>
+                            <p:outputLabel value="Número de controle" style="font-weight: bold; margin-left: 3%" /> <br/>
+                            <p:inputText value="#{lancamentoController.lancamentoFinanceiro.numeroControle}" disabled="#{not empty lancamentoController.lancamentoFinanceiro.id}"  style=" margin-left: 3%" />
+                        </p:column>
+                        <p:column>
+                            <p:outputLabel value="Valor" style="font-weight: bold" /> <br/>
+                            <p:inputText value="#{lancamentoController.lancamentoFinanceiro.valor}" style="color: black !important;font-weight: bold; "
+                                          disabled="#{not empty lancamentoController.lancamentoFinanceiro.id or lancamentoController.parcelasSelecionadas.size() > 1 }"  
+                                         onkeyup="somenteNumeros(this);"  >
+                                <p:ajax event="change" update="@this" listener="#{lancamentoController.fixarValor()}" />
+                            </p:inputText>
+                        </p:column>
+
+                    </h:panelGrid>
+                    <p:outputLabel rendered="#{not empty lancamentoController.lancamentoFinanceiro.dataVencimento}" value="Ao informar a data de vencimento inicial, as parcelas serão geradas a partir dessa data com o intervalo definido na forma de recebimento"  style="color:red; margin-left: 10%"/>
+                  
+                    <p:separator style="width: 100%" />
+
+                    <p:outputPanel rendered="#{lancamentoController.origemDiversas}" autoUpdate="true"  style="margin-left: 2%"  >
+                        <h:panelGrid columns="5" cellpadding="2" cellspacing="2"  style="width: 98%"   >
+                            <p:column>
+                                <h:panelGrid columns="2" columnClasses="column1, column2" >
+                                    <p:column>
+                                        <p:outputLabel value="Colaborador" style="font-weight: bold" /> <br/>
+                                        <p:inputText  disabled="true" style="width: 97%" value="#{lancamentoController.lancamentoFinanceiro.usuarioFornecedor.nome}" /> 							
+                                    </p:column>
+                                    <p:column>
+                                        <p:commandLink style="text-align: left"  onclick="PF('dlgUsuario').show();" disabled="#{not empty lancamentoController.lancamentoFinanceiro.id}"  >
+                                            <h:graphicImage url="/Images/search.png"  width="27px" height="27px" style="vertical-align: bottom"/>
+                                        </p:commandLink>
+                                    </p:column>
+                                </h:panelGrid>
+                            </p:column>
+                            <p:column>
+                                <h:panelGrid columns="2" columnClasses="column1, column2">
+                                    <p:column>
+                                        <p:outputLabel value="Cliente" style="font-weight: bold" />
+                                        <p:inputText  disabled="true" style="width: 97%" value="#{lancamentoController.lancamentoFinanceiro.cliente.nome}" /> 
+                                    </p:column>
+                                    <p:column>
+                                        <p:commandLink onclick="PF('dlgCliente').show();" disabled="#{not empty lancamentoController.lancamentoFinanceiro.id}" >
+                                            <h:graphicImage url="/Images/search.png"  width="27px" height="27px" style="vertical-align: bottom"/>
+                                        </p:commandLink>
+                                    </p:column>
+                                </h:panelGrid>
+                            </p:column>
+                            <p:column>
+                                <h:panelGrid columns="2" columnClasses="column1, column2" >
+                                    <p:column>
+                                        <p:outputLabel value="Fornecedor" style="font-weight: bold" />
+                                        <p:inputText  disabled="true" style="width: 97%"   value="#{lancamentoController.lancamentoFinanceiro.fornecedor.nome}" /> 
+                                    </p:column>
+                                    <p:column>
+                                        <p:commandLink onclick="PF('dlgFornecedor').show();" disabled="#{not empty lancamentoController.lancamentoFinanceiro.id}" >
+                                            <h:graphicImage url="/Images/search.png"  width="27px" height="27px"/>
+                                        </p:commandLink>
+                                    </p:column>
+                                </h:panelGrid>
+                            </p:column>
+                             <p:column rendered="#{usuarioController.usuario.empresa.loginKey eq 'BBERTUZZI'}">
+                                <h:panelGrid columns="2" columnClasses="column1, column2" >
+                                    <p:column>
+                                        <p:outputLabel value="Produção" style="font-weight: bold" />
+                                        <p:inputText  disabled="true" style="width: 97%"   value="#{lancamentoController.lancamentoFinanceiro.producao.observacao}" /> 
+                                    </p:column>
+                                    <p:column>
+                                        <p:commandLink onclick="PF('dlgProducao').show();" disabled="#{not empty lancamentoController.lancamentoFinanceiro.id}" >
+                                            <h:graphicImage url="/Images/search.png"  width="27px" height="27px"/>
+                                        </p:commandLink>
+                                    </p:column>
+                                </h:panelGrid>
+                            </p:column>
+
+                        </h:panelGrid>
+                    </p:outputPanel>
+                    <p:outputPanel autoUpdate="true"  rendered="#{not lancamentoController.origemDiversas}"  ><br/>
+                        <p:outputLabel value="Receber Parcelas" style="font-weight: bold"  /><br/><br/>
+                        <p:outputLabel value="(Mantenha CTRL pressionado para selecionar mais de uma parcela)" style="font-size: x-small" /><br/>
+                        <p:dataTable emptyMessage="Nenhuma parcela a receber" reflow="true"  rendered="#{empty lancamentoController.lancamentoFinanceiro.id}" 
+                                     value="#{lancamentoController.parcelasLiquidacao}" 
+                                     selection="#{lancamentoController.parcelasSelecionadas}"  rowKey="#{t.id}" selectionMode="multiple" 
+                                     var="t" scrollHeight="300" scrollable="true"  scrollRows="10">
+                            <p:ajax process="@this" listener="#{lancamentoController.addParcela(t)}" event="rowSelect"  immediate="true" />
+                            <p:ajax process="@this"  event="rowUnselect"  update="form" />
+                            <p:column selectionMode="multiple" style="width:8%;text-align:center"/>
+                            <p:column headerText="Sacado/cedente" width="20%" >
+                                #{t.titulo.sacadoCedente}   
+                            </p:column>
+                            <p:column headerText="Venda" width="8%"> 
+                                #{t.titulo.orcamento.id}
+                            </p:column>
+                           
+                            <p:column   width="10%" headerText="Data Emissão"  style="text-align: left">
+                                <p:outputLabel id="dataVenda"  value="#{t.titulo.dataEmissao}"  >
+                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                </p:outputLabel>
+                            </p:column>
+                            <p:column   width="10%" headerText="Data Vcto"  style="text-align: left">
+                                <p:outputLabel id="data"  value="#{t.dataVencimento}"  >
+                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                </p:outputLabel>
+                            </p:column>
+                            <p:column headerText="Responsável" width="12%">
+                                #{not empty t.titulo.orcamento ? t.titulo.orcamento.usuario.nome : t.titulo.lancamentoFinanceiro.usuario.nome}
+                            </p:column>
+                            <p:column   width="15%" headerText="Valor "  style="text-align: left">
+                                <p:outputLabel value="#{t.valorParcela }" style="text-align: right" >
+                                    <f:convertNumber currencySymbol="R$" type="currency"/>
+                                </p:outputLabel> 
+                            </p:column>
+                            <p:column   width="15%" headerText="Saldo "  style="text-align: left">
+                                <p:outputLabel value="#{t.valorSaldo }" style="text-align: right; font-weight: bold" >
+                                    <f:convertNumber currencySymbol="R$" type="currency"/>
+                                </p:outputLabel> 
+                            </p:column>
+                            <p:column   width="15%" headerText="Observações "  style="text-align: left">
+                                <p:outputLabel value="#{t.titulo.lancamentoFinanceiro.observacao }" style="text-align: left" >
+                                </p:outputLabel> 
+                            </p:column>
+                        </p:dataTable>
+
+                        <p:dataTable  rendered="#{not empty lancamentoController.lancamentoFinanceiro.id}" reflow="true"
+                                      value="#{lancamentoController.parcelasSelecionadas}" 
+                                      var="t" scrollHeight="300" scrollable="true"  scrollRows="10" >
+                            <p:column headerText="Sacado/cedente" >
+                                #{t.titulo.sacadoCedente}   
+                            </p:column>
+                            <p:column headerText="Venda" width="8%"> 
+                                #{t.titulo.orcamento.id}
+                            </p:column>
+                            <p:column   width="10%" headerText="Data emissão"  style="text-align: left">
+                                <p:outputLabel id="dataVenda"  value="#{t.titulo.dataEmissao}"  >
+                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                </p:outputLabel>
+                            </p:column>
+                            <p:column   width="10%" headerText="Data Vcto"  style="text-align: left">
+                                <p:outputLabel id="data"  value="#{t.dataVencimento}"  >
+                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                </p:outputLabel>
+                            </p:column>
+                            <p:column headerText="Responsável">
+                                #{not empty t.titulo.orcamento ? t.titulo.orcamento.usuario.nome : t.titulo.lancamentoFinanceiro.usuario.nome}
+                            </p:column>
+                            <p:column   width="15%" headerText="Valor "  style="text-align: left">
+                                <p:outputLabel value="#{t.valorParcela }" style="text-align: right" >
+                                    <f:convertNumber currencySymbol="R$" type="currency"/>
+                                </p:outputLabel> 
+                            </p:column>
+                            <p:column   width="15%" headerText="Saldo "  style="text-align: left">
+                                <p:outputLabel value="#{t.valorSaldo }" style="text-align: right; font-weight: bold" >
+                                    <f:convertNumber currencySymbol="R$" type="currency"/>
+                                </p:outputLabel> 
+                            </p:column>
+                            <p:column   width="15%" headerText="Observaçoes "  style="text-align: left">
+                                <p:outputLabel value="#{t.titulo.lancamentoFinanceiro.observacao }" style="text-align: left" >
+                                </p:outputLabel> 
+                            </p:column>
+                        </p:dataTable>
+                    </p:outputPanel>
+                    <br/>
+                    <p:outputLabel value="Observação" style="font-weight: bold; margin-left: 2%" />
+                    <p:inputTextarea value="#{lancamentoController.lancamentoFinanceiro.observacao}"  style="width: 98%;margin-left: 2%" disabled="#{not empty lancamentoController.lancamentoFinanceiro.id}" />
+
+                </p:outputPanel>
+                <br/>
+
+                <p:dialog  style="background-color: lightslategray; " 
+                           widgetVar="dlgBanco" id="dlgBanco" height="500px" width="50%"  modal="true" header="Selecao de banco">
+                    <p:dataTable    value="#{lancamentoController.listarBancos()}" var="t" scrollRows="15" scrollable="true" scrollHeight="400"  >
+                        <p:column headerText="#" width="8%">
+                            <p:commandLink actionListener="#{lancamentoController.lancamentoFinanceiro.setBanco(t)}"  oncomplete="PF('dlgBanco').hide();"   >
+                                <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                            </p:commandLink>
+                        </p:column>
+                        <p:column headerText="Banco" filterBy="#{c.descricao}">
+                            #{t.descricao}   
+                        </p:column>
+                    </p:dataTable>
+                    <p:commandLink value="NENHUM REGISTRO" style="color: white !important; float: right" actionListener="#{lancamentoController.lancamentoFinanceiro.setBanco(null)}" oncomplete="PF('dlgBanco').hide();"  />
+                </p:dialog>
+
+                <p:dialog  style="background-color: lightslategray;" 
+                           widgetVar="dlgUsuario" id="dlgUsuario" height="500px" width="50%"  modal="true" header="Seleção de usuario">
+                    <p:dataTable    value="#{lancamentoController.listarUsuarios()}" var="i"  scrollRows="15" scrollable="true" scrollHeight="400"  >
+                        <p:column headerText="#" width="8%">
+                            <p:commandLink actionListener="#{lancamentoController.lancamentoFinanceiro.setUsuarioFornecedor(i)}"  oncomplete="PF('dlgUsuario').hide();"   >
+                                <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                            </p:commandLink>
+                        </p:column>
+                        <p:column headerText="Nome" filterBy="#{i.nome}">
+                            #{i.nome}   
+                        </p:column>
+                    </p:dataTable>
+                    <p:commandLink value="NENHUM REGISTRO" style="color: white !important; float: right" actionListener="#{lancamentoController.lancamentoFinanceiro.setUsuarioFornecedor(null)}" oncomplete="PF('dlgUsuario').hide();"  />
+                </p:dialog>
+
+                <p:dialog  style="background-color: lightslategray; " 
+                           widgetVar="dlgFrmPagamento" id="dlgFrmPagamento" height="400px" width="50%"  modal="true" header="Selecao de forma de recebimento">
+                    <p:dataTable    value="#{lancamentoController.listarFormaPagamentos()}" var="t" scrollRows="15" scrollable="true" scrollHeight="400"  >
+                        <p:column headerText="#" width="8%">
+                            <p:commandLink actionListener="#{lancamentoController.lancamentoFinanceiro.setFormaPagamento(t)}" 
+                                           oncomplete="PF('dlgFrmPagamento').hide();"  >
+                                <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                            </p:commandLink>
+                        </p:column>
+                        <p:column headerText="Tipo de orcamento" filterBy="#{c.descricao}">
+                            #{t.descricao}   
+                        </p:column>
+                        <p:column headerText="Num Parcelas" filterBy="#{c.descricao}">
+                            #{t.numeroParcelas}   
+                        </p:column>
+                    </p:dataTable>
+                    <p:commandLink value="NENHUM REGISTRO" style="color: white !important; float: right" actionListener="#{lancamentoController.lancamentoFinanceiro.setFormaPagamento(null)}" oncomplete="PF('dlgFrmPagamento').hide();"  />
+                </p:dialog>
+                
+                  <p:dialog  style="background-color: lightslategray;" 
+                           widgetVar="dlgProducao" id="dlgProducao" height="500px" width="70%"  modal="true" header="Seleção de Produção">
+                    <p:dataTable    value="#{lancamentoController.listarProducao()}" var="i"  scrollRows="15" scrollable="true" scrollHeight="400px" >
+                        <p:column headerText="#" width="8%">
+                            <p:commandLink actionListener="#{lancamentoController.lancamentoFinanceiro.setProducao(i)}"  oncomplete="PF('dlgProducao').hide();"   >
+                                <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                            </p:commandLink>
+                        </p:column>
+                        <p:column headerText="Produção" filterBy="#{i.observacao}">
+                            #{i.observacao}   
+                        </p:column>
+                         <p:column headerText="Cliente" filterBy="#{i.cliente.nome}">
+                            #{i.cliente.nome}   
+                        </p:column>
+                        <p:column headerText="Valor" filterBy="#{i.valorProducao}">
+                            #{i.valorProducao}   
+                        </p:column>
+                    </p:dataTable>
+                    <p:commandLink value="NENHUM REGISTRO" style="color: white !important; float: right" actionListener="#{lancamentoController.lancamentoFinanceiro.setProducao(null)}" oncomplete="PF('dlgProducao').hide();"  />
+                </p:dialog>
+
+                <p:dialog  style="background-color: lightslategray; " 
+                           widgetVar="dlgTpPagamento" id="dlgTpPagamento" height="400px" width="50%"  modal="true" header="Seleção de tipo de recebimento">
+                    <p:dataTable    value="#{lancamentoController.listarTipoPagamentos()}" var="t" scrollRows="15" scrollable="true" scrollHeight="400"   >
+                        <p:column headerText="#" width="8%">
+                            <p:commandLink actionListener="#{lancamentoController.lancamentoFinanceiro.setTipoPagamento(t)}"  
+                                           oncomplete="PF('dlgTpPagamento').hide();" >
+                                <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                            </p:commandLink>
+                        </p:column>
+                        <p:column headerText="Tipo recebimento" filterBy="#{c.descricao}">
+                            #{t.descricao}   
+                        </p:column>
+                    </p:dataTable>
+                    <p:commandLink value="NENHUM REGISTRO" style="color: white !important; float: right" actionListener="#{lancamentoController.lancamentoFinanceiro.setTipoPagamento(null)}" oncomplete="PF('dlgTpPagamento').hide();"  />
+                </p:dialog>
+
+                <p:dialog  style="background-color: lightslategray; " 
+                           widgetVar="dlgCliente" id="dlgCliente" height="500px" width="70%"  modal="true" header="Seleção de Clientes">
+                    <p:dataTable    value="#{lancamentoController.listarClientes()}" var="i" scrollRows="15" scrollable="true" scrollHeight="400"   >
+                        <p:column headerText="#" width="8%">
+                            <p:commandLink actionListener="#{lancamentoController.lancamentoFinanceiro.setCliente(i)}"  oncomplete="PF('dlgCliente').hide();"   >
+                                <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                            </p:commandLink>
+                        </p:column>
+
+                        <p:column headerText="Cliente" filterBy="#{i.nome}">
+                            #{i.nome}   
+                        </p:column>
+                        <p:column headerText="Cpf/Cnpj" filterBy="#{i.cpfCnpj}">
+                            #{i.cpfCnpj}   
+                        </p:column>
+                    </p:dataTable>
+                    <p:commandLink value="NENHUM REGISTRO" style="color: white !important; float: right" actionListener="#{lancamentoController.lancamentoFinanceiro.setCliente(null)}" oncomplete="PF('dlgCliente').hide();" />
+                </p:dialog>
+
+                <p:dialog  style="background-color: lightslategray; " 
+                           widgetVar="dlgFornecedor" id="dlgFornecedor" height="500px" width="60%"  modal="true" header="Seleção de Fornecedores">
+                    <p:dataTable    value="#{lancamentoController.listarFornecedores()}" var="i" scrollRows="15" scrollable="true" scrollHeight="400"  >
+                        <p:column headerText="#" width="8%">
+                            <p:commandLink actionListener="#{lancamentoController.lancamentoFinanceiro.setFornecedor(i)}"  oncomplete="PF('dlgFornecedor').hide();"   >
+                                <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                            </p:commandLink>
+                        </p:column>
+                        <p:column headerText="Cliente" filterBy="#{i.nome}">
+                            #{i.nome}   
+                        </p:column>
+                        <p:column headerText="Cpf/Cnpj" filterBy="#{i.cpfCnpj}">
+                            #{i.cpfCnpj}   
+                        </p:column>
+                    </p:dataTable>
+                    <p:commandLink value="NENHUM REGISTRO" style="color: white !important; float: right" actionListener="#{lancamentoController.lancamentoFinanceiro.setFornecedor(null)}" oncomplete="PF('dlgFornecedor').hide();" />
+                </p:dialog>
+
+                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                    <p:commandButton value="Excluir" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                    <p:commandButton value="Cancelar" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                </p:confirmDialog>
+            </h:form>
+        </h:body>
+    </ui:define>
+
+</ui:composition>

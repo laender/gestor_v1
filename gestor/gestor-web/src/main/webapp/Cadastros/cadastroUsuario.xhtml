@@ -1,0 +1,136 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/template.xhtml" >
+
+
+    <h:head>
+        <title>Gestor - Cadastro de Profissionais</title>
+    </h:head>
+
+
+    <ui:define name="body" >
+        <style>
+            .ui-widget {
+                font-size: 12px !important;
+            }
+        </style>
+        <script>
+            function somenteNumeros(num) {
+                var er = /[^0-9.]/;
+                er.lastIndex = 0;
+                var campo = num;
+                if (er.test(campo.value)) {
+                    campo.value = "";
+                    alert("Utilize apenas números e substitua vírgula(,) por ponto (.)");
+                }
+            }
+        </script>
+        <h:form id="form"  >
+            <h:panelGrid columns="4" cellpadding="3" cellspacing="3" style="width: 98%; background-color: lightsteelblue; box-shadow: 10px 10px">
+                <h:graphicImage url="/Images/user-group.png"  width="30px" height="30px" /> 
+                <p:outputLabel value="CADASTRO DE PROFISSIONAIS" style="font-size: large !important; color: white" />
+                <h:outputLink target="_blank" value="https://youtu.be/gYGjHtC4RpE">ASSISTA AQUI O TUTORIAL</h:outputLink>
+                <p:outputPanel>
+                    <p:commandButton  actionListener="#{cadastroUsuarioController.salvar()}" rendered="#{cadastroUsuarioController.usuario ne null}" value="SALVAR" style="color: white; background-color: green; float: right; font-weight: bold" />
+                    <p:commandButton  actionListener="#{cadastroUsuarioController.cancelar()}" rendered="#{cadastroUsuarioController.usuario ne null}" value="CANCELAR" style="color: white; background-color:grey ; float: right; border: none" />
+                    <p:commandButton  actionListener="#{cadastroUsuarioController.novo()}" rendered="#{cadastroUsuarioController.usuario eq null}" value="NOVO" style="color: white; background-color: darkturquoise; float: right; font-weight: bold" />
+                    <p:commandButton  actionListener="#{cadastroUsuarioController.fechar()}" ajax="false" rendered="#{cadastroUsuarioController.usuario eq null}"  value="FECHAR" style="color: white;  background-color: red; float: right; border: none " />
+                    <!--<h:outputLink value="https://www.youtube.com/watch?v=tIH7sFDuzcI" target="_blank" >Tutorial aqui</h:outputLink>-->
+                </p:outputPanel>
+            </h:panelGrid>
+            <p:separator  />
+            <p:outputPanel id="panelNovo" rendered="#{cadastroUsuarioController.usuario ne null}" style="height: 98% !important; background-color: whitesmoke;border-radius: 20px 20px;" >
+                <p:focus for="inputName"/>
+                <h:panelGrid columns="1" cellpadding="3" cellspacing="2"  style="margin-left: 1%" >
+                    <p:outputLabel value="Ativo"  style="font-weight: bold" />
+                    <p:selectBooleanCheckbox id="chkAtivo" value="#{cadastroUsuarioController.usuario.ativo}"  />
+                    <p:tooltip  for="chkAtivo" value="Profissionais inativos não aparecerão na seleção de profissionais no momento da venda" position="top"/>
+                    <p:outputLabel  value="Administrador" style="font-weight: bold" />
+                    <p:selectBooleanCheckbox  id="chkAdm" value="#{cadastroUsuarioController.usuario.administrador}"  />
+                    <p:tooltip  for="chkAdm" value="Quando marcado essa opção, todas as telas, inclusive gerenciais serão liberadas para o profissional, do contrário, somente as telas operacionais" position="top"/>
+                    <p:outputLabel value="Nome" style="font-weight: bold" />
+                    <p:inputText id="inputName" value="#{cadastroUsuarioController.usuario.nome}" style="width: 300px" />
+                    <p:outputLabel value="Login" style="font-weight: bold" />
+                    <p:inputText id="login" value="#{cadastroUsuarioController.usuario.login}"/>
+                    <p:tooltip  for="login" value="Deve ser informado apenas se o profissional for operar o sistema" position="top"/>
+                    <p:outputLabel value="Senha" style="font-weight: bold" />
+                    <p:password  id="senha" value="#{cadastroUsuarioController.usuario.senha}"  style="width: 200px"/>
+                    <p:tooltip  for="senha" value="Deve ser informado apenas se o profissional for operar o sistema" position="top"/>
+                    <p:outputLabel value="Email" style="font-weight: bold" />
+                    <p:inputText value="#{cadastroUsuarioController.usuario.email}" style="width: 300px" />
+                    <p:outputLabel value="Telefone" style="font-weight: bold" />
+                    <p:inputText value="#{cadastroUsuarioController.usuario.telefone}" style="width: 300px" />
+                    <p:outputLabel value="Endereço" style="font-weight: bold" />
+                    <p:inputText value="#{cadastroUsuarioController.usuario.endereco}" style="width: 400px" />
+                    <p:outputLabel value="Numero" style="font-weight: bold" />
+                    <p:inputText value="#{cadastroUsuarioController.usuario.numero}" style="width: 100px" >
+                        <f:convertNumber integerOnly="true" minIntegerDigits="1"  />
+                    </p:inputText>
+                    <p:outputPanel rendered="#{usuarioController.empresa.comissaoTotalMaoObra or usuarioController.empresa.comissaoTotalVenda}" >
+                        <p:outputLabel  value="% Comissão #{usuarioController.empresa.comissaoTotalMaoObra ? 'sobre mão de obra/serviço':'sobre total venda'}"  style="font-weight: bold" /> <br/>
+                        <p:inputText value="#{cadastroUsuarioController.usuario.percComissao}" style="width: 100px" onkeyup="somenteNumeros(this);"  >
+                        </p:inputText>
+                    </p:outputPanel>
+                </h:panelGrid>
+                <p:outputPanel autoUpdate="true">
+                    <h:panelGrid columns="2"  cellspacing="2" style="margin-left: 1%" >
+                        <p:outputLabel value="Cidade" style="font-weight: bold" />  <br/>
+                        <p:inputText disabled="true"  value="#{cadastroUsuarioController.usuario.cidade.nome}" />
+                        <p:commandLink onclick="PF('dlgCidade').show();"  >
+                            <h:graphicImage url="/Images/search.png"  width="27px" height="27px"/>
+                        </p:commandLink>
+                    </h:panelGrid>
+                </p:outputPanel>
+
+            </p:outputPanel>
+
+            <p:outputPanel  rendered="#{cadastroUsuarioController.usuario eq null}" style="height: 450px !important;width: 98%" >
+                <p:dataTable emptyMessage="Nenhuma Profissional cadastrado"  reflow="true" 
+                             scrollable="true"  scrollRows="20" scrollHeight="500"  value="#{cadastroUsuarioController.usuarios}"  var="u" >
+                    <p:column headerText="#" width="8%" >
+                        <p:commandLink actionListener="#{cadastroUsuarioController.setUsuario(u)}"  update="form"  >
+                            <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                        </p:commandLink>
+                    </p:column>
+
+                    <p:column headerText="Cod"   style="text-align: center " >
+                        <p:outputLabel value="#{u.id}" style="text-align: center" />
+                    </p:column>
+                    <p:column headerText="Nome"  style="text-align: center " >
+                        <p:outputLabel value="#{u.nome}" style="text-align: center" />
+                    </p:column>
+                    <p:column headerText="Login"  style="text-align: center " >
+                        <p:outputLabel value="#{u.login}" style="text-align: center" />
+                    </p:column>
+                    <p:column headerText="Cidade"  style="text-align: center " >
+                        <p:outputLabel value="#{u.cidade.nome}" style="text-align: center" />
+                    </p:column>
+                    <p:column headerText="ADM" style="text-align: center " >
+                        <p:outputLabel value="#{u.administrador ? 'Sim':'Não'}" style="text-align: center" />
+                    </p:column>
+                    <p:column headerText="Ativo" style="text-align: center " >
+                        <p:outputLabel value="#{u.ativo ? 'Sim':'Não'}" style="text-align: center" />
+                    </p:column>
+
+                </p:dataTable>
+
+            </p:outputPanel>
+            <p:dialog  style="background-color: lightslategray;" 
+                       widgetVar="dlgCidade" id="dlgCidade" height="600px" width="800px"  modal="true" header="Seleção de Cidade">
+                <p:dataTable    value="#{cadastroUsuarioController.listarCidades()}" var="c" >
+                    <p:column headerText="#" width="8%">
+                        <p:commandLink actionListener="#{cadastroUsuarioController.usuario.setCidade(c)}"  oncomplete="PF('dlgCidade').hide();" >
+                            <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                        </p:commandLink>
+                    </p:column>
+                    <p:column headerText="Nome" filterBy="#{c.nome}" width="90%">
+                        #{c.nome}   
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+</ui:composition>

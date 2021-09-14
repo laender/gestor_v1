@@ -1,0 +1,126 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+    <style>
+        .ui-widget {
+            font-size: 12px !important;
+        }
+    </style>
+
+    <h:head>
+        <title>Gestor - Estorno de lançamento</title>
+    </h:head>
+    <h:body style="background-color: whitesmoke ; background-size: 100%">
+        <h:form id="form" style="height: 100% !important">
+            <p:messages id="messages" showDetail="true" autoUpdate="true" closable="true" />
+            <h:panelGrid columns="3" cellpadding="3" cellspacing="3" style="width: 98%; border-radius: 15px 15px; background-color: lightsteelblue; box-shadow: 10px 10px">
+                <h:graphicImage url="/Images/estorno.png"  width="30px" height="30px" /> 
+                <p:outputLabel value="ESTORNO DE LANÇAMENTO" style="font-size: x-large; color: white" />
+                <p:outputPanel >
+                    <p:commandButton  actionListener="#{estornoLancamentoController.salvar()}" rendered="#{estornoLancamentoController.lancamentoFinanceiro ne null}" value="SALVAR" style="color: white; background-color: green; float: right; font-weight: bold" />
+                    <p:commandButton  actionListener="#{estornoLancamentoController.cancelar()}" rendered="#{estornoLancamentoController.lancamentoFinanceiro ne null}" value="CANCELAR" style="color: white; background-color:grey ; float: right; border: none" />
+                    <p:commandButton  actionListener="#{estornoLancamentoController.fechar()}" ajax="false"  rendered="#{estornoLancamentoController.lancamentoFinanceiro eq null}"  value="FECHAR" style="color: white; background-color: red; float: right; border: none" />
+                </p:outputPanel>
+            </h:panelGrid>
+            <p:separator />
+            <p:outputPanel rendered="#{estornoLancamentoController.lancamentoFinanceiro eq null}" 
+                           style="height: 90% !important; overflow: scroll !important ">
+
+                <p:dataTable emptyMessage="Nenhuma lançamento cadastrado"   
+                             scrollable="true"  scrollHeight="400"
+                             scrollRows="20"  style="height: 98%" 
+                             value="#{estornoLancamentoController.lancamentoFinanceiros}"  var="u" >
+                    <p:column headerText="#" width="5%">
+                        <p:commandLink actionListener="#{estornoLancamentoController.setLancamentoFinanceiro(u)}" disabled="#{not empty u.lancamentoFinanceiroReferencia or u.estornado}"  ajax="false"  immediate="true" >
+                            <h:graphicImage url="/Images/select-icon.png"  width="20px" height="20px" />
+                        </p:commandLink>
+                    </p:column>
+                    <p:column   width="14%" headerText="Código" filterBy="#{u.id}" style="text-align: left">
+                        <p:outputLabel value="#{u.id}" style="text-align: center" /> 
+                    </p:column>
+                    <p:column   width="25%" headerText="Cliente" filterBy="#{u.cliente.nome}" style="text-align: left">
+                        <p:outputLabel value="#{not empty u.cliente ? u.cliente.nome : null}" style="text-align: center" /> 
+                    </p:column>
+                    <p:column   width="15%" headerText="Vendedor" filterBy="#{u.cliente.nome}" style="text-align: left">
+                        <p:outputLabel value="#{not empty u.usuario ? u.usuario.nome : null}" style="text-align: center" /> 
+                    </p:column>
+                    <p:column   width="20%" headerText="Fornecedor" filterBy="#{u.cliente.nome}" style="text-align: left">
+                        <p:outputLabel value="#{not empty u.fornecedor ? u.fornecedor.nome : null}" style="text-align: center" /> 
+                    </p:column>
+                    <p:column   width="15%" headerText="Venda" filterBy="#{u.cliente.nome}" style="text-align: left">
+                        <p:outputLabel value="#{not empty u.orcamento ? u.orcamento.id : null}" style="text-align: center" /> 
+                    </p:column>
+                    <p:column   width="15%" headerText="Data" filterBy="#{u.dataLancamento}" style="text-align: left">
+                        <p:outputLabel value="#{u.dataLancamento}">
+                            <f:convertDateTime pattern="dd/MM/yyyy" />
+                        </p:outputLabel>
+                    </p:column>
+                    <p:column   width="15%" headerText="Valor " filterBy="#{u.valor}"  style="text-align: left">
+                        <p:outputLabel value="#{u.valor }" style="text-align: right" >
+                            <f:convertNumber currencySymbol="R$" type="currency"/>
+                        </p:outputLabel> 
+                    </p:column>
+                    <p:column   width="15%" headerText="Tipo " filterBy="#{u.tipoLancamento.value}"  style="text-align: left">
+                        <p:outputLabel value="#{u.tipoLancamento.value }" style="text-align: right" /> 
+                    </p:column>
+                    <p:column   width="15%" headerText="Observação " filterBy="#{u.observacao}"  style="text-align: left">
+                        <p:outputLabel value="#{u.observacao }" style="text-align: right" /> 
+                    </p:column>
+                </p:dataTable>
+            </p:outputPanel>
+
+            <p:outputPanel id="panelDados" autoUpdate="true" rendered="#{not empty estornoLancamentoController.lancamentoFinanceiro}" style="width: 70%">
+                <p:outputLabel value="Data:" />
+                <h:outputText value="#{estornoLancamentoController.lancamentoFinanceiro.dataLancamento}" >
+                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                </h:outputText><br/><br/>
+                <h:panelGrid columns="3" cellpadding="2" cellspacing="2" >
+                    <p:outputLabel value="Tipo de Pagamento:" />
+                    <p:inputText disabled="true" style="width: 85%"  value="#{estornoLancamentoController.lancamentoFinanceiro.tipoPagamento.descricao}" /> 							
+                </h:panelGrid>
+
+                <h:panelGrid columns="4" cellpadding="3" cellspacing="3">
+                    <p:outputLabel value="Número de controle:" />
+                    <p:inputText disabled="true" value="#{estornoLancamentoController.lancamentoFinanceiro.numeroControle}" style="width: 50%" />
+                    <p:outputLabel value="Valor:" />
+                    <p:inputText disabled="true" value="#{estornoLancamentoController.lancamentoFinanceiro.valor}" style="width: 50%" >
+                        <f:convertNumber currencySymbol="R$" type="currency"/>
+                    </p:inputText> 
+                </h:panelGrid>
+
+                <h:panelGrid columns="2" cellpadding="2" cellspacing="2" style="width: 55%" >
+                    <p:outputLabel value="Colaborador:" />
+                    <p:inputText disabled="true" style="width: 85%"  value="#{estornoLancamentoController.lancamentoFinanceiro.usuarioFornecedor.nome}" /> 							
+
+                    <p:outputLabel value="Cliente:" />
+                    <p:inputText disabled="true" style="width: 85%"  value="#{estornoLancamentoController.lancamentoFinanceiro.cliente.nome}" /> 
+
+                    <p:outputLabel value="Fornecedor:" />
+                    <p:inputText  style="width: 85%" disabled="true" value="#{estornoLancamentoController.lancamentoFinanceiro.fornecedor.nome}" /> 
+
+                    <p:outputLabel value="Venda" />
+                    <p:inputText  style="width: 85%" disabled="true" value="#{not empty estornoLancamentoController.lancamentoFinanceiro.parcelas ? estornoLancamentoController.lancamentoFinanceiro.parcelas.get(0).parcela.titulo.orcamento.id : null}" /> 
+                    <p:outputLabel value="Sacado/cedente" />
+                    <p:inputText style="width: 85%" value="#{not empty estornoLancamentoController.lancamentoFinanceiro.parcelas ? estornoLancamentoController.lancamentoFinanceiro.parcelas.get(0).parcela.titulo.sacadoCedente: null}" disabled="true" />
+                    <p:column></p:column>
+                </h:panelGrid>
+                <br/><br/>
+                <p:outputLabel value="Observação:" /> <br/>
+                <p:inputTextarea value="#{estornoLancamentoController.lancamentoFinanceiro.observacao}"  style="width: 70%" />
+
+            </p:outputPanel>
+            <br/>
+
+
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                <p:commandButton value="Cancelar" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+            </p:confirmDialog>
+        </h:form>
+    </h:body>
+</html>
+
+
